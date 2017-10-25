@@ -2,14 +2,8 @@
 
 Usage: python release.py <component_name>-<expected version>
 
-Component name should be one of:
-    iotilecore
-    iotilebuild
-    iotilegateway
-    iotile_transport_bled112
-
-The version must match the version encoded in version.py in the respective
-subdirectory for the component for the release to proceed.
+If there is only one component defined, you can instead pass a version as vX.Y.Z
+where X.Y.Z is the version
 """
 
 import sys
@@ -43,8 +37,14 @@ def get_release_component():
     if len(sys.argv) < 2:
         raise EnvironmentError("Usage: python release.py <component_name>-<version>")
 
+
     comp = sys.argv[-1]
-    name, vers = comp.split("-")
+
+    if len(comp_names) == 1 and len(comp) > 0 and comp[0] == 'v':
+        name = comp_names.keys()[0]
+        vers = comp[1:]
+    else:
+        name, vers = comp.split("-")
 
     if name not in comp_names:
         raise EnvironmentError("Invalid unknown release component name", name=name, known_names=comp_names.keys())

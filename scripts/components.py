@@ -1,3 +1,3 @@
 comp_names = {
-    'typedargs': ['typedargs', '.']
+    'iotile_analytics': ['iotile_analytics', '.']
 }
