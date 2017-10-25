@@ -1,0 +1,22 @@
+language: python
+sudo: false
+python:
+- '2.7'
+- '3.6'
+- '3.5'
+install:
+- pip install --upgrade tox-travis -r requirements_build.txt
+script:
+- tox
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: python scripts/release.py $TRAVIS_TAG
+  on:
+    branch: master
+    tags: true
+    condition: $TRAVIS_PYTHON_VERSION = "2.7"
+notifications:
+  on_success: always
+  on_failure: always
+  email: false
