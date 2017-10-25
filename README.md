@@ -12,6 +12,7 @@ iotile.cloud.
 - [Requirements](#requirements)
 - [Installation](#installation)
     - [\(optional\) Jupyter Setup](#optional-jupyter-setup)
+    - [\(optional\) Interactive Widgets](#optional-interactive-widgets)
     - [\(optional\) Windows Python Installation](#optional-windows-python-installation)
 - [Basic Usage](#basic-usage)
 - [Documentation](#documentation)
@@ -59,6 +60,17 @@ jupyter notebook
 ```
 
 There is also [Quickstart Guide](https://jupyter.readthedocs.io/en/latest/content-quickstart.html)
+
+### (optional) Interactive Widgets
+
+Some operations can take awhile to complete depending on how much data you have
+to fetch from iotile.cloud.  To support showing progress bars in Jupyter
+Notebook you need to install [IPyWidgets](https://ipywidgets.readthedocs.io/en/latest/):
+
+```shell
+pip install ipywidgets
+jupyter nbextension enable --py --sys-prefix widgetsnbextension
+``` 
 
 ### (optional) Windows Python Installation
 
