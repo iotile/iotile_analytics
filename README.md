@@ -70,7 +70,7 @@ Notebook you need to install [IPyWidgets](https://ipywidgets.readthedocs.io/en/l
 ```shell
 pip install ipywidgets
 jupyter nbextension enable --py --sys-prefix widgetsnbextension
-``` 
+```
 
 ### (optional) Windows Python Installation
 
