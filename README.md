@@ -7,21 +7,52 @@
 An open-source data science package for interacting with data stored on
 iotile.cloud.  
 
-## Dependencies
+## Requirements
 
-This package requires the following standard python data analysis packages
+- Python 2.7+ or Python 3.5+
+- Any platform supported by python with all of the required dependencies
+- Ideally a working Jupyter installation for analysis though that is not
+  required.
+
+This package requires the following standard python data analysis packages:
 
 - numpy
 - pandas
 - matplotlib
 
-They are installed automatically when you install `iotile_anlytics`.
+They are installed automatically when you install `iotile_anlytics` but if you
+are running on Windows, you may want to download a prebuilt python distribution
+since that's easier to install than trying to compile everything.
 
 ## Installation
 
 ```shell
 pip install iotile_analytics
 ```
+
+### (optional) Jupyter Setup
+
+If you're not familiar with the Jupyter Interactive Computing program, you can
+read more about it at [https://jupyter.org](https://jupyter.org/) or you can
+install it quickly using:
+
+```
+pip install jupyter
+```
+
+Running is as simple as:
+
+```
+jupyter notebook
+```
+
+There is also [Quickstart Guide](https://jupyter.readthedocs.io/en/latest/content-quickstart.html)
+
+### (optional) Windows Python Installation
+
+If you are on Windows and don't have a good python interpreter, one potentially
+good option would be [Anaconda](https://www.anaconda.com/download/).  It has
+prebuilt versions of all of the standard packages.  
 
 ## Basic Usage
 
