@@ -7,6 +7,18 @@
 An open-source data science package for interacting with data stored on
 iotile.cloud.  
 
+<!-- MarkdownTOC autolink="true" bracket="round"-->
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+    - [\(optional\) Jupyter Setup](#optional-jupyter-setup)
+    - [\(optional\) Windows Python Installation](#optional-windows-python-installation)
+- [Basic Usage](#basic-usage)
+- [Documentation](#documentation)
+
+<!-- /MarkdownTOC -->
+
+
 ## Requirements
 
 - Python 2.7+ or Python 3.5+
