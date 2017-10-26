@@ -11,7 +11,13 @@ setup(
     version=version,
     license="LGPLv3",
     install_requires=[
-        "future>=0.16.0"
+        "future>=0.16.0",
+        "numpy>=1.13.1",
+        "pandas>=0.20.3",
+        "matplotlib>=2.0.2",
+        "typedargs>=0.10.0",
+        "iotile_cloud>=0.7.0",
+        "tqdm>=4.19.4"
     ],
     description="A data science bridge for iotile.cloud",
     author="Arch",
