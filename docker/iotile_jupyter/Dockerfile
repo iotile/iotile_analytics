@@ -1,5 +1,5 @@
-# Copyright (c) Jupyter Development Team.
-# Distributed under the terms of the Modified BSD License.
+# Copyright (c) Arch Systems Inc
+# Distributed under the terms of the iotile_analytics license
 
 # Pick your favorite docker-stacks image
 FROM jupyter/datascience-notebook
