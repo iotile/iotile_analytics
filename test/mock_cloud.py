@@ -1,6 +1,7 @@
 """A simple mock iotile.cloud server for testing cloud interactions."""
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
+from builtins import *
 
 import pytest
 import re
@@ -11,58 +12,11 @@ import logging
 from pytest_localserver.http import WSGIServer
 from werkzeug.wrappers import Request, Response
 
-ERROR_CODE_MAP = {
-    100: b"Continue",
-    101: b"Switching Protocols",
-    200: b"OK",
-    201: b"Created",
-    202: b"Accepted",
-    203: b"Non-Authoritative Information",
-    204: b"No Content",
-    205: b"Reset Content",
-    206: b"Partial Content",
-    300: b"Multiple Choices",
-    301: b"Moved Permanently",
-    302: b"Found",
-    303: b"See Other",
-    304: b"Not Modified",
-    305: b"Use Proxy",
-    307: b"Temporary Redirect",
-    400: b"Bad Request",
-    401: b"Unauthorized",
-    402: b"Payment Required",
-    403: b"Forbidden",
-    404: b"Not Found",
-    405: b"Method Not Allowed",
-    406: b"Not Acceptable",
-    407: b"Proxy Authentication Required",
-    408: b"Request Time-out",
-    409: b"Conflict",
-    410: b"Gone",
-    411: b"Length Required",
-    412: b"Precondition Failed",
-    413: b"Request Entity Too Large",
-    414: b"Request-URI Too Large",
-    415: b"Unsupported Media Type",
-    416: b"Requested range not satisfiable",
-    417: b"Expectation Failed",
-    500: b"Internal Server Error",
-    501: b"Not Implemented",
-    502: b"Bad Gateway",
-    503: b"Service Unavailable",
-    504: b"Gateway Time-out",
-    505: b"HTTP Version not supported"
-}
 
 class ErrorCode(Exception):
     def __init__(self, code):
         super(ErrorCode, self).__init__()
         self.status = code
-
-    @property
-    def status_string(self):
-        message = ERROR_CODE_MAP[self.status]
-        return ("%d %s" % (self.status, message)).encode('utf-8')
 
 
 class MockIOTileCloud(object):
@@ -110,9 +64,10 @@ class MockIOTileCloud(object):
     @classmethod
     def _parse_json(cls, request, *keys):
         data = request.get_data()
+        string_data = data.decode('utf-8')
 
         try:
-            injson = json.loads(data)
+            injson = json.loads(string_data)
 
             if len(keys) == 0:
                 return injson
@@ -180,7 +135,7 @@ class MockIOTileCloud(object):
             csv_stream_path = os.path.join(self.stream_folder, stream + '.csv')
 
             if os.path.isfile(json_stream_path):
-                with open(json_stream_path, "rb") as infile:
+                with open(json_stream_path, "r") as infile:
                     results = json.load(infile)
             elif os.path.isfile(csv_stream_path):
                 results = self._format_stream_data(self.streams[stream], csv_stream_path)
@@ -297,7 +252,7 @@ class MockIOTileCloud(object):
     def add_data(self, path):
         """Add data to our mock cloud from a json file."""
 
-        with open(path, "rb") as infile:
+        with open(path, "r") as infile:
             data = json.load(infile)
 
         self.users.update(data.get('users', {}))
