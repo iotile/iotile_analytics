@@ -11,6 +11,7 @@ from builtins import *
 from future.utils import viewitems
 
 import pandas as pd
+from iotile_cloud.api.connection import DOMAIN_NAME
 from iotile_cloud.api.exceptions import RestHttpBaseException
 from iotile_cloud.stream.data import StreamData
 from typedargs.exceptions import ArgumentError
@@ -43,9 +44,11 @@ class AnalysisGroup(object):
             an iotile.cloud project, but finding only streams from a
             single device is also supported.  You can currently
             specify 'project' ,'device' or 'archive'.
+        domain (str): Optional iotile.cloud domain to connect to (defaults to
+            https://iotile.cloud).
     """
 
-    def __init__(self, cloud_id, source_type='project'):
+    def __init__(self, cloud_id, source_type='project', domain=DOMAIN_NAME):
         stream_finders = {
             'project': self._find_project_streams,
             'device': self._find_device_streams,
@@ -56,7 +59,7 @@ class AnalysisGroup(object):
         if stream_finder is None:
             raise ArgumentError("Invalid source type", source_type=source_type, supported_sources=stream_finders.keys(), suggestion="Try using one of the convenience functions for creating an AnalysisGroup like FromDevice or FromProject")
 
-        session = CloudSession()
+        session = CloudSession(domain=domain)
         self._session = session
         self._api = session.get_api()
 
@@ -302,7 +305,7 @@ class AnalysisGroup(object):
         return self._session.fetch_all(resource, page_size=1000, filter=slug)
 
     @classmethod
-    def FromDevice(cls, slug=None, external_id=None):
+    def FromDevice(cls, slug=None, external_id=None, domain=DOMAIN_NAME):
         """Create a new AnalysisGroup from a single device.
 
         The device can be found either by passing its slug or numeric
@@ -321,15 +324,17 @@ class AnalysisGroup(object):
             external_id (str): The external id of the device that we want to
                 search for. This external_id must be unique among all devices
                 so that it matches a single device.
+            domain (str): Optional iotile.cloud domain to connect to (defaults to
+                https://iotile.cloud).
         """
 
-        session = CloudSession()
+        session = CloudSession(domain=domain)
         device = session.find_device(slug=slug, external_id=external_id)
 
-        return AnalysisGroup(device['slug'], source_type="device")
+        return AnalysisGroup(device['slug'], source_type="device", domain=domain)
 
     @classmethod
-    def FromArchive(cls, slug=None):
+    def FromArchive(cls, slug=None, domain=DOMAIN_NAME):
         """Create a new AnalysisGroup from a single archive.
 
         The archive is found by passing its archive slug:
@@ -339,6 +344,8 @@ class AnalysisGroup(object):
             slug (str): the slug of the archive that we want.  This can either
                  be a short slug with leading zeros omitted or long slug. It
                  should start with 'b--' since it is an archive slug.
+            domain (str): Optional iotile.cloud domain to connect to (defaults to
+                https://iotile.cloud).
         """
 
         return AnalysisGroup(slug, source_type="archive")

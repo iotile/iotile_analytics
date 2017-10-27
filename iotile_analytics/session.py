@@ -18,27 +18,44 @@ from threading import Lock
 from multiprocessing.pool import ThreadPool
 from tqdm import tqdm
 from typedargs.exceptions import ArgumentError
-from iotile_cloud.api.connection import Api
+from iotile_cloud.api.connection import Api, DOMAIN_NAME
 from iotile_cloud.api.exceptions import HttpNotFoundError, HttpClientError, RestHttpBaseException
-from .exceptions import CloudError
+from .exceptions import CloudError, AuthenticationError
+
+
+logger = logging.getLogger(__name__)
 
 
 class CloudSession(object):
-    token_type = None
-    token = None
-    logger = logging.getLogger(__name__)
+    """A persistent session to IOTile.cloud.
+
+    CloudSession internally caches results and information from iotile.cloud
+    so that you don't have to login multiple times per script invocation.
+
+    All caching is performed on a per domain basis so you can have multiple sessions
+    going to different IOTile.cloud instances if needed.
+    """
 
     MAX_CONCURRENCY = 10
+    _login_cache = {}
 
-    _cache = {}
-    _cache_lock = Lock()
-
-    def __init__(self, user=None, password=None):
+    def __init__(self, user=None, password=None, domain=DOMAIN_NAME):
         self.pool = ThreadPool(CloudSession.MAX_CONCURRENCY)
 
-        # Explictly log in if we're passed all of the right information
+        if domain not in CloudSession._login_cache:
+            CloudSession._login_cache[domain] = {'requests': {}, 'request_lock': Lock()}
 
-        if CloudSession.token is not None and CloudSession.token_type is not None and user is None and password is None:
+        cache = CloudSession._login_cache[domain]
+        self.token = cache.get('token', None)
+        self.token_type = cache.get('token_type', None)
+        self.domain = domain
+
+        self._api = Api(domain=domain)
+        self._api.set_token(self.token, self.token_type)
+
+        # Explictly log in if we're passed all of the right information
+        # or our current token is invalid
+        if self.token is not None and self.token_type is not None and user is None and password is None:
             return
 
         if password is None and self._check_token():
@@ -50,11 +67,15 @@ class CloudSession(object):
         if password is None:
             password = getpass.getpass("Please enter your IOTile.cloud password:")
 
-        api = Api()
-        api.login(email=user, password=password)
+        res = self._api.login(email=user, password=password)
+        if not res:
+            raise AuthenticationError("Could not login to IOTile.cloud", user=user, domain=domain)
 
-        CloudSession.token = api.token
-        CloudSession.token_type = api.token_type
+        self.token = self._api.token
+        self.token_type = self._api.token_type
+
+        cache['token'] = self.token
+        cache['token_type'] = self.token_type
 
     def _check_token(self):
         """Verify that we're able to log in to IOTile.cloud with our token."""
@@ -63,9 +84,7 @@ class CloudSession(object):
             return False
 
         try:
-            api = Api()
-            api.set_token(self.token, self.token_type)
-            _info = api.account.get()
+            _info = self._api.account.get()
 
             return True
         except HttpClientError:
@@ -137,7 +156,7 @@ class CloudSession(object):
         """
 
         try:
-            with tqdm(total=9e9) as progbar:
+            with tqdm(total=100) as progbar:
                 results = resource.get(page_size=page_size, **kwargs)
                 total_count = results['count']
                 results = results.get('results', [])
@@ -164,8 +183,7 @@ class CloudSession(object):
         except RestHttpBaseException as err:
             raise self._translate_error(err, msg="Error fetching resource from IOTile.cloud", url=resource.url())
 
-    @classmethod
-    def _resource_fetcher(cls, args):
+    def _resource_fetcher(self, args):
         resource, kwargs, progress = args
 
         try:
@@ -173,19 +191,18 @@ class CloudSession(object):
             query_string = urlencode(kwargs)
 
             cache_key = "%s?%s" % (url, query_string)
-            result = cls._check_cache(cache_key)
+            result = self._check_cache(cache_key)
 
             if result is None:
                 result = resource.get(**kwargs)
-                cls._cache_result(cache_key, result)
+                self._cache_result(cache_key, result)
 
             progress.update(1)
             return result, None
         except Exception as err:  # pylint:disable=W0703; we do the exception processing in the calling function
             return None, err
 
-    @classmethod
-    def _url_fetcher(cls, args):
+    def _url_fetcher(self, args):
         """Method for fetching a url page in a worker thread."""
 
         resource, page, page_size, kwargs, progress = args
@@ -198,26 +215,28 @@ class CloudSession(object):
             query_string = urlencode(query)
 
             cache_key = "%s?%s" % (url, query_string)
-            result = cls._check_cache(cache_key)
+            result = self._check_cache(cache_key)
 
             if result is None:
                 result = resource.get(**query)
-                cls._cache_result(cache_key, result)
+                self._cache_result(cache_key, result)
 
             progress.update(1)
             return result, None
         except Exception as err:  # pylint:disable=W0703; we do the exception processing in the calling function
             return None, err
 
-    @classmethod
-    def _cache_result(cls, query, response):
-        with cls._cache_lock:
-            cls._cache[query] = response
+    def _cache_result(self, query, response):
+        cache = self._login_cache[self.domain]
 
-    @classmethod
-    def _check_cache(cls, key):
-        with cls._cache_lock:
-            return cls._cache.get(key, None)
+        with cache['request_lock']:
+            cache['requests'][query] = response
+
+    def _check_cache(self, key):
+        cache = self._login_cache[self.domain]
+
+        with cache['request_lock']:
+            return cache['requests'].get(key, None)
 
     def get_api(self):
         """Return a logged in API object to IOTile.cloud.
@@ -226,10 +245,7 @@ class CloudSession(object):
             Api
         """
 
-        api = Api()
-        api.set_token(self.token, self.token_type)
-
-        return api
+        return self._api
 
     @classmethod
     def _translate_error(cls, error, msg="Error interacting with iotile.cloud", **kwargs):
