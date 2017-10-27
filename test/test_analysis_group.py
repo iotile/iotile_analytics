@@ -36,3 +36,9 @@ def test_device_analysis(water_meter):
 
     assert group.stream_counts['s--0000-0077--0000-0000-0000-00d2--5001']['points'] == 11
     assert group.stream_counts['s--0000-0077--0000-0000-0000-00d2--5002']['points'] == 3
+
+def test_stream_download(filter_group):
+    """Make sure we can download streams from an analysis group."""
+
+    data = filter_group.fetch_stream('5001')
+    assert len(data) == 11
