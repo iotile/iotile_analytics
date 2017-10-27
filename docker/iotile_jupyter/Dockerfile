@@ -10,8 +10,7 @@ USER jovyan
 # e.g., RUN pip install jupyter_dashboards
 
 RUN pip install -U pip
-RUN pip install iotile_cloud
-# TODO: Add pip install for iotile_analytics when released to pypi
+RUN pip install iotile_analytics
 
 USER root
 
