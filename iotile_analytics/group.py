@@ -242,7 +242,40 @@ class AnalysisGroup(object):
         except RestHttpBaseException as exc:
             raise CloudError("Error fetching events from stream", exception=exc, response=exc.response.status_code)
 
-    def fetch_event(self, event_or_id, subkey=None):
+    def fetch_raw_events(self, slug_or_name, subkey=None, postprocess=None):
+        """Fetch multiple raw events by numeric id.
+
+        Args:
+            slug_or_name (str): The stream that we want to fetch.  This
+                can be a partial match to a full stream slug or name so long
+                as it uniquely matches.  This is passed to find_stream so anything
+                that find_stream accepts will be accepted here.
+            subkey (str): Only include a single key of the event.  This is usefuly for complex
+                events where you want to just focus on a portion of them.
+            postprocess (callable): (Optional) function to call on each raw event before
+                adding it to the dataframe.
+
+        Returns:
+            pd.DataFrame: The raw event object data fetched from iotile.cloud.
+        """
+
+        events = self.fetch_events(slug_or_name)
+        event_ids = events['event_id'].values
+
+        resources = [self._api.event(x).data for x in event_ids]
+        data = self._session.fetch_multiple(resources)
+
+        if postprocess is None:
+            postprocess = lambda x: x
+
+        if subkey is not None:
+            data = [postprocess(x[subkey]) for x in data]
+        else:
+            data = [postprocess(x) for x in data]
+
+        return pd.DataFrame(data, index=events.index)
+
+    def fetch_raw_event(self, event_or_id, subkey=None):
         """Fetch associated raw data for an event.
 
         Args:
