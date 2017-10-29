@@ -71,12 +71,12 @@ class AnalysisGroup(object):
 
     def _count_streams(self, slugs):
         resources = [self._api.stream(x).data for x in slugs]
-        ts_results = self._session.fetch_multiple(resources, page_size=1)
+        ts_results = self._session.fetch_multiple(resources, message='Counting Events in Streams', page_size=1)
 
         event_resources = [self._api.event for x in slugs]
         event_args = [{"filter": x} for x in slugs]
 
-        event_results = self._session.fetch_multiple(event_resources, event_args, page_size=1)
+        event_results = self._session.fetch_multiple(event_resources, event_args, message='Counting Data in Streams', page_size=1)
 
         return {slug: {'points': ts['count'], 'events': event['count']} for slug, ts, event in zip(slugs, ts_results, event_results)}
 
@@ -331,11 +331,11 @@ class AnalysisGroup(object):
 
     def _get_stream_data(self, slug, start=None, end=None):
         resource = self._api.stream(slug).data
-        return self._session.fetch_all(resource, page_size=1000)
+        return self._session.fetch_all(resource, page_size=1000, message="Downloading Stream Data")
 
     def _get_event_data(self, slug):
         resource = self._api.event
-        return self._session.fetch_all(resource, page_size=1000, filter=slug)
+        return self._session.fetch_all(resource, page_size=1000, message="Downloading Events", filter=slug)
 
     @classmethod
     def FromDevice(cls, slug=None, external_id=None, domain=DOMAIN_NAME):

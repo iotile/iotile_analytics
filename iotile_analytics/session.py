@@ -93,7 +93,7 @@ class CloudSession(object):
         except HttpClientError:
             return False
 
-    def fetch_multiple(self, resources, per_call_kw=None, concurrency=MAX_CONCURRENCY, **kwargs):
+    def fetch_multiple(self, resources, per_call_kw=None, concurrency=MAX_CONCURRENCY, message=None, **kwargs):
         """Fetch multiple resources in parallel.
 
         Up to concurrency max calls are in flight at a given time.  The results
@@ -105,6 +105,7 @@ class CloudSession(object):
                 for each fetch call.  For example, you could pass a custom filter argument for
                 each call.
             concurrency (int): The maximum number of parallel requests to send.
+            message (str): Optional descriptive message that is printed with the progress bar
             **kwargs (str): Additional keyword arguments that are passed as part of
                 the query string in the get request.
 
@@ -119,7 +120,7 @@ class CloudSession(object):
             raise ArgumentError("You must pass the same number of per_call keyword arguments as resources (or none at all)", fetch_length=len(resources), kw_length=len(per_call_kw))
 
         try:
-            with ProgressBar(total=len(resources), leave=False) as progbar:
+            with ProgressBar(total=len(resources), message=message, leave=False) as progbar:
                 args = [(x, _merge_dicts(per_call_kw[i], kwargs), progbar) for i, x in enumerate(resources)]
                 wrapped_results = self.pool.map(self._resource_fetcher, args)
 
@@ -131,7 +132,7 @@ class CloudSession(object):
         except RestHttpBaseException as err:
             raise self._translate_error(err, msg="Error fetching resources in parallel from IOTile.cloud")
 
-    def fetch_all(self, resource, page_size=100, concurrency=MAX_CONCURRENCY, **kwargs):
+    def fetch_all(self, resource, page_size=100, concurrency=MAX_CONCURRENCY, message=None, **kwargs):
         """Fetch and concatenate all pages of a given resource.
 
         The pages are fetched in parallel using up to concurrency requests
@@ -151,6 +152,7 @@ class CloudSession(object):
             resource (RestResource): Should be created from an Api object.
             page_size (int): The desired page size to use for fetches.
             concurrency (int): The maximum number of parallel requests to send.
+            message (str): Optional descriptive message that is printed with the progress bar
             **kwargs (str): Additional keyword arguments that are passed as part of
                 the query string in the get request.
 
@@ -159,7 +161,7 @@ class CloudSession(object):
         """
 
         try:
-            with ProgressBar(total=100, leave=False) as progbar:
+            with ProgressBar(total=100, leave=False, message=message) as progbar:
                 results = resource.get(page_size=page_size, **kwargs)
                 total_count = results['count']
                 results = results.get('results', [])

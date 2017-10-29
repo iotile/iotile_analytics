@@ -9,19 +9,21 @@ class ProgressBar(object):
         env = Environment()
         if env.interactivity == Environment.Notebook:
             from tqdm import tqdm_notebook
-            self._bar = tqdm_notebook(total, leave=leave)
+            self._bar = tqdm_notebook(total=total, leave=leave)
 
             if message is not None:
                 self._bar.set_description(message)
 
         #FIXME: Handle other display environments
 
+        self.total = total
+
     @property
     def total(self):
         return self._bar.total
 
     @total.setter
-    def set_total(self, total):
+    def total(self, total):
         self._bar.total = total
 
     def update(self, delta):
@@ -29,6 +31,8 @@ class ProgressBar(object):
 
     def __enter__(self):
         self._bar.__enter__()
+
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self._bar.__exit__(exc_type, exc_value, traceback)
