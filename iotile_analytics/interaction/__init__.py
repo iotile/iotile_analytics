@@ -8,5 +8,7 @@ an unattended background worker.
 """
 
 from .progress import ProgressBar
+from .viewer_timeseries import TimeseriesViewer
+from .viewer_loglog import LogLogViewer
 
-__all__ = ['ProgressBar']
+__all__ = ['ProgressBar', 'TimeseriesViewer', 'LogLogViewer']

@@ -17,7 +17,8 @@ setup(
         "matplotlib>=2.0.2",
         "typedargs>=0.10.0",
         "iotile_cloud>=0.7.0",
-        "tqdm>=4.19.4"
+        "tqdm>=4.19.4",
+        "bqplot >= 0.10.0"
     ],
     description="A data science bridge for iotile.cloud",
     author="Arch",

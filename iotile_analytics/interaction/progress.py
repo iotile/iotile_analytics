@@ -13,8 +13,12 @@ class ProgressBar(object):
 
             if message is not None:
                 self._bar.set_description(message)
+        else:
+            from tqdm import tqdm
+            self._bar = tqdm(total=total, leave=leave)
 
-        #FIXME: Handle other display environments
+            if message is not None:
+                self._bar.set_description(message)
 
         self.total = total
 
