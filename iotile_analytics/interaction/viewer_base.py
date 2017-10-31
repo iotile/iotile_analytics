@@ -4,6 +4,7 @@ import bqplot
 from IPython.display import display
 import pandas as pd
 import numpy as np
+from typedargs.exceptions import ArgumentError
 
 
 class BaseViewer(object):
@@ -98,3 +99,41 @@ class BaseViewer(object):
             return input_data[:, 0], input_data[:, 1]
 
         return np.linspace(0, len(input_data) - 1, len(input_data)), np.array(input_data)
+
+    def set_data(self, x_data, *y_data, mark_type='lines', names=None):
+        """Add one or more lines to the plot based on the number of columns of data.
+
+        This function clears any lines that were previously set on the plot.
+
+        Args:
+            data (ndarray): A 2 dimensional array with the first column as the x value and
+                each additional column as the y values.
+            names (list): Optional list of string names for each of the lines in data that
+                will be shown in the chart legend.  This must be passed as a keyword arguments
+            mark_type (str): The type of mark to add.  Valid types strings are:
+                lines, scatter which translate to bqplot.Lines, bqplot.Scatter.  This must
+                be passed as a keyword argument.
+        """
+
+        mark_types = {
+            'lines': bqplot.Lines,
+            'scatter': bqplot.Scatter
+        }
+
+        mark = mark_types.get(mark_type, None)
+        if mark is None:
+            raise ArgumentError("Unkown type of mark specified in mark_type", mark_type=mark_type, known_types=mark_types.keys())
+
+        display_legend = names is not None
+
+        if names is not None and len(names) != len(y_data):
+            raise ArgumentError("You must pass the same number of names as line", num_lines=len(y_data), num_names=len(names), names=names)
+
+        if names is None:
+            names = []
+
+        if len(y_data) == 1:
+            y_data = y_data[0]
+
+        line = mark(x=x_data, y=y_data, labels=names, display_legend=display_legend, scales={'x': self.x_scale, 'y': self.y_scale})
+        self.figure.marks = [line]

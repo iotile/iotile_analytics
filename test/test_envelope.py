@@ -20,7 +20,7 @@ def test_basic_envelope():
     in2[:5, 1] = -1.0
     in2[5:, 1] = 1.0
 
-    out = envelope(in1, in2, num_bins=10)
+    out = envelope(in1, in2, bin_count=10)
     assert out.shape[0] == 10
     assert out.shape[1] == 3
 
@@ -43,7 +43,7 @@ def test_envelope_interpolation():
     in2[:5, 1] = -1.0
     in2[5:, 1] = 1.0
 
-    out = envelope(in1, in2, num_bins=100)
+    out = envelope(in1, in2, bin_count=100)
     assert out.shape[0] == 100
     assert out.shape[1] == 3
 
@@ -66,9 +66,9 @@ def test_bin_edges():
     in2[:5, 1] = -1.0
     in2[5:, 1] = 1.0
 
-    out_left = envelope(in1, in2, num_bins=10, bin_mark="left")
-    out_right = envelope(in1, in2, num_bins=10, bin_mark="right")
-    out_center = envelope(in1, in2, num_bins=10, bin_mark="center")
+    out_left = envelope(in1, in2, bin_count=10, bin_mark="left")
+    out_right = envelope(in1, in2, bin_count=10, bin_mark="right")
+    out_center = envelope(in1, in2, bin_count=10, bin_mark="center")
 
     bins = bins = np.linspace(0, 10, 11)
 

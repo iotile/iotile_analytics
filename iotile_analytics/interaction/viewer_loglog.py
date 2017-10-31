@@ -17,17 +17,8 @@ class LogLogViewer(BaseViewer):
         fixed_y (tuple): Either None for a dynamically scaling y-axis
             or a tuple with (min, max) that contains the fixed min and
             max values for the axis.
-        xticks (bool): Whether to show the x axis tick values, ticks
-            are usually shown when there is a single plot but hidden
-            when there are multiple plots stacked on top of each other
-            with a common x axis since you want the bottom plot to show
-            the ticks for all of the others.
-        xlabel (str): Optional label to display on the x axis
-        ylabel (str): Optional label to display on the y axis
-        size (tuple): Optional tuple of (width, height) as strings in either
-            % or pixels that are passed to Figure.layout to set its width and
-            height.
-        margic (dict): Optional dict of margin values
+        **kwargs: Any arguments accepted by BaseViewer may be passed to LinearViewer
+            and will have the same effect
     """
 
     def __init__(self, data=None, fixed_y=None, **kwargs):

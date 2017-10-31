@@ -14,12 +14,12 @@ def envelope(*arrays, **kwargs):
 
     All passed in arguments should be 2D arrays.  The domain of all of the
     functions is found using combine_domains() and this is then divided into
-    a fixed number of buckets using the num_bins keyword parameter (that
+    a fixed number of buckets using the bin_count keyword parameter (that
     must be passed as a keyword).
 
     For each bin in the combined domain, the minimum and maximum values in
     all of the passed arrays is then found and the resulting min/max envelopes
-    are returned as a (num_bins, 3) array.  The first column is the bins that
+    are returned as a (bin_count, 3) array.  The first column is the bins that
     were used.  You can either return the left side, center or right side of
     the bins using the keyword bin_mark = "left" | "right" | "center".
 
@@ -28,7 +28,7 @@ def envelope(*arrays, **kwargs):
     Args:
         *arrays (ndarray): A list of numpy arrays that must be 2D and are used
              to compute a min/max envelope.
-        num_bins (int): An optional keyword argument that indicates the number of
+        bin_count (int): An optional keyword argument that indicates the number of
             bins to divde the domain into for envelope calculation.  Default: 100
         bin_spacing (str): An optional keyword argument of either 'linear' or 'log'
             to indicate whether the bins should be generated using.  Default: linear
@@ -44,7 +44,7 @@ def envelope(*arrays, **kwargs):
 
     d_min, d_max = combine_domains(*arrays, type="union")
 
-    num_bins = kwargs.get('num_bins', 100)
+    num_bins = kwargs.get('bin_count', 100)
 
     bin_spacing = kwargs.get('bin_spacing', 'linear')
     if bin_spacing not in ('linear', 'log'):

@@ -1,10 +1,10 @@
-"""Helper classes showing interactive timeseries."""
+"""Helper classes showing interactive linear plots."""
 
 import bqplot
 from .viewer_base import BaseViewer
 
-class TimeseriesViewer(BaseViewer):
-    """A simple interface to plot timeseries data.
+class LinearViewer(BaseViewer):
+    """A simple interface to plot linear x,y data.
 
     Internally this object wraps a bqplot Figure object and
     provides reasonable defaults for all of the settings, while
@@ -22,10 +22,10 @@ class TimeseriesViewer(BaseViewer):
     """
 
     def __init__(self, data=None, fixed_y=None, **kwargs):
-        x_scale = bqplot.DateScale()
+        x_scale = bqplot.LinearScale()
         y_scale = bqplot.LinearScale()
 
-        super(TimeseriesViewer, self).__init__(x_scale, y_scale, data=data, **kwargs)
+        super(LinearViewer, self).__init__(x_scale, y_scale, data=data, **kwargs)
 
         if fixed_y is not None:
             y_min, y_max = fixed_y
