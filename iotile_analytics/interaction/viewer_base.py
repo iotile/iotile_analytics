@@ -100,7 +100,7 @@ class BaseViewer(object):
 
         return np.linspace(0, len(input_data) - 1, len(input_data)), np.array(input_data)
 
-    def set_data(self, x_data, *y_data, mark_type='lines', names=None):
+    def set_data(self, x_data, *y_data, **kwargs):
         """Add one or more lines to the plot based on the number of columns of data.
 
         This function clears any lines that were previously set on the plot.
@@ -115,6 +115,9 @@ class BaseViewer(object):
                 be passed as a keyword argument.
         """
 
+        mark_type = kwargs.get('mark_type', 'lines'),
+        names = kwargs.get('names', []),
+
         mark_types = {
             'lines': bqplot.Lines,
             'scatter': bqplot.Scatter
@@ -126,11 +129,8 @@ class BaseViewer(object):
 
         display_legend = names is not None
 
-        if names is not None and len(names) != len(y_data):
+        if len(names) != 0 and len(names) != len(y_data):
             raise ArgumentError("You must pass the same number of names as line", num_lines=len(y_data), num_names=len(names), names=names)
-
-        if names is None:
-            names = []
 
         if len(y_data) == 1:
             y_data = y_data[0]
