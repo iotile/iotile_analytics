@@ -8,15 +8,15 @@ from iotile_analytics.utilities import envelope
 def test_basic_envelope():
     """Make sure envelope works correctly."""
 
-    x = np.linspace(0, 10, 10)
+    x_vals = np.linspace(0, 10, 10)
 
     in1 = np.ndarray([10, 2])
-    in1[:, 0] = x
+    in1[:, 0] = x_vals
     in1[:5, 1] = 1.0
     in1[5:, 1] = -1.0
 
     in2 = np.ndarray([10, 2])
-    in2[:, 0] = x
+    in2[:, 0] = x_vals
     in2[:5, 1] = -1.0
     in2[5:, 1] = 1.0
 
@@ -31,15 +31,15 @@ def test_basic_envelope():
 def test_envelope_interpolation():
     """Make sure we can fill in gaps in the envelope."""
 
-    x = np.linspace(0, 10, 10)
+    x_vals = np.linspace(0, 10, 10)
 
     in1 = np.ndarray([10, 2])
-    in1[:, 0] = x
+    in1[:, 0] = x_vals
     in1[:5, 1] = 1.0
     in1[5:, 1] = -1.0
 
     in2 = np.ndarray([10, 2])
-    in2[:, 0] = x
+    in2[:, 0] = x_vals
     in2[:5, 1] = -1.0
     in2[5:, 1] = 1.0
 
@@ -54,15 +54,15 @@ def test_envelope_interpolation():
 def test_bin_edges():
     """Make sure we return the right bin edges in all 3 supported cases."""
 
-    x = np.linspace(0, 10, 10)
+    x_vals = np.linspace(0, 10, 10)
 
     in1 = np.ndarray([10, 2])
-    in1[:, 0] = x
+    in1[:, 0] = x_vals
     in1[:5, 1] = 1.0
     in1[5:, 1] = -1.0
 
     in2 = np.ndarray([10, 2])
-    in2[:, 0] = x
+    in2[:, 0] = x_vals
     in2[:5, 1] = -1.0
     in2[5:, 1] = 1.0
 
@@ -72,6 +72,6 @@ def test_bin_edges():
 
     bins = bins = np.linspace(0, 10, 11)
 
-    assert out_left[:,0] == pytest.approx(bins[:-1])
-    assert out_right[:,0] == pytest.approx(bins[1:])
-    assert out_center[:,0] == pytest.approx((bins[1:] + bins[:-1]) / 2.0)
+    assert out_left[:, 0] == pytest.approx(bins[:-1])
+    assert out_right[:, 0] == pytest.approx(bins[1:])
+    assert out_center[:, 0] == pytest.approx((bins[1:] + bins[:-1]) / 2.0)
