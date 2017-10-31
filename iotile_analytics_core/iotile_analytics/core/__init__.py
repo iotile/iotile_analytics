@@ -2,5 +2,6 @@
 
 from .group import AnalysisGroup
 from .session import CloudSession
+from .interaction import ProgressBar
 
-__all__ = ['AnalysisGroup', 'CloudSession']
+__all__ = ['AnalysisGroup', 'CloudSession', 'ProgressBar']
