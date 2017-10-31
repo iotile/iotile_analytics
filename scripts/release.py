@@ -6,6 +6,9 @@ If there is only one component defined, you can instead pass a version as vX.Y.Z
 where X.Y.Z is the version
 """
 
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+
 import sys
 import os
 import requests
@@ -124,7 +127,7 @@ def get_release_notes(component, version):
         sys.exit(1)
 
     start_line = release_lines[version]
-    past_releases = [x for x in release_lines.itervalues() if x > start_line]
+    past_releases = [x for x in release_lines.values() if x > start_line]
 
     if len(past_releases) == 0:
         release_string = "".join(lines[start_line+1:])

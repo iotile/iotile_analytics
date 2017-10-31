@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 from version import version
 
 setup(
-    name="iotile_analytics",
+    name="iotile-analytics-core",
     packages=find_packages(exclude=("test",)),
     version=version,
     license="LGPLv3",
