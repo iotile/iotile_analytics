@@ -1,6 +1,6 @@
 """Tests to make sure domain union/intersection and finding works."""
 
-from iotile_analytics.utilities import find_domain, combine_domains
+from iotile_analytics.core.utilities import find_domain, combine_domains
 from typedargs.exceptions import ArgumentError
 import pandas as pd
 import numpy as np

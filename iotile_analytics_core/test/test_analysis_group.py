@@ -6,8 +6,8 @@ from builtins import *
 
 import pytest
 from typedargs.exceptions import ArgumentError
-from iotile_analytics import CloudSession, AnalysisGroup
-from iotile_analytics.exceptions import CloudError, AuthenticationError
+from iotile_analytics.core import CloudSession, AnalysisGroup
+from iotile_analytics.core.exceptions import CloudError, AuthenticationError
 
 
 def test_session_login(water_meter):

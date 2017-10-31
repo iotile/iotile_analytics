@@ -2,7 +2,7 @@
 
 import pytest
 import numpy as np
-from iotile_analytics.utilities import envelope
+from iotile_analytics.core.utilities import envelope
 
 
 def test_basic_envelope():
