@@ -1,6 +1,9 @@
 """Base viewer class for interactive plots."""
-
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+from builtins import *
 import bqplot
+from bqplot.colorschemes import CATEGORY10
 from IPython.display import display
 import pandas as pd
 import numpy as np
@@ -100,40 +103,77 @@ class BaseViewer(object):
 
         return np.linspace(0, len(input_data) - 1, len(input_data)), np.array(input_data)
 
-    def set_data(self, x_data, *y_data, **kwargs):
+    def set_data(self, x_data, y_data, **kwargs):
         """Add one or more lines to the plot based on the number of columns of data.
 
         This function clears any lines that were previously set on the plot.
 
         Args:
-            data (ndarray): A 2 dimensional array with the first column as the x value and
-                each additional column as the y values.
+            x_data (ndarray): A 1D array of x values to plot
+            y_data (ndarray): An array of one or more y values to plot.  These all correspond
+                to the same x values listed as the first argument.  Each one becomes a separate line.
+                If this array has more than one dimension, separate lines are added for each dimension
             names (list): Optional list of string names for each of the lines in data that
-                will be shown in the chart legend.  This must be passed as a keyword arguments
+                will be shown in the chart legend.  This must be passed as a keyword argument
             mark_type (str): The type of mark to add.  Valid types strings are:
                 lines, scatter which translate to bqplot.Lines, bqplot.Scatter.  This must
                 be passed as a keyword argument.
         """
 
-        mark_type = kwargs.get('mark_type', 'lines'),
-        names = kwargs.get('names', []),
+        self.figure.marks = []
+        self.add_data(x_data, y_data, **kwargs)
+
+    def add_data(self, x_data, y_data, **kwargs):
+        """Add one or more lines to the plot based on the number of columns of data.
+
+        This function does not clear the data that is already there so it creates a new line
+
+        Args:
+            x_data (ndarray): A 1D array of x values to plot
+            y_data (ndarray): An array of one or more y values to plot.  These all correspond
+                to the same x values listed as the first argument.  Each one becomes a separate line.
+                If this array has more than one dimension, separate lines are added for each dimension
+            names (list): Optional list of string names for each of the lines in data that
+                will be shown in the chart legend.  This must be passed as a keyword argument
+            mark_type (str): The type of mark to add.  Valid types strings are:
+                lines, scatter which translate to bqplot.Lines, bqplot.Scatter.  This must
+                be passed as a keyword argument.
+        """
+
+        mark_type = kwargs.get('mark_type', 'lines')
+        names = kwargs.get('names', [])
 
         mark_types = {
             'lines': bqplot.Lines,
             'scatter': bqplot.Scatter
         }
 
-        mark = mark_types.get(mark_type, None)
+        mark = mark_types.get(mark_type)
         if mark is None:
             raise ArgumentError("Unkown type of mark specified in mark_type", mark_type=mark_type, known_types=mark_types.keys())
 
-        display_legend = names is not None
+        num_lines = 1
+        if len(y_data.shape) == 2:
+            num_lines = y_data.shape[1]
+        if len(names) != 0 and len(names) != num_lines:
+            raise ArgumentError("You must pass the same number of names as line", num_lines=num_lines, y_shape=y_data.shape, num_names=len(names), names=names)
 
-        if len(names) != 0 and len(names) != len(y_data):
-            raise ArgumentError("You must pass the same number of names as line", num_lines=len(y_data), num_names=len(names), names=names)
+        # BQPlot chokes on a scatter plot
+        if num_lines == 1 and len(names) == 1 and mark == 'scatter':
+            names = names[0]
 
-        if len(y_data) == 1:
-            y_data = y_data[0]
+        if len(names) > 0:
+            line = mark(labels=names, display_legend=True, scales={'x': self.x_scale, 'y': self.y_scale})
+        else:
+            line = mark(display_legend=False, scales={'x': self.x_scale, 'y': self.y_scale})
 
-        line = mark(x=x_data, y=y_data, labels=names, display_legend=display_legend, scales={'x': self.x_scale, 'y': self.y_scale})
-        self.figure.marks = [line]
+        num_lines = 1
+        if len(y_data.shape) > 1:
+            num_lines = y_data.shape[1]
+
+        with line.hold_trait_notifications():
+            line.x = x_data
+            line.y = y_data
+            line.colors = CATEGORY10[len(self.figure.marks):len(self.figure.marks) + num_lines]
+
+        self.figure.marks = [x for x in self.figure.marks] + [line]
