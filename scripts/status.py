@@ -1,5 +1,7 @@
-"""Check whether there are changes since the last released version of a component
-"""
+"""Check whether there are changes since the last released version of a component."""
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+
 import subprocess
 import cmdln
 import sys
@@ -64,7 +66,7 @@ class StatusProcessor(cmdln.Cmdln):
         ${cmd_option_list}
         """
 
-        for comp_name, comp_parts in components.comp_names.iteritems():
+        for comp_name, comp_parts in components.comp_names.items():
             releases = get_released_versions(comp_name)
             if len(releases) == 0:
                 print(comp_name + ' - ' + 'No tagged releases')

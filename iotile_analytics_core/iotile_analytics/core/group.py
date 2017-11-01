@@ -71,12 +71,12 @@ class AnalysisGroup(object):
 
     def _count_streams(self, slugs):
         resources = [self._api.stream(x).data for x in slugs]
-        ts_results = self._session.fetch_multiple(resources, page_size=1)
+        ts_results = self._session.fetch_multiple(resources, message='Counting Events in Streams', page_size=1)
 
         event_resources = [self._api.event for x in slugs]
         event_args = [{"filter": x} for x in slugs]
 
-        event_results = self._session.fetch_multiple(event_resources, event_args, page_size=1)
+        event_results = self._session.fetch_multiple(event_resources, event_args, message='Counting Data in Streams', page_size=1)
 
         return {slug: {'points': ts['count'], 'events': event['count']} for slug, ts, event in zip(slugs, ts_results, event_results)}
 
@@ -242,7 +242,40 @@ class AnalysisGroup(object):
         except RestHttpBaseException as exc:
             raise CloudError("Error fetching events from stream", exception=exc, response=exc.response.status_code)
 
-    def fetch_event(self, event_or_id, subkey=None):
+    def fetch_raw_events(self, slug_or_name, subkey=None, postprocess=None):
+        """Fetch multiple raw events by numeric id.
+
+        Args:
+            slug_or_name (str): The stream that we want to fetch.  This
+                can be a partial match to a full stream slug or name so long
+                as it uniquely matches.  This is passed to find_stream so anything
+                that find_stream accepts will be accepted here.
+            subkey (str): Only include a single key of the event.  This is usefuly for complex
+                events where you want to just focus on a portion of them.
+            postprocess (callable): (Optional) function to call on each raw event before
+                adding it to the dataframe.
+
+        Returns:
+            pd.DataFrame: The raw event object data fetched from iotile.cloud.
+        """
+
+        events = self.fetch_events(slug_or_name)
+        event_ids = events['event_id'].values
+
+        resources = [self._api.event(x).data for x in event_ids]
+        data = self._session.fetch_multiple(resources)
+
+        if postprocess is None:
+            postprocess = lambda x: x
+
+        if subkey is not None:
+            data = [postprocess(x[subkey]) for x in data]
+        else:
+            data = [postprocess(x) for x in data]
+
+        return pd.DataFrame(data, index=events.index)
+
+    def fetch_raw_event(self, event_or_id, subkey=None):
         """Fetch associated raw data for an event.
 
         Args:
@@ -298,11 +331,11 @@ class AnalysisGroup(object):
 
     def _get_stream_data(self, slug, start=None, end=None):
         resource = self._api.stream(slug).data
-        return self._session.fetch_all(resource, page_size=1000)
+        return self._session.fetch_all(resource, page_size=1000, message="Downloading Stream Data")
 
     def _get_event_data(self, slug):
         resource = self._api.event
-        return self._session.fetch_all(resource, page_size=1000, filter=slug)
+        return self._session.fetch_all(resource, page_size=1000, message="Downloading Events", filter=slug)
 
     @classmethod
     def FromDevice(cls, slug=None, external_id=None, domain=DOMAIN_NAME):

@@ -6,7 +6,7 @@ import pytest
 import os.path
 from pytest_localserver.http import WSGIServer
 from mock_cloud import MockIOTileCloud
-from iotile_analytics import CloudSession, AnalysisGroup
+from iotile_analytics.core import CloudSession, AnalysisGroup
 
 
 @pytest.fixture(scope="module")

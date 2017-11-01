@@ -6,21 +6,24 @@ from builtins import *
 import logging
 import getpass
 import math
+import json
 
 try:
     #python2
+    from urllib2 import urlopen, Request
     from urllib import urlencode
 except ImportError:
     #python3
+    from urllib.request import urlopen, Request
     from urllib.parse import urlencode
 
 from threading import Lock
 from multiprocessing.pool import ThreadPool
-from tqdm import tqdm
 from typedargs.exceptions import ArgumentError
 from iotile_cloud.api.connection import Api, DOMAIN_NAME
 from iotile_cloud.api.exceptions import HttpNotFoundError, HttpClientError, RestHttpBaseException
 from .exceptions import CloudError, AuthenticationError
+from .interaction import ProgressBar
 
 
 logger = logging.getLogger(__name__)
@@ -90,7 +93,7 @@ class CloudSession(object):
         except HttpClientError:
             return False
 
-    def fetch_multiple(self, resources, per_call_kw=None, concurrency=MAX_CONCURRENCY, **kwargs):
+    def fetch_multiple(self, resources, per_call_kw=None, concurrency=MAX_CONCURRENCY, message=None, **kwargs):
         """Fetch multiple resources in parallel.
 
         Up to concurrency max calls are in flight at a given time.  The results
@@ -102,6 +105,7 @@ class CloudSession(object):
                 for each fetch call.  For example, you could pass a custom filter argument for
                 each call.
             concurrency (int): The maximum number of parallel requests to send.
+            message (str): Optional descriptive message that is printed with the progress bar
             **kwargs (str): Additional keyword arguments that are passed as part of
                 the query string in the get request.
 
@@ -116,7 +120,7 @@ class CloudSession(object):
             raise ArgumentError("You must pass the same number of per_call keyword arguments as resources (or none at all)", fetch_length=len(resources), kw_length=len(per_call_kw))
 
         try:
-            with tqdm(total=len(resources)) as progbar:
+            with ProgressBar(total=len(resources), message=message, leave=False) as progbar:
                 args = [(x, _merge_dicts(per_call_kw[i], kwargs), progbar) for i, x in enumerate(resources)]
                 wrapped_results = self.pool.map(self._resource_fetcher, args)
 
@@ -128,7 +132,7 @@ class CloudSession(object):
         except RestHttpBaseException as err:
             raise self._translate_error(err, msg="Error fetching resources in parallel from IOTile.cloud")
 
-    def fetch_all(self, resource, page_size=100, concurrency=MAX_CONCURRENCY, **kwargs):
+    def fetch_all(self, resource, page_size=100, concurrency=MAX_CONCURRENCY, message=None, **kwargs):
         """Fetch and concatenate all pages of a given resource.
 
         The pages are fetched in parallel using up to concurrency requests
@@ -148,6 +152,7 @@ class CloudSession(object):
             resource (RestResource): Should be created from an Api object.
             page_size (int): The desired page size to use for fetches.
             concurrency (int): The maximum number of parallel requests to send.
+            message (str): Optional descriptive message that is printed with the progress bar
             **kwargs (str): Additional keyword arguments that are passed as part of
                 the query string in the get request.
 
@@ -156,12 +161,14 @@ class CloudSession(object):
         """
 
         try:
-            with tqdm(total=100) as progbar:
+            with ProgressBar(total=100, leave=False, message=message) as progbar:
                 results = resource.get(page_size=page_size, **kwargs)
                 total_count = results['count']
                 results = results.get('results', [])
 
                 if total_count <= page_size:
+                    progbar.total = 1
+                    progbar.update(1)
                     return results
 
                 pages = int(math.ceil(total_count / float(page_size)))
@@ -194,7 +201,13 @@ class CloudSession(object):
             result = self._check_cache(cache_key)
 
             if result is None:
-                result = resource.get(**kwargs)
+                headers = {b'Authorization': '{} {}'.format(self.token_type, self.token).encode('utf-8')}
+                req = Request(cache_key, headers=headers)
+
+                resp = urlopen(req)
+                data = resp.read()
+                result = json.loads(data.decode('utf-8'))
+                #result = resource.get(**kwargs)
                 self._cache_result(cache_key, result)
 
             progress.update(1)
@@ -218,7 +231,13 @@ class CloudSession(object):
             result = self._check_cache(cache_key)
 
             if result is None:
-                result = resource.get(**query)
+                headers = {b'Authorization': '{} {}'.format(self.token_type, self.token).encode('utf-8')}
+                req = Request(cache_key, headers=headers)
+
+                resp = urlopen(req)
+                data = resp.read()
+                result = json.loads(data.decode('utf-8'))
+
                 self._cache_result(cache_key, result)
 
             progress.update(1)

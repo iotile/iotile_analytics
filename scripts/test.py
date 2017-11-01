@@ -1,3 +1,6 @@
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+
 import os
 import time
 import subprocess
@@ -25,7 +28,7 @@ def run_test(component, args):
     finally:
         os.chdir(currdir)
 
-    return output_status, output
+    return output_status, output.decode('utf-8')
 
 
 class TestProcessor(cmdln.Cmdln):
@@ -49,7 +52,7 @@ class TestProcessor(cmdln.Cmdln):
         failed = False
         failed_outputs = []
 
-        for comp_name in sorted(components.comp_names.iterkeys()):
+        for comp_name in sorted(components.comp_names.keys()):
             start = time.time()
             sys.stdout.write("Testing {}: ".format(comp_name))
             sys.stdout.flush()

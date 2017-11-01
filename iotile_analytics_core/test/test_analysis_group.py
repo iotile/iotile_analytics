@@ -5,8 +5,9 @@ from __future__ import (absolute_import, division,
 from builtins import *
 
 import pytest
-from iotile_analytics import CloudSession, AnalysisGroup
-from iotile_analytics.exceptions import CloudError, AuthenticationError
+from typedargs.exceptions import ArgumentError
+from iotile_analytics.core import CloudSession, AnalysisGroup
+from iotile_analytics.core.exceptions import CloudError, AuthenticationError
 
 
 def test_session_login(water_meter):
@@ -43,3 +44,10 @@ def test_stream_download(filter_group):
 
     data = filter_group.fetch_stream('5001')
     assert len(data) == 11
+
+
+def test_invalid_stream(filter_group):
+    """Make sure we raise the right error if we can't find a stream."""
+
+    with pytest.raises(ArgumentError):
+        filter_group.fetch_stream('5500')
