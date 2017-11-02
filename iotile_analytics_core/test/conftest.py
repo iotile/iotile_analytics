@@ -1,9 +1,11 @@
+"""Local pytest fixtures."""
+
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from builtins import *
 
-import pytest
 import os.path
+import pytest
 from pytest_localserver.http import WSGIServer
 from mock_cloud import MockIOTileCloud
 from iotile_analytics.core import CloudSession, AnalysisGroup
@@ -17,7 +19,7 @@ def mock_cloud():
     conf = os.path.join(base, 'data', 'basic_cloud.json')
 
     cloud = MockIOTileCloud(conf)
-    server = WSGIServer(application=cloud)
+    server = WSGIServer(application=cloud, ssl_context="adhoc")  # Generate a new fake, unverified ssl cert for this server
 
     server.start()
     domain = server.url
@@ -45,8 +47,7 @@ def filter_group(water_meter):
 
     domain, cloud = water_meter
 
-    CloudSession('test@arch-iot.com', 'test', domain=domain)
+    CloudSession('test@arch-iot.com', 'test', domain=domain, verify=False)
 
     group = AnalysisGroup.FromDevice('d--0000-0000-0000-00d2', domain=domain)
     return group
-

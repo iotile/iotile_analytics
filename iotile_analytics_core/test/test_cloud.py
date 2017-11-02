@@ -18,7 +18,7 @@ def test_mock_cloud_login(mock_cloud):
     """Make sure the mock cloud is working."""
 
     domain, cloud = mock_cloud
-    api = Api(domain=domain)
+    api = Api(domain=domain, verify=False)
 
     res = api.login('test', 'test@arch-iot.com')
     assert res
@@ -35,7 +35,7 @@ def test_data_access(water_meter):
 
     domain, _cloud = water_meter
 
-    api = Api(domain=domain)
+    api = Api(domain=domain, verify=False)
     api.login('test', 'test@arch-iot.com')
 
     data = api.device('d--0000-0000-0000-00d2').get()

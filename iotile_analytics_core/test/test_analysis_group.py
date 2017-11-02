@@ -15,18 +15,18 @@ def test_session_login(water_meter):
 
     domain, _cloud = water_meter
 
-    session = CloudSession('test@arch-iot.com', 'test', domain=domain)
+    session = CloudSession('test@arch-iot.com', 'test', domain=domain, verify=False)
     assert session.token == "JWT_USER"
 
     with pytest.raises(AuthenticationError):
-        CloudSession('test@arch-iot.com', 'test2', domain=domain)
+        CloudSession('test@arch-iot.com', 'test2', domain=domain, verify=False)
 
 def test_multiple_login(water_meter):
     """Make sure multiple logins work correctly."""
 
     domain, _cloud = water_meter
 
-    CloudSession('test@arch-iot.com', 'test', domain=domain)
+    CloudSession('test@arch-iot.com', 'test', domain=domain, verify=False)
 
     session = CloudSession(domain=domain)
     assert session.token == 'JWT_USER'
@@ -41,7 +41,7 @@ def test_device_analysis(water_meter):
     """
 
     domain, _cloud = water_meter
-    CloudSession('test@arch-iot.com', 'test', domain=domain)
+    CloudSession('test@arch-iot.com', 'test', domain=domain, verify=False)
 
     group = AnalysisGroup.FromDevice('d--0000-0000-0000-00d2', domain=domain)
 
