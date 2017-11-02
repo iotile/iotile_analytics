@@ -7,7 +7,7 @@ from builtins import *
 import pytest
 from typedargs.exceptions import ArgumentError
 from iotile_analytics.core import CloudSession, AnalysisGroup
-from iotile_analytics.core.exceptions import CloudError, AuthenticationError
+from iotile_analytics.core.exceptions import CloudError, AuthenticationError, CertificateVerificationError
 
 
 def test_session_login(water_meter):
@@ -20,6 +20,14 @@ def test_session_login(water_meter):
 
     with pytest.raises(AuthenticationError):
         CloudSession('test@arch-iot.com', 'test2', domain=domain, verify=False)
+
+def test_ssl_verification(water_meter):
+    """Make sure we default to verifying SSL partners."""
+
+    domain, _cloud = water_meter
+
+    with pytest.raises(CertificateVerificationError):
+        CloudSession('test@arch-iot.com', 'test', domain=domain, verify=True)
 
 def test_multiple_login(water_meter):
     """Make sure multiple logins work correctly."""

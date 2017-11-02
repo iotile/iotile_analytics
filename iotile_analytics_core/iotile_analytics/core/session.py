@@ -24,7 +24,7 @@ from multiprocessing.pool import ThreadPool
 from typedargs.exceptions import ArgumentError
 from iotile_cloud.api.connection import Api, DOMAIN_NAME
 from iotile_cloud.api.exceptions import HttpNotFoundError, HttpClientError, RestHttpBaseException, HttpCouldNotVerifyServerError
-from .exceptions import CloudError, AuthenticationError
+from .exceptions import CloudError, AuthenticationError, CertificateVerificationError
 from .interaction import ProgressBar
 
 
@@ -116,7 +116,11 @@ class CloudSession(object):
         if self.verify is False:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-        res = self._api.login(email=user, password=password)
+        try:
+            res = self._api.login(email=user, password=password)
+        except RestHttpBaseException as err:
+            self._translate_error(err, "Error logging into iotile.cloud", email=user)
+
         if not res:
             raise AuthenticationError("Could not login to IOTile.cloud", user=user, domain=domain)
 
@@ -333,7 +337,7 @@ class CloudSession(object):
     def _translate_error(cls, error, msg="Error interacting with iotile.cloud", **kwargs):
         """Translate a raw rest error into a user friendly cloud error."""
 
-        if isinstance(error, ):
+        if isinstance(error, HttpCouldNotVerifyServerError):
             raise CertificateVerificationError(msg, raw_eror=error, **kwargs)
 
         return CloudError(msg, raw_error=error, **kwargs)
