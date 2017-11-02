@@ -3,30 +3,29 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from builtins import *
 
-import logging
 import getpass
 import math
 import json
+import ssl
 
 try:
     #python2
     from urllib2 import urlopen, Request
     from urllib import urlencode
+    import requests.packages.urllib3 as urllib3
 except ImportError:
     #python3
     from urllib.request import urlopen, Request
     from urllib.parse import urlencode
+    import requests.packages.urllib3 as urllib3
 
 from threading import Lock
 from multiprocessing.pool import ThreadPool
 from typedargs.exceptions import ArgumentError
 from iotile_cloud.api.connection import Api, DOMAIN_NAME
-from iotile_cloud.api.exceptions import HttpNotFoundError, HttpClientError, RestHttpBaseException
-from .exceptions import CloudError, AuthenticationError
+from iotile_cloud.api.exceptions import HttpNotFoundError, HttpClientError, RestHttpBaseException, HttpCouldNotVerifyServerError
+from .exceptions import CloudError, AuthenticationError, CertificateVerificationError
 from .interaction import ProgressBar
-
-
-logger = logging.getLogger(__name__)
 
 
 class CloudSession(object):
@@ -36,24 +35,68 @@ class CloudSession(object):
     so that you don't have to login multiple times per script invocation.
 
     All caching is performed on a per domain basis so you can have multiple sessions
-    going to different IOTile.cloud instances if needed.
+    going to different IOTile.cloud instances if needed.  If you login to the same
+    domain mulitple times with different users, the cache for that domain will be
+    cleared with each login.
+
+    You can create a CloudSession instance with no arguments and it will use stored credentials
+    from the last time you logged into that cloud server.  So you can do:
+
+    CloudSession(user="Username", password="Password")
+
+    and then later just call:
+    CloudSession()
+
+    The SSL certificate verification option is also saved with each successful login
+
+    Args:
+        user (str): The user name to login with
+        password (str): The user's password
+        domain (str): The complete domain name of the iotile.cloud instance to login to.
+            This defaults to https://iotile.cloud
+        concurrence (int): The maximum number of simultaneous requests to send to iotile.cloud
+            when we are requesting multiple resources at a time.  Default: CloudSession.MAX_CONCURRENCY
+        verify (bool): If set to false, do not verify the SSL certificate of the remote
+            iotile.cloud server.  This option is **NOT RECOMMENDED** but sometimes required
+            if you are behind a corporate firewall that terminates SSL connections at the
+            firewall and uses a self-signed certificate.  Setting this option allows your
+            connection to iotile.cloud to be intercepted by third parties in a Man in the
+            Middle Attack.  Obviously, the default option is True.  If you don't pass any option here
+            the default is use the same verification options that were used in the last successful
+            login to the domain that you are talking to.
     """
 
     MAX_CONCURRENCY = 10
     _login_cache = {}
 
-    def __init__(self, user=None, password=None, domain=DOMAIN_NAME):
-        self.pool = ThreadPool(CloudSession.MAX_CONCURRENCY)
+    #pytest: disable=R0913; These arguments are all necessary and appropriate, with sane defaults
+    def __init__(self, user=None, password=None, domain=DOMAIN_NAME, concurrency=None, verify=None):
+        if concurrency is None:
+            concurrency = CloudSession.MAX_CONCURRENCY
+
+        self.pool = ThreadPool(concurrency)
 
         if domain not in CloudSession._login_cache:
             CloudSession._login_cache[domain] = {'requests': {}, 'request_lock': Lock()}
 
+        # If we are logging in with a different user than before, clear out the old cache data.
         cache = CloudSession._login_cache[domain]
+        with cache['request_lock']:
+            old_user = cache.get('user')
+            if user is not None and old_user is not None and old_user != user:
+                CloudSession._login_cache[domain] = {'requests': {}, 'request_lock': Lock()}
+
         self.token = cache.get('token', None)
         self.token_type = cache.get('token_type', None)
+
+        if verify is not None:
+            self.verify = verify
+        else:
+            self.verify = cache.get('verify', True)
+
         self.domain = domain
 
-        self._api = Api(domain=domain)
+        self._api = Api(domain=domain, verify=self.verify)
         self._api.set_token(self.token, self.token_type)
 
         # Explictly log in if we're passed all of the right information
@@ -70,15 +113,26 @@ class CloudSession(object):
         if password is None:
             password = getpass.getpass("Please enter your IOTile.cloud password:")
 
-        res = self._api.login(email=user, password=password)
+        if self.verify is False:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+        try:
+            res = self._api.login(email=user, password=password)
+        except RestHttpBaseException as err:
+            self._translate_error(err, "Error logging into iotile.cloud", email=user)
+
         if not res:
             raise AuthenticationError("Could not login to IOTile.cloud", user=user, domain=domain)
 
         self.token = self._api.token
         self.token_type = self._api.token_type
 
-        cache['token'] = self.token
-        cache['token_type'] = self.token_type
+        with cache['request_lock']:
+            cache['user'] = user
+            cache['token'] = self.token
+            cache['token_type'] = self.token_type
+            cache['verify'] = self.verify
+
 
     def _check_token(self):
         """Verify that we're able to log in to IOTile.cloud with our token."""
@@ -93,7 +147,7 @@ class CloudSession(object):
         except HttpClientError:
             return False
 
-    def fetch_multiple(self, resources, per_call_kw=None, concurrency=MAX_CONCURRENCY, message=None, **kwargs):
+    def fetch_multiple(self, resources, per_call_kw=None, message=None, **kwargs):
         """Fetch multiple resources in parallel.
 
         Up to concurrency max calls are in flight at a given time.  The results
@@ -104,7 +158,6 @@ class CloudSession(object):
             per_call_kw (dict[]): An optional set of keyword arguments that should be individual
                 for each fetch call.  For example, you could pass a custom filter argument for
                 each call.
-            concurrency (int): The maximum number of parallel requests to send.
             message (str): Optional descriptive message that is printed with the progress bar
             **kwargs (str): Additional keyword arguments that are passed as part of
                 the query string in the get request.
@@ -132,7 +185,7 @@ class CloudSession(object):
         except RestHttpBaseException as err:
             raise self._translate_error(err, msg="Error fetching resources in parallel from IOTile.cloud")
 
-    def fetch_all(self, resource, page_size=100, concurrency=MAX_CONCURRENCY, message=None, **kwargs):
+    def fetch_all(self, resource, page_size=100, message=None, **kwargs):
         """Fetch and concatenate all pages of a given resource.
 
         The pages are fetched in parallel using up to concurrency requests
@@ -151,7 +204,6 @@ class CloudSession(object):
         Args:
             resource (RestResource): Should be created from an Api object.
             page_size (int): The desired page size to use for fetches.
-            concurrency (int): The maximum number of parallel requests to send.
             message (str): Optional descriptive message that is printed with the progress bar
             **kwargs (str): Additional keyword arguments that are passed as part of
                 the query string in the get request.
@@ -204,10 +256,17 @@ class CloudSession(object):
                 headers = {b'Authorization': '{} {}'.format(self.token_type, self.token).encode('utf-8')}
                 req = Request(cache_key, headers=headers)
 
-                resp = urlopen(req)
+                if self.verify is False:
+                    context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+                    context.options |= ssl.OP_NO_SSLv2
+                    context.options |= ssl.OP_NO_SSLv3
+
+                    resp = urlopen(req, context=context)
+                else:
+                    resp = urlopen(req)
+
                 data = resp.read()
                 result = json.loads(data.decode('utf-8'))
-                #result = resource.get(**kwargs)
                 self._cache_result(cache_key, result)
 
             progress.update(1)
@@ -234,7 +293,15 @@ class CloudSession(object):
                 headers = {b'Authorization': '{} {}'.format(self.token_type, self.token).encode('utf-8')}
                 req = Request(cache_key, headers=headers)
 
-                resp = urlopen(req)
+                if self.verify is False:
+                    context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+                    context.options |= ssl.OP_NO_SSLv2
+                    context.options |= ssl.OP_NO_SSLv3
+
+                    resp = urlopen(req, context=context)
+                else:
+                    resp = urlopen(req)
+
                 data = resp.read()
                 result = json.loads(data.decode('utf-8'))
 
@@ -270,7 +337,9 @@ class CloudSession(object):
     def _translate_error(cls, error, msg="Error interacting with iotile.cloud", **kwargs):
         """Translate a raw rest error into a user friendly cloud error."""
 
-        #FIXME: Actually do the translation
+        if isinstance(error, HttpCouldNotVerifyServerError):
+            raise CertificateVerificationError(msg, raw_eror=error, **kwargs)
+
         return CloudError(msg, raw_error=error, **kwargs)
 
     def find_device(self, slug=None, external_id=None):
