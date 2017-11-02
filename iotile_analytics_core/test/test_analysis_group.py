@@ -21,6 +21,16 @@ def test_session_login(water_meter):
     with pytest.raises(AuthenticationError):
         CloudSession('test@arch-iot.com', 'test2', domain=domain)
 
+def test_multiple_login(water_meter):
+    """Make sure multiple logins work correctly."""
+
+    domain, _cloud = water_meter
+
+    CloudSession('test@arch-iot.com', 'test', domain=domain)
+
+    session = CloudSession(domain=domain)
+    assert session.token == 'JWT_USER'
+
 
 def test_device_analysis(water_meter):
     """Make sure we can create an analysis group from a device.

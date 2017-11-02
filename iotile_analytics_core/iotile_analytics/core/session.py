@@ -48,7 +48,13 @@ class CloudSession(object):
         if domain not in CloudSession._login_cache:
             CloudSession._login_cache[domain] = {'requests': {}, 'request_lock': Lock()}
 
+        # If we are logging in with a different user than before, clear out the old cache data.
         cache = CloudSession._login_cache[domain]
+        with cache['request_lock']:
+            old_user = cache.get('user')
+            if user is not None and old_user is not None and old_user != user:
+                 CloudSession._login_cache[domain] = {'requests': {}, 'request_lock': Lock()}
+
         self.token = cache.get('token', None)
         self.token_type = cache.get('token_type', None)
         self.domain = domain
@@ -77,8 +83,10 @@ class CloudSession(object):
         self.token = self._api.token
         self.token_type = self._api.token_type
 
-        cache['token'] = self.token
-        cache['token_type'] = self.token_type
+        with cache['request_lock']:
+            cache['user'] = user
+            cache['token'] = self.token
+            cache['token_type'] = self.token_type
 
     def _check_token(self):
         """Verify that we're able to log in to IOTile.cloud with our token."""
