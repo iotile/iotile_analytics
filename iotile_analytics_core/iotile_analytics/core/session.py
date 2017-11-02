@@ -12,10 +12,12 @@ try:
     #python2
     from urllib2 import urlopen, Request
     from urllib import urlencode
+    import requests.packages.urllib3 as urllib3
 except ImportError:
     #python3
     from urllib.request import urlopen, Request
     from urllib.parse import urlencode
+    import requests.packages.urllib3 as urllib3
 
 from threading import Lock
 from multiprocessing.pool import ThreadPool
@@ -111,6 +113,9 @@ class CloudSession(object):
         if password is None:
             password = getpass.getpass("Please enter your IOTile.cloud password:")
 
+        if self.verify is False:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
         res = self._api.login(email=user, password=password)
         if not res:
             raise AuthenticationError("Could not login to IOTile.cloud", user=user, domain=domain)
@@ -123,6 +128,7 @@ class CloudSession(object):
             cache['token'] = self.token
             cache['token_type'] = self.token_type
             cache['verify'] = self.verify
+
 
     def _check_token(self):
         """Verify that we're able to log in to IOTile.cloud with our token."""
