@@ -170,12 +170,14 @@ class AnalysisGroup(object):
                 that find_stream accepts will be accepted here.
 
         Returns:
-            pd.DataFrame: A pandas DataFrame containing the data points as columns.
+            StreamSeries: A pandas DataFrame subclass containing the data points as columns.
                 The index of the dataframe is time in UTC.
         """
 
         slug = self.find_stream(slug_or_name)
-        return self._channel.fetch_datapoints(slug)
+        raw = self._channel.fetch_datapoints(slug)
+        raw.set_stream(self.streams[slug])
+        return raw
 
     def fetch_events(self, slug_or_name):
         """Fetch event metadata from a stream by its slug or name.

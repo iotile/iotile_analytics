@@ -11,6 +11,7 @@ from iotile_cloud.api.exceptions import RestHttpBaseException
 from typedargs.exceptions import ArgumentError
 from .channel import AnalysisGroupChannel
 from ..session import CloudSession
+from ..stream_series import StreamSeries
 from ..exceptions import CloudError
 
 
@@ -141,15 +142,15 @@ class IOTileCloudChannel(AnalysisGroupChannel):
                 raw events for.
 
         Returns:
-            pd.DataFrame: An array with timestamp, internal value and raw
-                value as floating point numbers.
+            StreamSeries: A data fame with internal value as floating
+                point data.
         """
 
         resource = self._api.stream(slug).data
         raw_data = self._session.fetch_all(resource, page_size=1000, message="Downloading Stream Data")
 
         dt_index = pd.to_datetime([x['timestamp'] for x in raw_data])
-        return pd.DataFrame.from_records(raw_data, exclude=('timestamp', 'type', 'display_value'), index=dt_index)
+        return StreamSeries([x['value'] for x in raw_data], index=dt_index)
 
     def _find_device_streams(self, device_slug):
         """Find all streams for a device by its slug."""

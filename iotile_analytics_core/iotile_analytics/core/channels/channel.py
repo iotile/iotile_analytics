@@ -81,8 +81,8 @@ class AnalysisGroupChannel(object):
                 raw events for.
 
         Returns:
-            pd.dataFrame: A data fame with internal value and raw
-                value as floating point numbers.
+            StreamSeries: A data fame with internal value as floating
+                point data.
         """
 
         raise NotImplementedError()

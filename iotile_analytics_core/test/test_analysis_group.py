@@ -7,6 +7,7 @@ from builtins import *
 import pytest
 from typedargs.exceptions import ArgumentError
 from iotile_analytics.core import CloudSession, AnalysisGroup
+from iotile_analytics.core.stream_series import StreamSeries
 from iotile_analytics.core.exceptions import CloudError, AuthenticationError, CertificateVerificationError
 
 
@@ -63,6 +64,10 @@ def test_stream_download(filter_group):
     data = filter_group.fetch_stream('5001')
     assert len(data) == 11
 
+    assert isinstance(data, StreamSeries)
+
+    out = data.convert('raw')
+    assert data.available_units == ['Acre Feet']
 
 def test_invalid_stream(filter_group):
     """Make sure we raise the right error if we can't find a stream."""
