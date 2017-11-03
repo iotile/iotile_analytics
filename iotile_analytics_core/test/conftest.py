@@ -6,8 +6,6 @@ from builtins import *
 
 import os.path
 import pytest
-from pytest_localserver.http import WSGIServer
-from mock_cloud import MockIOTileCloud
 from iotile_analytics.core import CloudSession, AnalysisGroup
 
 
