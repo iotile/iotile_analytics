@@ -14,10 +14,10 @@ def config_path(filename):
     return os.path.join(base, 'data', filename)
 
 
-def test_mock_cloud_login(mock_cloud):
+def test_mock_cloud_login(water_meter):
     """Make sure the mock cloud is working."""
 
-    domain, cloud = mock_cloud
+    domain, cloud = water_meter
     api = Api(domain=domain, verify=False)
 
     res = api.login('test', 'test@arch-iot.com')

@@ -290,3 +290,16 @@ class MockIOTileCloud(object):
         self.streams.update({x['slug']: x for x in data.get('streams', [])})
         self.projects.update({x['id']: x for x in data.get('projects', [])})
         self.events.update({x['id']: x for x in data.get('events', [])})
+
+
+@pytest.fixture(scope="module")
+def mock_cloud():
+    """A Mock iotile.cloud instance for testing."""
+
+    cloud = MockIOTileCloud()
+    server = WSGIServer(application=cloud, ssl_context="adhoc")  # Generate a new fake, unverified ssl cert for this server
+
+    server.start()
+    domain = server.url
+    yield domain, cloud
+    server.stop()
