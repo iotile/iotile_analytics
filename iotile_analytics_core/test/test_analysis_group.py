@@ -69,3 +69,21 @@ def test_invalid_stream(filter_group):
 
     with pytest.raises(ArgumentError):
         filter_group.fetch_stream('5500')
+
+
+def test_raw_events(filter_group):
+    """Make sure we can download raw events."""
+
+    meta = filter_group.fetch_events('5001')
+    print(meta.columns)
+    assert meta.columns[0] == 'event_id'
+    assert meta.columns[1] == 'meta'
+
+    assert meta.iloc[0]['meta'] == 'hello'
+    assert meta.iloc[1]['meta'] == 'goodbye'
+
+    raw = filter_group.fetch_raw_events('5001')
+
+    assert len(raw) == 2
+    assert raw.iloc[0]['test'] == 1
+    assert raw.iloc[1]['goodbye'] == 15
