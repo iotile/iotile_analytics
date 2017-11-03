@@ -65,9 +65,16 @@ def test_stream_download(filter_group):
     assert len(data) == 11
 
     assert isinstance(data, StreamSeries)
-
-    _out = data.convert('raw')
     assert set(data.available_units) == set(['Liters', 'Gallons', 'Cubic Meters', 'Acre Feet'])
+
+    outL = data.convert('Liters')
+    outG = data.convert('Gallons')
+
+    assert data.iloc[0][0] == pytest.approx(outL.iloc[0][0])
+    assert data.iloc[0][0] / 3.78541 == pytest.approx(outG.iloc[0][0])
+    with pytest.raises(ArgumentError):
+        data.convert('Test Unit')
+
 
 def test_invalid_stream(filter_group):
     """Make sure we raise the right error if we can't find a stream."""

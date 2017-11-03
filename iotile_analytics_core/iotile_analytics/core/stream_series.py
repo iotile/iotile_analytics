@@ -1,6 +1,7 @@
 """A Pandas DataFrame subclass for dealing with TimeSeries data from IOTile.cloud streams."""
 
 import pandas as pd
+from typedargs.exceptions import ArgumentError
 
 
 class StreamSeries(pd.DataFrame):
@@ -72,6 +73,22 @@ class StreamSeries(pd.DataFrame):
 
         return []
 
+    def _mdo_for_unit(self, unit):
+        if unit not in self.available_units:
+            raise ArgumentError("Unknown units", units=unit)
+
+        if self._vartype is not None:
+            units = {x['unit_full']: x for x in self._vartype.get('available_output_units', [])}
+        else:
+            units = {self._stream['output_unit']['unit_full']: self._stream['output_unit']}
+
+        unit_data = units[unit]
+        m = unit_data.get('m', 1)
+        d = unit_data.get('d', 1)
+        o = unit_data.get('o', 1)
+
+        return (m, d, o)
+
     def convert(self, units):
         """Convert this stream to another set of supported units.
 
@@ -82,7 +99,12 @@ class StreamSeries(pd.DataFrame):
             pd.DataFrame: The converted data stream.
         """
 
-        out = pd.DataFrame(self.values, index=self.index)
+        out = pd.DataFrame(self.values, copy=True, index=self.index)
 
-        #FIXME: Actually do the conversion
+        m, d, o = self._mdo_for_unit(units)
+
+        out[0] *= float(m)
+        out[0] /= float(d)
+        out[0] += float(o)
+
         return out
