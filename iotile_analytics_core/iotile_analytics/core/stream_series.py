@@ -11,19 +11,19 @@ class StreamSeries(pd.DataFrame):
     you set associated metadata and units for this stream.
     """
 
-    _metadata = ['_stream', '_variable']
+    _metadata = ['_stream', '_vartype']
 
     def __init__(self, *args, **kwargs):
         self._stream = None
-        self._variable = None
+        self._vartype = None
 
         if 'stream' in kwargs:
             self.set_stream(kwargs['stream'])
             del kwargs['stream']
 
-        if 'variable' in kwargs:
-            self.set_variable(kwargs['variable'])
-            del kwargs['variable']
+        if 'vartype' in kwargs:
+            self.set_variable(kwargs['vartype'])
+            del kwargs['vartype']
 
         super(StreamSeries, self).__init__(*args, **kwargs)
 
@@ -46,14 +46,14 @@ class StreamSeries(pd.DataFrame):
 
         self._stream = stream
 
-    def set_variable(self, variable):
-        """Set the variable metadata for this data series.
+    def set_vartype(self, vartype):
+        """Set the variable type and units metadata for this data series.
 
         This data is what is returned by the iotile.cloud API
-        /api/v1/variable/<var_slug>
+        /api/v1/vartype/<slug>
         """
 
-        self._variable = variable
+        self._vartype = vartype
 
     @property
     def available_units(self):
@@ -64,11 +64,13 @@ class StreamSeries(pd.DataFrame):
                 converted to.
         """
 
-        if self._stream is None:
-            return []
+        if self._vartype is not None:
+            return [x['unit_full'] for x in self._vartype.get('available_output_units', [])]
 
-        #FIXME: pull in variable information with available units
-        return [self._stream['output_unit']['unit_full']]
+        if self._stream is not None:
+            return [self._stream['output_unit']['unit_full']]
+
+        return []
 
     def convert(self, units):
         """Convert this stream to another set of supported units.
