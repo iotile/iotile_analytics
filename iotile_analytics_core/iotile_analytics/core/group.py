@@ -175,8 +175,13 @@ class AnalysisGroup(object):
         """
 
         slug = self.find_stream(slug_or_name)
+        stream = self.streams[slug]
         raw = self._channel.fetch_datapoints(slug)
         raw.set_stream(self.streams[slug])
+
+        vartype = self.variable_types[stream['var_type']]
+        raw.set_vartype(vartype)
+
         return raw
 
     def fetch_events(self, slug_or_name):

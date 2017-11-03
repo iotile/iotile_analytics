@@ -67,7 +67,7 @@ def test_stream_download(filter_group):
     assert isinstance(data, StreamSeries)
 
     _out = data.convert('raw')
-    assert data.available_units == ['Acre Feet']
+    assert set(data.available_units) == set(['Liters', 'Gallons', 'Cubic Meters', 'Acre Feet'])
 
 def test_invalid_stream(filter_group):
     """Make sure we raise the right error if we can't find a stream."""
