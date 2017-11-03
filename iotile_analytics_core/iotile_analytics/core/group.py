@@ -17,6 +17,7 @@ from iotile_cloud.stream.data import StreamData
 from typedargs.exceptions import ArgumentError
 from .exceptions import CloudError
 from .session import CloudSession
+from .channels import IOTileCloudChannel
 
 
 class AnalysisGroup(object):
@@ -26,59 +27,31 @@ class AnalysisGroup(object):
     or slug of a project in iotile.cloud and then are populated with
     all of the data streams and variables in that project.
 
-    If you specify 'device' for source_type, the cloud_id should be
-    a slug for the device that you want to fetch streams from.
+    You should use one of the static methods FromDevice, FromArchive,
+    FromProject or FromFile.
 
-    If you specify 'archive' for the source type, the cloud_id should
-    be a slug for the archive that you want to fetch streams from.
+    If you use FromDevice, you should pass a slug for the device that you want
+    to fetch streams from.
 
-    if you specify 'project' for source type, the cloud_id should be
-    the UUId of the project that you want to fetch streams from.
+    If you use FromArchive you should pass a slug for the archive
+    that you want to fetch streams from.
+
+    If you use FromProject, you should pass the UUID of the project
+    that you want to fetch streams from.
 
     Args:
-        cloud_id (str): An IOTile.cloud id (usually a slug) that
-            selects that data streams are included in this analysis
-            project.
-        source_type (str): The type of iotile.cloud object that we
-            are linking this AnalysisProject to.  This defaults to
-            an iotile.cloud project, but finding only streams from a
-            single device is also supported.  You can currently
-            specify 'project' ,'device' or 'archive'.
-        domain (str): Optional iotile.cloud domain to connect to (defaults to
-            https://iotile.cloud).
+        channel (AnalysisGroupChannel): The channel by which we can
+            find and download streams.
     """
 
-    def __init__(self, cloud_id, source_type='project', domain=DOMAIN_NAME):
-        stream_finders = {
-            'project': self._find_project_streams,
-            'device': self._find_device_streams,
-            'archive': self._find_archive_streams
-        }
+    def __init__(self, channel):
+        self._channel = channel
 
-        stream_finder = stream_finders.get(source_type, None)
-        if stream_finder is None:
-            raise ArgumentError("Invalid source type", source_type=source_type, supported_sources=stream_finders.keys(), suggestion="Try using one of the convenience functions for creating an AnalysisGroup like FromDevice or FromProject")
-
-        session = CloudSession(domain=domain)
-        self._session = session
-        self._api = session.get_api()
-
-        stream_list = stream_finder(cloud_id)
+        stream_list = channel.list_streams()
         self.streams = self._parse_stream_list(stream_list)
-        self.stream_counts = self._count_streams([x['slug'] for x in stream_list])
+        self.stream_counts = channel.count_streams([x['slug'] for x in stream_list])
 
         self._stream_table = [(slug.lower(), self._get_stream_name(stream).lower()) for slug, stream in viewitems(self.streams)]
-
-    def _count_streams(self, slugs):
-        resources = [self._api.stream(x).data for x in slugs]
-        ts_results = self._session.fetch_multiple(resources, message='Counting Events in Streams', page_size=1)
-
-        event_resources = [self._api.event for x in slugs]
-        event_args = [{"filter": x} for x in slugs]
-
-        event_results = self._session.fetch_multiple(event_resources, event_args, message='Counting Data in Streams', page_size=1)
-
-        return {slug: {'points': ts['count'], 'events': event['count']} for slug, ts, event in zip(slugs, ts_results, event_results)}
 
     def stream_empty(self, slug):
         """Check if a stream is empty.
@@ -195,13 +168,14 @@ class AnalysisGroup(object):
                 can be a partial match to a full stream slug or name so long
                 as it uniquely matches.  This is passed to find_stream so anything
                 that find_stream accepts will be accepted here.
+
+        Returns:
+            pd.DataFrame: A pandas DataFrame containing the data points as columns.
+                The index of the dataframe is time in UTC.
         """
 
         slug = self.find_stream(slug_or_name)
-        data = self._get_stream_data(slug)
-
-        dt_index = pd.to_datetime([x['timestamp'] for x in data])
-        return pd.Series([x['output_value'] for x in data], index=dt_index)
+        return self._channel.fetch_datapoints(slug)
 
     def fetch_events(self, slug_or_name):
         """Fetch event metadata from a stream by its slug or name.
@@ -228,19 +202,7 @@ class AnalysisGroup(object):
         """
 
         slug = self.find_stream(slug_or_name)
-
-        try:
-            data = self._get_event_data(slug)
-
-            dt_index = pd.to_datetime([x['timestamp'] for x in data])
-            extra_data = [x['extra_data'] for x in data]
-
-            for i, event in enumerate(data):
-                extra_data[i]['event_id'] = event['id']
-
-            return pd.DataFrame(extra_data, index=dt_index)
-        except RestHttpBaseException as exc:
-            raise CloudError("Error fetching events from stream", exception=exc, response=exc.response.status_code)
+        return self._channel.fetch_events(slug)
 
     def fetch_raw_events(self, slug_or_name, subkey=None, postprocess=None):
         """Fetch multiple raw events by numeric id.
@@ -259,83 +221,23 @@ class AnalysisGroup(object):
             pd.DataFrame: The raw event object data fetched from iotile.cloud.
         """
 
-        events = self.fetch_events(slug_or_name)
-        event_ids = events['event_id'].values
+        slug = self.find_stream(slug_or_name)
 
-        resources = [self._api.event(x).data for x in event_ids]
-        data = self._session.fetch_multiple(resources)
+        raw_events = self._channel.fetch_raw_events(slug)
 
         if postprocess is None:
-            postprocess = lambda x: x
+            return raw_events
 
         if subkey is not None:
-            data = [postprocess(x[subkey]) for x in data]
+            data = [postprocess(x[subkey]) for _i, x in raw_events.iterrows()]
         else:
-            data = [postprocess(x) for x in data]
+            data = [postprocess(x) for _i, x in raw_events.iterrows()]
 
-        return pd.DataFrame(data, index=events.index)
-
-    def fetch_raw_event(self, event_or_id, subkey=None):
-        """Fetch associated raw data for an event.
-
-        Args:
-            event_or_id (pd.Series or int): Either an event returned as a member of the response
-                of fetch_events with the event_id key set or an id for an event as an integer.
-            subkey (str): Only include a single key of the event.  This is usefuly for complex
-                events where you want to just focus on a portion of them.
-
-        Returns:
-            pd.DataFrame: The raw event object data fetched from iotile.cloud.
-        """
-
-        event = self._session.fetch_raw_event(event_or_id)
-
-        if subkey is not None:
-            if subkey not in event:
-                raise ArgumentError("Desired key was not found in event", subkey=subkey, keys=event.keys())
-
-            event = event[subkey]
-
-        return pd.DataFrame.from_dict(event)
-
-    def _find_project_streams(self, project_id):
-        """Find all streams in a project by its uuid."""
-
-        try:
-            results = self._api.stream.get(project=project_id)
-            return results['results']
-        except RestHttpBaseException as exc:
-            raise CloudError("Error calling method on iotile.cloud", exception=exc, response=exc.response.status_code)
-
-    def _find_device_streams(self, device_slug):
-        """Find all streams for a device by its slug."""
-
-        try:
-            results = self._api.stream.get(device=device_slug)
-            return results['results']
-        except RestHttpBaseException as exc:
-            raise CloudError("Error calling method on iotile.cloud", exception=exc, response=exc.response.status_code)
-
-    def _find_archive_streams(self, archive_slug):
-        """Find all streams for an archive by its slug."""
-
-        try:
-            results = self._api.stream.get(block=archive_slug, all=1)
-            return results['results']
-        except RestHttpBaseException as exc:
-            raise CloudError("Error calling method on iotile.cloud", exception=exc, response=exc.response.status_code)
+        return pd.DataFrame(data, index=raw_events.index)
 
     @classmethod
     def _parse_stream_list(cls, stream_list):
         return {stream['slug']: stream for stream in stream_list}
-
-    def _get_stream_data(self, slug, start=None, end=None):
-        resource = self._api.stream(slug).data
-        return self._session.fetch_all(resource, page_size=1000, message="Downloading Stream Data")
-
-    def _get_event_data(self, slug):
-        resource = self._api.event
-        return self._session.fetch_all(resource, page_size=1000, message="Downloading Events", filter=slug)
 
     @classmethod
     def FromDevice(cls, slug=None, external_id=None, domain=DOMAIN_NAME):
@@ -364,7 +266,8 @@ class AnalysisGroup(object):
         session = CloudSession(domain=domain)
         device = session.find_device(slug=slug, external_id=external_id)
 
-        return AnalysisGroup(device['slug'], source_type="device", domain=domain)
+        channel = IOTileCloudChannel(device['slug'], source_type="device", domain=domain)
+        return AnalysisGroup(channel)
 
     @classmethod
     def FromArchive(cls, slug=None, domain=DOMAIN_NAME):
@@ -381,4 +284,18 @@ class AnalysisGroup(object):
                 https://iotile.cloud).
         """
 
-        return AnalysisGroup(slug, source_type="archive")
+        channel = IOTileCloudChannel(slug, source_type="archive", domain=domain)
+        return AnalysisGroup(channel)
+
+    def save(self, out_path):
+        """Save this analysis group as an HDF5 file using PyTables.
+
+        You can load this file back in the future without connecting to
+        iotile.cloud using AnalysisGroup.FromFile.
+
+        Args:
+            out_path (str): The path to the output file to save.
+        """
+
+        #FIXME Implement this method
+        pass

@@ -17,7 +17,8 @@ setup(
         "scipy>=1.0.0",
         "typedargs>=0.10.0",
         "iotile_cloud>=0.7.2",
-        "tqdm>=4.19.4"
+        "tqdm>=4.19.4",
+        "tables>=3.4.2"
     ],
     description="A data science bridge for iotile.cloud",
     author="Arch",

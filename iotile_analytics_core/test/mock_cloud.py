@@ -45,6 +45,7 @@ class MockIOTileCloud(object):
 
         # APIs for getting raw data
         self.add_api("/api/v1/stream/(s--[0-9\-a-f]+)/data/", self.get_stream_data)
+        self.add_api("/api/v1/event/([0-9]+)/data/", self.get_raw_event)
 
         # APIs for querying single models
         self.add_api("/api/v1/device/(d--[0-9\-a-f]+)/", lambda x, y: self.one_object('devices', x, y))
@@ -123,6 +124,19 @@ class MockIOTileCloud(object):
                 raise ErrorCode(500)
 
         return self._paginate(results, request, 100)
+
+    def get_raw_event(self, request, event_id):
+        if self.stream_folder is None:
+            raise ErrorCode(404)
+
+        path = os.path.join(self.stream_folder, 'event_%s.json' % event_id)
+        if not os.path.isfile(path):
+            raise ErrorCode(404)
+
+        with open(path, "r") as infile:
+            results = json.load(infile)
+
+        return results
 
     def get_stream_data(self, request, stream):
         if stream not in self.streams:
@@ -259,3 +273,4 @@ class MockIOTileCloud(object):
         self.devices.update({x['slug']: x for x in data.get('devices', [])})
         self.streams.update({x['slug']: x for x in data.get('streams', [])})
         self.projects.update({x['id']: x for x in data.get('projects', [])})
+        self.events.update({x['id']: x for x in data.get('events', [])})

@@ -46,3 +46,13 @@ def test_data_access(water_meter):
 
     proj = api.project('1c07fdd0-3fad-4549-bd56-5af2aca18d5b').get()
     assert proj['slug'] == 'p--0000-0077'
+
+    events = api.event.get(filter="s--0000-0077--0000-0000-0000-00d2--5001")
+    res = events['results']
+    assert len(res) == 2
+
+    raw1 = api.event(1).data.get()
+    assert raw1 == {"test": 1, "hello": 2}
+
+    raw2 = api.event(2).data.get()
+    assert raw2 == {"test": 1, "goodbye": 15}
