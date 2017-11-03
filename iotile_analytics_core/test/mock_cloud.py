@@ -51,6 +51,7 @@ class MockIOTileCloud(object):
         self.add_api("/api/v1/device/(d--[0-9\-a-f]+)/", lambda x, y: self.one_object('devices', x, y))
         self.add_api("/api/v1/stream/(s--[0-9\-a-f]+)/", lambda x, y: self.one_object('streams', x, y))
         self.add_api("/api/v1/project/([0-9\-a-f]+)/", lambda x, y: self.one_object('projects', x, y))
+        self.add_api("/api/v1/vartype/([0-9\-a-zA-Z]+)/", self.get_vartype)
 
         # APIs for listing models
         self.add_api(r"/api/v1/stream/", self.list_streams)
@@ -87,8 +88,23 @@ class MockIOTileCloud(object):
 
         return injson
 
+    def get_vartype(self, request, slug):
+        """Get a vartype object."""
+
+        path = os.path.join(self.stream_folder, 'variable_types', '%s.json' % slug)
+        if not os.path.isfile(path):
+            raise ErrorCode(404)
+
+        try:
+            with open(path, "r") as infile:
+                vartype = json.load(infile)
+        except:
+            raise ErrorCode(500)
+
+        return vartype
+
     def one_object(self, obj_type, request, obj_id):
-        """Handle /device/<slug>/ GET."""
+        """Handle /<object>/<slug>/ GET."""
 
         self.verify_token(request)
 

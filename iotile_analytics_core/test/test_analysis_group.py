@@ -8,7 +8,7 @@ import pytest
 from typedargs.exceptions import ArgumentError
 from iotile_analytics.core import CloudSession, AnalysisGroup
 from iotile_analytics.core.stream_series import StreamSeries
-from iotile_analytics.core.exceptions import CloudError, AuthenticationError, CertificateVerificationError
+from iotile_analytics.core.exceptions import AuthenticationError, CertificateVerificationError
 
 
 def test_session_login(water_meter):

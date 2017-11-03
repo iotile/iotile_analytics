@@ -39,6 +39,18 @@ class AnalysisGroupChannel(object):
 
         raise NotImplementedError()
 
+    def fetch_variable_types(self, slugs):
+        """Fetch variable type information for a list of variable slugs.
+
+        Args:
+            slugs (list(str)): The slugs of the variable types that we should fetch.
+
+        Returns:
+            dict(<slug>: dict): A dict mapping variable slugs to variable type definitions
+        """
+
+        raise NotImplementedError()
+
     def fetch_events(self, slug):
         """Fetch all events for a given stream.
 

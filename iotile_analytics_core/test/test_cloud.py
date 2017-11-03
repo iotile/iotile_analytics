@@ -56,3 +56,5 @@ def test_data_access(water_meter):
 
     raw2 = api.event(2).data.get()
     assert raw2 == {"test": 1, "goodbye": 15}
+
+    vartype = api.vartype('water-meter-volume').get()

@@ -8,7 +8,7 @@ from a Project, a Device or a DataBlock.
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from builtins import *
-from future.utils import viewitems
+from future.utils import viewitems, viewvalues
 
 import pandas as pd
 from iotile_cloud.api.connection import DOMAIN_NAME
@@ -50,7 +50,7 @@ class AnalysisGroup(object):
         stream_list = channel.list_streams()
         self.streams = self._parse_stream_list(stream_list)
         self.stream_counts = channel.count_streams([x['slug'] for x in stream_list])
-
+        self.variable_types = channel.fetch_variable_types(set([x['var_type'] for x in viewvalues(self.streams)]))
         self._stream_table = [(slug.lower(), self._get_stream_name(stream).lower()) for slug, stream in viewitems(self.streams)]
 
     def stream_empty(self, slug):
