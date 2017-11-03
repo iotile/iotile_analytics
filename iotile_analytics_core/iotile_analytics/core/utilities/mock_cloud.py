@@ -117,10 +117,14 @@ class MockIOTileCloud(object):
     def list_streams(self, request):
         """List and possibly filter streams."""
 
+        results = []
+
         if 'device' in request.args:
             results = [x for x in self.streams.values() if x['device'] == request.args['device']]
         elif 'project' in request.args:
             results = [x for x in self.streams.values() if x['project'] == request.args['project'] or x['project_id'] == request.args['project']]
+        elif 'block' in request.args:
+            results = [x for x in self.streams.values() if x['block'] == request.args['block']]
 
         return self._paginate(results, request, 100)
 
