@@ -293,16 +293,3 @@ class AnalysisGroup(object):
 
         channel = IOTileCloudChannel(slug, source_type="archive", domain=domain)
         return AnalysisGroup(channel)
-
-    def save(self, out_path):
-        """Save this analysis group as an HDF5 file using PyTables.
-
-        You can load this file back in the future without connecting to
-        iotile.cloud using AnalysisGroup.FromFile.
-
-        Args:
-            out_path (str): The path to the output file to save.
-        """
-
-        #FIXME Implement this method
-        pass
