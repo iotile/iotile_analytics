@@ -45,11 +45,13 @@ class MockIOTileCloud(object):
 
         # APIs for getting raw data
         self.add_api("/api/v1/stream/(s--[0-9\-a-f]+)/data/", self.get_stream_data)
+        self.add_api("/api/v1/event/([0-9]+)/data/", self.get_raw_event)
 
         # APIs for querying single models
         self.add_api("/api/v1/device/(d--[0-9\-a-f]+)/", lambda x, y: self.one_object('devices', x, y))
         self.add_api("/api/v1/stream/(s--[0-9\-a-f]+)/", lambda x, y: self.one_object('streams', x, y))
         self.add_api("/api/v1/project/([0-9\-a-f]+)/", lambda x, y: self.one_object('projects', x, y))
+        self.add_api("/api/v1/vartype/([0-9\-a-zA-Z]+)/", self.get_vartype)
 
         # APIs for listing models
         self.add_api(r"/api/v1/stream/", self.list_streams)
@@ -86,8 +88,23 @@ class MockIOTileCloud(object):
 
         return injson
 
+    def get_vartype(self, request, slug):
+        """Get a vartype object."""
+
+        path = os.path.join(self.stream_folder, 'variable_types', '%s.json' % slug)
+        if not os.path.isfile(path):
+            raise ErrorCode(404)
+
+        try:
+            with open(path, "r") as infile:
+                vartype = json.load(infile)
+        except:
+            raise ErrorCode(500)
+
+        return vartype
+
     def one_object(self, obj_type, request, obj_id):
-        """Handle /device/<slug>/ GET."""
+        """Handle /<object>/<slug>/ GET."""
 
         self.verify_token(request)
 
@@ -100,10 +117,14 @@ class MockIOTileCloud(object):
     def list_streams(self, request):
         """List and possibly filter streams."""
 
+        results = []
+
         if 'device' in request.args:
             results = [x for x in self.streams.values() if x['device'] == request.args['device']]
         elif 'project' in request.args:
             results = [x for x in self.streams.values() if x['project'] == request.args['project'] or x['project_id'] == request.args['project']]
+        elif 'block' in request.args:
+            results = [x for x in self.streams.values() if x['block'] == request.args['block']]
 
         return self._paginate(results, request, 100)
 
@@ -123,6 +144,19 @@ class MockIOTileCloud(object):
                 raise ErrorCode(500)
 
         return self._paginate(results, request, 100)
+
+    def get_raw_event(self, request, event_id):
+        if self.stream_folder is None:
+            raise ErrorCode(404)
+
+        path = os.path.join(self.stream_folder, 'event_%s.json' % event_id)
+        if not os.path.isfile(path):
+            raise ErrorCode(404)
+
+        with open(path, "r") as infile:
+            results = json.load(infile)
+
+        return results
 
     def get_stream_data(self, request, stream):
         if stream not in self.streams:
@@ -259,3 +293,17 @@ class MockIOTileCloud(object):
         self.devices.update({x['slug']: x for x in data.get('devices', [])})
         self.streams.update({x['slug']: x for x in data.get('streams', [])})
         self.projects.update({x['id']: x for x in data.get('projects', [])})
+        self.events.update({x['id']: x for x in data.get('events', [])})
+
+
+@pytest.fixture(scope="module")
+def mock_cloud():
+    """A Mock iotile.cloud instance for testing."""
+
+    cloud = MockIOTileCloud()
+    server = WSGIServer(application=cloud, ssl_context="adhoc")  # Generate a new fake, unverified ssl cert for this server
+
+    server.start()
+    domain = server.url
+    yield domain, cloud
+    server.stop()

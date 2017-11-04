@@ -6,25 +6,7 @@ from builtins import *
 
 import os.path
 import pytest
-from pytest_localserver.http import WSGIServer
-from mock_cloud import MockIOTileCloud
 from iotile_analytics.core import CloudSession, AnalysisGroup
-
-
-@pytest.fixture(scope="module")
-def mock_cloud():
-    """Create a mock IOTile.cloud server."""
-
-    base = os.path.dirname(__file__)
-    conf = os.path.join(base, 'data', 'basic_cloud.json')
-
-    cloud = MockIOTileCloud(conf)
-    server = WSGIServer(application=cloud, ssl_context="adhoc")  # Generate a new fake, unverified ssl cert for this server
-
-    server.start()
-    domain = server.url
-    yield domain, cloud
-    server.stop()
 
 
 @pytest.fixture(scope="module")
@@ -35,6 +17,7 @@ def water_meter(mock_cloud):
     base = os.path.dirname(__file__)
     conf = os.path.join(base, 'data', 'test_project_watermeter.json')
 
+    cloud.add_data(os.path.join(base, 'data', 'basic_cloud.json'))
     cloud.add_data(conf)
     cloud.stream_folder = os.path.join(base, 'data', 'watermeter')
 

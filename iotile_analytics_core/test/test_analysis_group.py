@@ -7,7 +7,8 @@ from builtins import *
 import pytest
 from typedargs.exceptions import ArgumentError
 from iotile_analytics.core import CloudSession, AnalysisGroup
-from iotile_analytics.core.exceptions import CloudError, AuthenticationError, CertificateVerificationError
+from iotile_analytics.core.stream_series import StreamSeries
+from iotile_analytics.core.exceptions import AuthenticationError, CertificateVerificationError
 
 
 def test_session_login(water_meter):
@@ -63,9 +64,38 @@ def test_stream_download(filter_group):
     data = filter_group.fetch_stream('5001')
     assert len(data) == 11
 
+    assert isinstance(data, StreamSeries)
+    assert set(data.available_units) == set(['Liters', 'Gallons', 'Cubic Meters', 'Acre Feet'])
+
+    outL = data.convert('Liters')
+    outG = data.convert('Gallons')
+
+    assert data.iloc[0][0] == pytest.approx(outL.iloc[0][0])
+    assert data.iloc[0][0] / 3.78541 == pytest.approx(outG.iloc[0][0])
+    with pytest.raises(ArgumentError):
+        data.convert('Test Unit')
+
 
 def test_invalid_stream(filter_group):
     """Make sure we raise the right error if we can't find a stream."""
 
     with pytest.raises(ArgumentError):
         filter_group.fetch_stream('5500')
+
+
+def test_raw_events(filter_group):
+    """Make sure we can download raw events."""
+
+    meta = filter_group.fetch_events('5001')
+    print(meta.columns)
+    assert meta.columns[0] == 'event_id'
+    assert meta.columns[1] == 'meta'
+
+    assert meta.iloc[0]['meta'] == 'hello'
+    assert meta.iloc[1]['meta'] == 'goodbye'
+
+    raw = filter_group.fetch_raw_events('5001')
+
+    assert len(raw) == 2
+    assert raw.iloc[0]['test'] == 1
+    assert raw.iloc[1]['goodbye'] == 15

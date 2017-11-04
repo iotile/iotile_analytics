@@ -2,6 +2,10 @@
 
 ## HEAD
 
+## 0.1.0
+
+- Update Viewer to support Pandas DataFrame arguments
+
 ## 0.0.1
 
 - Initial release with new package names
