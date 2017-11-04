@@ -98,6 +98,8 @@ class BaseViewer(object):
 
         if isinstance(input_data, pd.Series):
             return input_data.index, input_data.values
+        elif isinstance(input_data, pd.DataFrame):
+            return input_data.index, input_data.values
         elif isinstance(input_data, np.ndarray):
             return input_data[:, 0], input_data[:, 1]
 

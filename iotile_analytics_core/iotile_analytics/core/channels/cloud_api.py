@@ -144,7 +144,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
         resources = [self._api.event(x).data for x in event_ids]
 
-        data = self._session.fetch_multiple(resources)
+        data = self._session.fetch_multiple(resources, message="Downloading Raw Event Data")
         return pd.DataFrame(data, index=events.index)
 
     def fetch_datapoints(self, slug):
