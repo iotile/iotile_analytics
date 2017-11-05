@@ -5,8 +5,9 @@ from __future__ import (absolute_import, division,
 import uuid
 import os.path
 import tables
-
+import pandas as pd
 import numpy as np
+from iotile_analytics.core.stream_series import StreamSeries
 from typedargs.exceptions import ArgumentError
 from .table_descriptions import Stream, EventIndex
 
@@ -40,6 +41,12 @@ class OfflineDatabase(object):
             self._initialize_database()
             self.read_only = False
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self._file.close()
+
     def _initialize_database(self):
         """Create all necessary tables."""
 
@@ -49,6 +56,7 @@ class OfflineDatabase(object):
         meta = self._file.create_group(root, 'meta')
         self._file.create_vlarray(meta, 'archive_defintions', tables.ObjectAtom())
         self._file.create_vlarray(meta, 'device_definitions', tables.ObjectAtom())
+        self._file.create_vlarray(meta, 'vartype_definitions', tables.ObjectAtom())
 
     def save_stream(self, slug, definition, data=None, events=None, raw_events=None):
         """Save a stream with timeseries and event data.
@@ -115,9 +123,23 @@ class OfflineDatabase(object):
 
             table_data.flush()
 
+    def save_vartype(self, _slug, vartype):
+        """Save a vartype into the database.
+
+        Args:
+            _slug (str): The variable type slug to save.
+            vartype (dict): The variable type data to save.
+        """
+
+        if self.read_only:
+            raise ArgumentError("Attempted to save variable type in read only file")
+
+        table = self._file.root.meta.vartype_definitions
+        table.append(vartype)
+
     @classmethod
     def _to_timecol(cls, value):
-        np.datetime64(value).astype('float64') / 1e6
+        return np.datetime64(value).astype('float64') / 1e6
 
     def list_streams(self):
         """List all stream slugs defined in this OfflineDatabase.
@@ -127,3 +149,73 @@ class OfflineDatabase(object):
         """
 
         return set([x._v_name.replace('_', '-') for x in self._file.root.streams._f_iter_nodes()])
+
+    def close(self):
+        self._file.close()
+
+    def get_stream_definition(self, slug):
+        """Get the stream definitions for a stream.
+
+        Args:
+            slug (str): The stream slug to query
+
+        Returns:
+            dict: The stream metadata
+        """
+
+        name = slug.replace('-', '_')
+
+        if name not in self._file.root.streams:
+            raise ArgumentError("Stream slug not found in OfflineDatabase", slug=slug)
+
+        group = getattr(self._file.root.streams, name)
+        return group.definition[0]
+
+    def get_datapoints(self, slug):
+        """Get all timeseries data for a stream.
+
+        Args:
+            slug (str): The stream slug to query
+
+        Returns:
+            StreamSeries: The stream data.
+        """
+
+        name = slug.replace('-', '_')
+
+        if name not in self._file.root.streams:
+            raise ArgumentError("Stream slug not found in OfflineDatabase", slug=slug)
+
+        data = getattr(self._file.root.streams, name).data
+
+        index = data.read(field='timestamp')
+        values = data.read(field='internal_value')
+
+        dt_index = pd.to_datetime(index*1e9)
+        return StreamSeries(values, index=dt_index)
+
+    def _get_event_index(self, name):
+        data = getattr(self._file.root.streams, name).event_index
+        return data.read()
+
+    def get_events(self, slug):
+        """Get all events for a stream.
+
+        Args:
+            slug (str): The stream slug to query
+
+        Returns:
+            pd.DataFrame: All of the events.
+        """
+
+        name = slug.replace('-', '_')
+
+        if name not in self._file.root.streams:
+            raise ArgumentError("Stream slug not found in OfflineDatabase", slug=slug)
+
+        events = self._get_event_index(name)
+
+        event_data = getattr(self._file.root.streams, name).events.read()
+
+        index = pd.to_datetime([x['timestamp']*1e9 for x in events])
+        return pd.DataFrame(event_data, index=index)

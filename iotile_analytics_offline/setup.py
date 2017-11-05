@@ -14,6 +14,10 @@ setup(
         "iotile-analytics-core >= 0.2.0",
         "tables >= 3.4.2"
     ],
+    entry_points={
+        'iotile_analytics.save_format': ['hdf5 = iotile_analytics.offline.database:OfflineDatabase'],
+        'iotile_analytics.load_format': ['hdf5 = iotile_analytics.offline.save_plugin:HDF5CloudChannel']
+    },
     description="A data science bridge for iotile.cloud",
     author="Arch",
     author_email="info@arch-iot.com",
