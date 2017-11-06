@@ -10,6 +10,7 @@ from __future__ import (absolute_import, division,
 from builtins import *
 from future.utils import viewitems, viewvalues
 
+import pkg_resources
 import pandas as pd
 from iotile_cloud.api.connection import DOMAIN_NAME
 from iotile_cloud.api.exceptions import RestHttpBaseException
@@ -318,3 +319,61 @@ class AnalysisGroup(object):
 
         channel = IOTileCloudChannel(slug, source_type="datablock", domain=domain)
         return AnalysisGroup(channel)
+
+    def save(self, identifier, format_name):
+        """Save this AnalysisGroup.
+
+        You can then load this analysis group again by calling
+        AnalysisGroup.FromSaved(identifier, format)
+
+        with the same identifier and format information.
+
+        Args:
+            identifier (str): The format specific identifier that we will
+                use to name this saved AnalysisGroup.  The meaning of this
+                parameter depends on the format but, for example, it could
+                be the file name.
+            format_name (str): An identifier for the format we wish to use to
+                save our data.  You can find the list of available formats
+                by calling list_formats().
+        """
+
+        saver_factory = self._find_save_format(format_name)
+        with saver_factory(identifier) as saver:
+            for slug, stream in viewitems(self.streams):
+                data = None
+                events = None
+                raw_events = None
+                if not self.stream_empty(slug):
+                    data = self.fetch_stream(slug)
+                    events = self.fetch_events(slug)
+                    raw_events = self.fetch_raw_events(slug)
+
+                saver.save_stream(slug, stream, data, events, raw_events)
+
+            for slug, vartype in viewitems(self.variable_types):
+                saver.save_vartype(slug, vartype)
+
+    @classmethod
+    def _find_save_format(cls, format_name):
+        for entry in pkg_resources.iter_entry_points('iotile_analytics.save_format', format_name):
+            return entry.load()
+
+        raise ArgumentError("Could not find output format by name", available_formats=cls.list_formats())
+
+    @classmethod
+    def _find_load_format(cls, format_name):
+        for entry in pkg_resources.iter_entry_points('iotile_analytics.load_format', format_name):
+            return entry.load()
+
+        raise ArgumentError("Could not find output format by name", available_formats=cls.list_formats())
+
+    @classmethod
+    def list_formats(cls):
+        """List the installed formats in which we can save an AnalysisGroup.
+
+        Returns:
+            list(str): A list of the names that can be passed to save or FromSaved.
+        """
+
+        return [x.name for x in pkg_resources.iter_entry_points('iotile_analytics.save_format')]

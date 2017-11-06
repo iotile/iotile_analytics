@@ -199,7 +199,7 @@ class MockIOTileCloud(object):
 
             for row in reader:
                 ts = row[0]
-                intval = row[1]
+                intval = float(row[1])
 
                 res = {
                     "type": "ITR",
