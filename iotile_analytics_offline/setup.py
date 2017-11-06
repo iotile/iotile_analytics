@@ -16,7 +16,7 @@ setup(
     ],
     entry_points={
         'iotile_analytics.save_format': ['hdf5 = iotile_analytics.offline.database:OfflineDatabase'],
-        'iotile_analytics.load_format': ['hdf5 = iotile_analytics.offline.save_plugin:HDF5CloudChannel']
+        'iotile_analytics.load_format': ['hdf5 = iotile_analytics.offline.database:OfflineDatabase']
     },
     description="A data science bridge for iotile.cloud",
     author="Arch",

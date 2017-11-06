@@ -142,13 +142,17 @@ class OfflineDatabase(object):
         return np.datetime64(value).astype('float64') / 1e6
 
     def list_streams(self):
-        """List all stream slugs defined in this OfflineDatabase.
+        """Return a list of all streams.
+
+        This is equivalent to the IOTile.cloud API method
+        /api/v1/stream/
 
         Returns:
-            set(str): A set of all of the stream slugs defined in this database.
+            list(dict): A list of dictionaries, one for each
+                stream that should be part of this analysis group.
         """
 
-        return set([x._v_name.replace('_', '-') for x in self._file.root.streams._f_iter_nodes()])
+        return [x.definition[0] for x in self._file.root.streams._f_iter_nodes()]
 
     def close(self):
         self._file.close()
@@ -171,7 +175,7 @@ class OfflineDatabase(object):
         group = getattr(self._file.root.streams, name)
         return group.definition[0]
 
-    def get_datapoints(self, slug):
+    def fetch_datapoints(self, slug):
         """Get all timeseries data for a stream.
 
         Args:
@@ -198,11 +202,15 @@ class OfflineDatabase(object):
         data = getattr(self._file.root.streams, name).event_index
         return data.read()
 
-    def get_events(self, slug):
-        """Get all events for a stream.
+    def fetch_events(self, slug):
+        """Fetch all events for a given stream.
+
+        These are the event metadata dictionaries, not the raw
+        event data that may be stored along with the metadata.
 
         Args:
-            slug (str): The stream slug to query
+            slug (str): The slug of the stream that we should fetch
+                events for.
 
         Returns:
             pd.DataFrame: All of the events.
@@ -219,3 +227,73 @@ class OfflineDatabase(object):
 
         index = pd.to_datetime([x['timestamp']*1e9 for x in events])
         return pd.DataFrame(event_data, index=index)
+
+    def _count_stream(self, slug):
+        """Count the number of data points and events in a stream."""
+
+        name = slug.replace('-', '_')
+
+        if name not in self._file.root.streams:
+            raise ArgumentError("Stream slug not found in OfflineDatabase", slug=slug)
+
+        stream = getattr(self._file.root.streams, name)
+        data_count = len(stream.data)
+        event_count = len(stream.events)
+
+        return {'points': data_count, 'events': event_count}
+
+    def fetch_raw_events(self, slug):
+        """Fetch all raw event data for this stream.
+
+        These are the raw json dictionaries that are stored for
+        each event.
+
+        Args:
+            slug (str): The slug of the stream that we should fetch
+                raw events for.
+
+        Returns:
+            pd.DataFrame: All of the raw events.
+        """
+
+        name = slug.replace('-', '_')
+
+        if name not in self._file.root.streams:
+            raise ArgumentError("Stream slug not found in OfflineDatabase", slug=slug)
+
+        events = self._get_event_index(name)
+
+        event_data = getattr(self._file.root.streams, name).raw_events.read()
+
+        index = pd.to_datetime([x['timestamp']*1e9 for x in events])
+        return pd.DataFrame(event_data, index=index)
+
+    def count_streams(self, slugs):
+        """Count the number of events and data points in a stream.
+
+        Args:
+            slugs (list(str)): The slugs of the stream that we should count.
+
+        Returns:
+            dict(<slug>: {'points': int, 'events': int}): A dict mapping dicts of 2
+                integers with the count of the number of events and the number of
+                data points in this stream.
+        """
+
+        return {slug: self._count_stream(slug) for slug in slugs}
+
+    def fetch_variable_types(self, slugs):
+        """Fetch variable type information for a list of variable slugs.
+
+        Args:
+            slugs (list(str)): The slugs of the variable types that we should fetch.
+
+        Returns:
+            dict(<slug>: dict): A dict mapping variable slugs to variable type definitions
+        """
+
+        slugs = set(slugs)
+        vartypes = self._file.root.meta.vartype_definitions.read()
+
+        return {x['slug']: x for x in vartypes if x['slug'] in slugs}
+

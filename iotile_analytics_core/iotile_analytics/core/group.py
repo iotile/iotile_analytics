@@ -320,6 +320,33 @@ class AnalysisGroup(object):
         channel = IOTileCloudChannel(slug, source_type="datablock", domain=domain)
         return AnalysisGroup(channel)
 
+    @classmethod
+    def FromSaved(cls, identifier, format_name):
+        """Load a saved AnalysisGroup.
+
+        You must have previously called save on an AnalysisGroup
+        and passed it a known format_name and identifier.  Passing
+        that same identifier and format_name will reload that same
+        AnalysisGroup without needing online access to IOTile.cloud.
+
+        Args:
+            identifier (str): The format specific identifier that we will
+                use to name this saved AnalysisGroup.  The meaning of this
+                parameter depends on the format but, for example, it could
+                be the file name.
+            format_name (str): An identifier for the format we wish to use to
+                save our data.  You can find the list of available formats
+                by calling list_formats().
+
+        Returns:
+            AnalysisGroup: The saved AnalysisGroup
+        """
+
+        loader = cls._find_load_format(format_name)
+
+        channel = loader(identifier)
+        return AnalysisGroup(channel)
+
     def save(self, identifier, format_name):
         """Save this AnalysisGroup.
 
