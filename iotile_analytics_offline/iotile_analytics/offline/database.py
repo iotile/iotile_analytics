@@ -139,7 +139,7 @@ class OfflineDatabase(object):
 
     @classmethod
     def _to_timecol(cls, value):
-        return np.datetime64(value).astype('float64') / 1e6
+        return value.astype('int64')
 
     def list_streams(self):
         """Return a list of all streams.
@@ -195,7 +195,7 @@ class OfflineDatabase(object):
         index = data.read(field='timestamp')
         values = data.read(field='internal_value')
 
-        dt_index = pd.to_datetime(index*1e9)
+        dt_index = pd.to_datetime(index)
         return StreamSeries(values, index=dt_index)
 
     def _get_event_index(self, name):
@@ -225,7 +225,7 @@ class OfflineDatabase(object):
 
         event_data = getattr(self._file.root.streams, name).events.read()
 
-        index = pd.to_datetime([x['timestamp']*1e9 for x in events])
+        index = pd.to_datetime([x['timestamp'] for x in events])
         return pd.DataFrame(event_data, index=index)
 
     def _count_stream(self, slug):
@@ -265,7 +265,7 @@ class OfflineDatabase(object):
 
         event_data = getattr(self._file.root.streams, name).raw_events.read()
 
-        index = pd.to_datetime([x['timestamp']*1e9 for x in events])
+        index = pd.to_datetime([x['timestamp'] for x in events])
         return pd.DataFrame(event_data, index=index)
 
     def count_streams(self, slugs):
@@ -296,4 +296,3 @@ class OfflineDatabase(object):
         vartypes = self._file.root.meta.vartype_definitions.read()
 
         return {x['slug']: x for x in vartypes if x['slug'] in slugs}
-
