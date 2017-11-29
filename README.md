@@ -79,6 +79,12 @@ If you are on Windows and don't have a good python interpreter, one potentially
 good option would be [Anaconda](https://www.anaconda.com/download/).  It has
 prebuilt versions of all of the standard packages.  
 
+### (optional) Using Docker
+
+Docker is a good alternative to avoid installing the different dependencies. Use the 
+[IOTile Jupyter Docker image](/docker/iotile_jupyter/README.md) to build and run an image
+with all the required packages.
+
 ## Basic Usage
 
 This package is best used in combination with a Jupyter Notebook for
