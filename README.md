@@ -33,6 +33,7 @@ This package requires the following standard python data analysis packages:
 - numpy
 - pandas
 - matplotlib
+- bqplot
 
 They are installed automatically when you install `iotile_anlytics` but if you
 are running on Windows, you may want to download a prebuilt python distribution
@@ -71,6 +72,7 @@ Notebook you need to install [IPyWidgets](https://ipywidgets.readthedocs.io/en/l
 ```shell
 pip install ipywidgets
 jupyter nbextension enable --py --sys-prefix widgetsnbextension
+jupyter nbextension enable --py --sys-prefix bqplot
 ```
 
 ### (optional) Windows Python Installation

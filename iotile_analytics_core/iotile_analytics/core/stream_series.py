@@ -85,7 +85,7 @@ class StreamSeries(pd.DataFrame):
         unit_data = units[unit]
         m = unit_data.get('m', 1)
         d = unit_data.get('d', 1)
-        o = unit_data.get('o', 1)
+        o = unit_data.get('o', 0.0)
 
         return (m, d, o)
 
