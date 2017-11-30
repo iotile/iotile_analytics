@@ -15,6 +15,7 @@ iotile.cloud.
     - [\(optional\) Jupyter Setup](#optional-jupyter-setup)
     - [\(optional\) Interactive Widgets](#optional-interactive-widgets)
     - [\(optional\) Windows Python Installation](#optional-windows-python-installation)
+    - [\(optional\) Using Docker](#optional-using-docker)
 - [Basic Usage](#basic-usage)
 - [Documentation](#documentation)
 
@@ -84,8 +85,9 @@ prebuilt versions of all of the standard packages.
 ### (optional) Using Docker
 
 Docker is a good alternative to avoid installing the different dependencies. Use the 
-[IOTile Jupyter Docker image](/docker/iotile_jupyter/README.md) to build and run an image
-with all the required packages.
+[IOTile Analytics Docker image](https://hub.docker.com/r/iotile/iotile_analytics/) to run the Jupyter server
+or stand alone python scripts.
+See [Docker Image README](/docker/iotile_jupyter/README.md).
 
 ## Basic Usage
 
