@@ -80,7 +80,7 @@ docker run -it --rm --entrypoint python -v $(pwd):/home/jovyan iotile/iotile_ana
 
 ## Docker Compose
 
-A convinient way to store the configuration (to avoid so much typing on the cmd line) is to use docker-compose. 
+A convenient way to store the configuration (to avoid so much typing on the cmd line) is to use docker-compose. 
 The following snippet shows a possible `docker-compose.yml` file
 
 ```
