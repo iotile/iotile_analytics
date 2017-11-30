@@ -16,7 +16,11 @@ import setuptools.sandbox
 import subprocess
 from twine.commands.upload import upload
 import glob
-from components import comp_names
+from components import comp_names, ignored_names
+
+class IgnoredTagError(Exception):
+    pass
+
 
 def send_slack_message(message):
     """Send a message to the slack channel #coretools
@@ -35,7 +39,7 @@ def get_release_component():
     """Split the argument passed on the command line into a component name and expected version
     """
 
-    global comp_names
+    global comp_names, ignored_names
 
     if len(sys.argv) < 2:
         raise EnvironmentError("Usage: python release.py <component_name>-<version>")
@@ -48,6 +52,9 @@ def get_release_component():
         vers = comp[1:]
     else:
         name, vers = comp.split("-")
+
+    if name in ignored_names:
+        raise IgnoredTagError()
 
     if name not in comp_names:
         raise EnvironmentError("Invalid unknown release component name", name=name, known_names=comp_names.keys())
@@ -148,8 +155,12 @@ def main():
     dry_run = False
     if sys.argv[-2] == '--check':
         dry_run = True
+    try:
+        component, version = get_release_component()
+    except IgnoredTagError:
+        print("Ignoring tag that is in our ignored tag list")
+        sys.exit(0)
 
-    component, version = get_release_component()
     check_version(component, version)
     build_component(component)
 
