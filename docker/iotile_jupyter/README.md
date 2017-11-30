@@ -32,7 +32,7 @@ To run in the background, replace `--rm` with `-d`, but you will need `docker ps
 to find the URL. e.g.
 
 ```
-$ docker run -it --d -p 8888:8888 -v $(pwd)/work:/home/jovyan/work  iotile_jupyter
+$ docker run -it -d -p 8888:8888 -v $(pwd)/work:/home/jovyan/work  iotile_jupyter
 ae2bd0332ebdd93653d579dfbf215ed2e370d91fd5aae8f7c643c10178056c9f
 
 $ docker ps

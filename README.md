@@ -33,6 +33,7 @@ This package requires the following standard python data analysis packages:
 - numpy
 - pandas
 - matplotlib
+- bqplot
 
 They are installed automatically when you install `iotile_anlytics` but if you
 are running on Windows, you may want to download a prebuilt python distribution
@@ -71,6 +72,7 @@ Notebook you need to install [IPyWidgets](https://ipywidgets.readthedocs.io/en/l
 ```shell
 pip install ipywidgets
 jupyter nbextension enable --py --sys-prefix widgetsnbextension
+jupyter nbextension enable --py --sys-prefix bqplot
 ```
 
 ### (optional) Windows Python Installation
@@ -78,6 +80,12 @@ jupyter nbextension enable --py --sys-prefix widgetsnbextension
 If you are on Windows and don't have a good python interpreter, one potentially
 good option would be [Anaconda](https://www.anaconda.com/download/).  It has
 prebuilt versions of all of the standard packages.  
+
+### (optional) Using Docker
+
+Docker is a good alternative to avoid installing the different dependencies. Use the 
+[IOTile Jupyter Docker image](/docker/iotile_jupyter/README.md) to build and run an image
+with all the required packages.
 
 ## Basic Usage
 

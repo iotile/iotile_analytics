@@ -16,6 +16,3 @@ RUN jupyter nbextension enable --py --sys-prefix bqplot
 
 EXPOSE 8888
 ENTRYPOINT ["jupyter", "notebook"]
-
-# Add permanent apt-get installs and other root commands here
-# e.g., RUN apt-get install npm nodejs
