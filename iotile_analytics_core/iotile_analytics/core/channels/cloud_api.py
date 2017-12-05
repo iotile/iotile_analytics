@@ -142,15 +142,20 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
         events = self.fetch_events(slug)
         event_ids = events['event_id'].values
-        # event.has_data is true if there is an associated raw JSON file stored on S3 for this event
+        # event.has_raw_data is true if there is an associated raw JSON file stored on S3 for this event
         event_has_data = events['has_raw_data'].values
+        indexes = events.index
         resources = []
+        new_index = []
         for index in range(len(event_ids)):
             if event_has_data[index]:
-                resources.append(channel._api.event(event_ids[index]).data)
+                resources.append(self._api.event(event_ids[index]).data)
+                new_index.append(indexes[index])
 
         data = self._session.fetch_multiple(resources, message="Downloading Raw Event Data")
-        return pd.DataFrame(data, index=events.index)
+        # new_index includes all indexes with actual data
+        new_index = pd.to_datetime(new_index)
+        return pd.DataFrame(data, index=new_index)
 
     def fetch_datapoints(self, slug):
         """Fetch all data points for this stream.

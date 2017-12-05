@@ -87,7 +87,6 @@ def test_raw_events(filter_group):
     """Make sure we can download raw events."""
 
     meta = filter_group.fetch_events('5001')
-    print(meta.columns)
     assert meta.columns[0] == 'event_id'
     assert meta.columns[1] == 'has_raw_data'
     assert meta.columns[2] == 'meta'
@@ -99,4 +98,4 @@ def test_raw_events(filter_group):
 
     assert len(raw) == 2
     assert raw.iloc[0]['test'] == 1
-    assert raw.iloc[1]['goodbye'] == 15
+    assert raw.iloc[1]['goodbye'] == 15.0
