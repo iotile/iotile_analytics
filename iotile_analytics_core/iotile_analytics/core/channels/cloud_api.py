@@ -120,7 +120,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
             for i, event in enumerate(data):
                 extra_data[i]['event_id'] = event['id']
-                extra_data[i]['has_data'] = event['has_data']
+                extra_data[i]['has_raw_data'] = event['has_raw_data']
 
             return pd.DataFrame(extra_data, index=dt_index)
         except RestHttpBaseException as exc:
@@ -143,7 +143,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         events = self.fetch_events(slug)
         event_ids = events['event_id'].values
         # event.has_data is true if there is an associated raw JSON file stored on S3 for this event
-        event_has_data = events['has_data'].values
+        event_has_data = events['has_raw_data'].values
         resources = []
         for index in range(len(event_ids)):
             if event_has_data[index]:
