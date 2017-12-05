@@ -89,7 +89,8 @@ def test_raw_events(filter_group):
     meta = filter_group.fetch_events('5001')
     print(meta.columns)
     assert meta.columns[0] == 'event_id'
-    assert meta.columns[1] == 'meta'
+    assert meta.columns[1] == 'has_raw_data'
+    assert meta.columns[2] == 'meta'
 
     assert meta.iloc[0]['meta'] == 'hello'
     assert meta.iloc[1]['meta'] == 'goodbye'
