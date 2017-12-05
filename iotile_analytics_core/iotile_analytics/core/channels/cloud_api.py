@@ -120,6 +120,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
             for i, event in enumerate(data):
                 extra_data[i]['event_id'] = event['id']
+                extra_data[i]['has_data'] = event['has_data']
 
             return pd.DataFrame(extra_data, index=dt_index)
         except RestHttpBaseException as exc:
@@ -128,7 +129,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
     def fetch_raw_events(self, slug):
         """Fetch all raw event data for this stream.
 
-        These are the raw json dictionaries that are stored for
+        These are the raw json dictionaries that may be stored for
         each event.
 
         Args:
@@ -141,8 +142,12 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
         events = self.fetch_events(slug)
         event_ids = events['event_id'].values
-
-        resources = [self._api.event(x).data for x in event_ids]
+        # event.has_data is true if there is an associated raw JSON file stored on S3 for this event
+        event_has_data = events['has_data'].values
+        resources = []
+        for index in range(len(event_ids)):
+            if event_has_data[index]:
+                resources.append(channel._api.event(event_ids[index]).data)
 
         data = self._session.fetch_multiple(resources, message="Downloading Raw Event Data")
         return pd.DataFrame(data, index=events.index)
