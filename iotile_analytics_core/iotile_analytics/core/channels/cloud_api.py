@@ -120,7 +120,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
             for i, event in enumerate(data):
                 extra_data[i]['event_id'] = event['id']
-                extra_data[i]['has_raw_data'] = event['has_raw_data'] if 'has_raw_data' in event else False
+                extra_data[i]['has_raw_data'] = event.get('has_raw_data', False)
 
             return pd.DataFrame(extra_data, index=dt_index)
         except RestHttpBaseException as exc:
