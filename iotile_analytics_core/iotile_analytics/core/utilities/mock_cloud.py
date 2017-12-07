@@ -86,8 +86,6 @@ class MockIOTileCloud(object):
         except:
             raise ErrorCode(400)
 
-        return injson
-
     def get_vartype(self, request, slug):
         """Get a vartype object."""
 
