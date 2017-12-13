@@ -106,6 +106,15 @@ def test_raw_events(filter_group):
 def test_channel_info(filter_group):
     """Make sure we can download raw events."""
 
+    # Test AnalyisGroup API
+    device = filter_group.source_info
+    assert device['slug'] == 'd--0000-0000-0000-00d2'
+    assert device['label'] == 'Filtration Flow'
+    assert device['org'] == 'test_org'
+    assert device['CargoDescription'] == 'SO# 83469'
+    assert device['Country'] == 'KOREA'
+
+    # Test Channel API (without properties)
     channel = filter_group._channel
 
     device = channel.fetch_source_info()

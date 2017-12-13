@@ -6,6 +6,7 @@
 
 - Add channel.fetch_source_info() to fetch data on the Project, Device or DataBlock source object.
   Option to get its properties as well.
+- Add docker/dev_dockerfile to build docker image with local changes
   
 ## 0.2.1
 
