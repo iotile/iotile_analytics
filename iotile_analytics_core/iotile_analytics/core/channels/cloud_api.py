@@ -33,7 +33,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         stream_finders = {
             'project': self._find_project_streams,
             'device': self._find_device_streams,
-            'archive': self._find_archive_streams
+            'datablock': self._find_archive_streams
         }
 
         stream_finder = stream_finders.get(source_type, None)
@@ -58,6 +58,37 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         """
 
         return self._stream_finder(self._cloud_id)
+
+    def fetch_source_info(self, with_properties=False):
+        """Fetch the record associated to the channel object (project, device or datablock)
+
+        This is the object dictionary for the project, device or datablock this channel is based on
+
+        Args:
+            with_properties: If True, will also fetch object properties and add them as dictionary entries
+
+        Returns:
+            dict(<name>: <value>): A dict mapping object attribute names and values (including properties
+            if with_properties=True)
+        """
+
+        resource = getattr(self._api, self._source_type)
+        try:
+            data = resource(self._cloud_id).get()
+        except RestHttpBaseException as exc:
+            raise CloudError("Error calling method on iotile.cloud", exception=exc, response=exc.response.status_code)
+
+        if with_properties:
+            try:
+                property_data = self._api.property.get(target=self._cloud_id)
+                if 'count' in property_data and property_data['count']:
+                    for item in property_data['results']:
+                        data[item['name']] = item['value']
+            except RestHttpBaseException as exc:
+                raise CloudError("Error calling method on iotile.cloud", exception=exc,
+                                 response=exc.response.status_code)
+
+        return data
 
     def count_streams(self, slugs):
         """Count the number of events and data points in a stream.
