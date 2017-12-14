@@ -20,6 +20,26 @@
 		}
 	],
 
+    "properties":
+    [
+        {
+            "id": 1,
+            "name": "CargoDescription",
+            "value": "SO# 83469",
+            "type": "str",
+            "is_system": false,
+            "target": "d--0000-0000-0000-00d2"
+        },
+        {
+            "id": 2,
+            "name": "Country",
+            "value": "KOREA",
+            "type": "str",
+            "is_system": false,
+            "target": "d--0000-0000-0000-00d2"
+        }
+    ],
+
 	"streams":
 	[
 		{

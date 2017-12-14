@@ -48,6 +48,7 @@ class AnalysisGroup(object):
         self._channel = channel
 
         stream_list = channel.list_streams()
+        self.source_info = channel.fetch_source_info(with_properties=True)
         self.streams = self._parse_stream_list(stream_list)
         self.stream_counts = channel.count_streams([x['slug'] for x in stream_list])
         self.variable_types = channel.fetch_variable_types(set([x['var_type'] for x in viewvalues(self.streams)]))
@@ -68,6 +69,24 @@ class AnalysisGroup(object):
 
         counts = self.stream_counts[slug]
         return counts['points'] == 0 and counts['events'] == 0
+
+    def print_source_info(self):
+        """Print a table with source object info
+
+        The source object is the Project, Device or DataBlock this channel was created from
+
+        Args:
+            None
+        """
+
+        print("{:30s} {:s}".format("Name", "Value"))
+        print("{:30s} {:s}".format("----", "----"))
+        new_line = '\n' + ' ' * 31
+        for key in self.source_info.keys():
+            if len(key) > 37:
+                key = key[:37] + '...'
+
+            print('{0:30s} {1}'.format(key, str(self.source_info[key]).replace('\n', new_line)))
 
     def print_streams(self, include_empty=False):
         """Print a table of the streams in this AnalysisGroup.
@@ -291,5 +310,5 @@ class AnalysisGroup(object):
                 https://iotile.cloud).
         """
 
-        channel = IOTileCloudChannel(slug, source_type="archive", domain=domain)
+        channel = IOTileCloudChannel(slug, source_type="datablock", domain=domain)
         return AnalysisGroup(channel)

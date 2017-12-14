@@ -1,0 +1,37 @@
+# Copyright (c) Arch Systems Inc
+# Distributed under the terms of the iotile_analytics license
+
+# This image is used during development to test local changes.
+# This image should not be released to customer. Use docker/iotile_jupyter for that
+
+# Usage (from root):
+#  cd docker
+#  docker build -t iotile/iotile_analytics -f dev-dockerfile ..
+#  docker run -it --rm -p 8888:8888 -v $(pwd)/work:/home/jovyan/work iotile/iotile_analytics --NotebookApp.token='abc'
+
+
+# Pick your favorite docker-stacks image
+FROM jupyter/datascience-notebook
+
+USER jovyan
+
+# Add permanent pip/conda installs, data files, other user libs here
+# e.g., RUN pip install jupyter_dashboards
+
+RUN pip install -U pip
+
+RUN mkdir /home/jovyan/build
+COPY iotile_analytics_core /home/jovyan/build/iotile_analytics_core
+COPY iotile_analytics_interactive /home/jovyan/build/iotile_analytics_interactive
+
+RUN pip install /home/jovyan/build/iotile_analytics_core
+RUN pip install /home/jovyan/build/iotile_analytics_interactive
+
+WORKDIR /home/jovyan/build
+RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
+RUN jupyter nbextension enable --py --sys-prefix bqplot
+
+WORKDIR /home/jovyan
+EXPOSE 8888
+ENTRYPOINT ["jupyter", "notebook"]
+

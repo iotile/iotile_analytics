@@ -22,6 +22,7 @@ def test_session_login(water_meter):
     with pytest.raises(AuthenticationError):
         CloudSession('test@arch-iot.com', 'test2', domain=domain, verify=False)
 
+
 def test_ssl_verification(water_meter):
     """Make sure we default to verifying SSL partners."""
 
@@ -29,6 +30,7 @@ def test_ssl_verification(water_meter):
 
     with pytest.raises(CertificateVerificationError):
         CloudSession('test@arch-iot.com', 'test', domain=domain, verify=True)
+
 
 def test_multiple_login(water_meter):
     """Make sure multiple logins work correctly."""
@@ -99,3 +101,33 @@ def test_raw_events(filter_group):
     assert len(raw) == 2
     assert raw.iloc[0]['test'] == 1
     assert raw.iloc[1]['goodbye'] == 15.0
+
+
+def test_channel_info(filter_group):
+    """Make sure we can download raw events."""
+
+    # Test AnalyisGroup API
+    device = filter_group.source_info
+    assert device['slug'] == 'd--0000-0000-0000-00d2'
+    assert device['label'] == 'Filtration Flow'
+    assert device['org'] == 'test_org'
+    assert device['CargoDescription'] == 'SO# 83469'
+    assert device['Country'] == 'KOREA'
+
+    # Test Channel API (without properties)
+    channel = filter_group._channel
+
+    device = channel.fetch_source_info()
+    assert device['slug'] == 'd--0000-0000-0000-00d2'
+    assert device['label'] == 'Filtration Flow'
+    assert device['org'] == 'test_org'
+    assert 'CargoDescription' not in device
+    assert 'Country' not in device
+
+    device = channel.fetch_source_info(with_properties=True)
+    assert device['slug'] == 'd--0000-0000-0000-00d2'
+    assert device['label'] == 'Filtration Flow'
+    assert device['org'] == 'test_org'
+    assert device['CargoDescription'] == 'SO# 83469'
+    assert device['Country'] == 'KOREA'
+

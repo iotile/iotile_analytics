@@ -32,6 +32,7 @@ class MockIOTileCloud(object):
         self.users = {}
         self.devices = {}
         self.streams = {}
+        self.properties = {}
         self.projects = {}
 
         self.events = {}
@@ -56,6 +57,7 @@ class MockIOTileCloud(object):
         # APIs for listing models
         self.add_api(r"/api/v1/stream/", self.list_streams)
         self.add_api(r"/api/v1/event/", self.list_events)
+        self.add_api(r"/api/v1/property/", self.list_properties)
 
     def add_api(self, regex, callback):
         """Add an API matching a regex."""
@@ -140,6 +142,18 @@ class MockIOTileCloud(object):
                 results = [x for x in self.events.values() if x['device'] == filter_str]
             else:
                 raise ErrorCode(500)
+
+        return self._paginate(results, request, 100)
+
+    def list_properties(self, request):
+        """List properties."""
+
+        # No listing of events if there is no filter
+        results = []
+
+        if 'target' in request.args:
+            target_str = request.args['target']
+            results = [x for x in self.properties.values() if x['target'] == target_str]
 
         return self._paginate(results, request, 100)
 
@@ -290,6 +304,7 @@ class MockIOTileCloud(object):
         self.users.update(data.get('users', {}))
         self.devices.update({x['slug']: x for x in data.get('devices', [])})
         self.streams.update({x['slug']: x for x in data.get('streams', [])})
+        self.properties.update({x['name']: x for x in data.get('properties', [])})
         self.projects.update({x['id']: x for x in data.get('projects', [])})
         self.events.update({x['id']: x for x in data.get('events', [])})
 

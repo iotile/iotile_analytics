@@ -2,6 +2,12 @@
 
 ## HEAD
 
+## 0.2.2
+
+- Add channel.fetch_source_info() to fetch data on the Project, Device or DataBlock source object.
+  Option to get its properties as well.
+- Add docker/dev_dockerfile to build docker image with local changes
+  
 ## 0.2.1
 
 - Only get event waveforms if they exist
