@@ -7,5 +7,6 @@ comp_names = {
 }
 
 ignored_names = [
-    'iotile_analytics_docker'
+    'iotile_analytics_docker',
+    'k8s_iotile_analytics_docker'
 ]
