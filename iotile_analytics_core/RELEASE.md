@@ -4,6 +4,10 @@
 
 ## 0.2.4
 
+- Fix minor bug in Datablock Mock functio
+
+## 0.2.3
+
 - Enhance Cloud Mock to include data blocks
 - Enhance CloudSession to accept an optional token to avoid getting a password
 
