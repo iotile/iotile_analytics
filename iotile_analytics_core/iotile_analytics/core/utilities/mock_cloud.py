@@ -31,6 +31,7 @@ class MockIOTileCloud(object):
         self.apis = []
         self.users = {}
         self.devices = {}
+        self.datablocks = {}
         self.streams = {}
         self.properties = {}
         self.projects = {}
@@ -50,6 +51,7 @@ class MockIOTileCloud(object):
 
         # APIs for querying single models
         self.add_api("/api/v1/device/(d--[0-9\-a-f]+)/", lambda x, y: self.one_object('devices', x, y))
+        self.add_api("/api/v1/datablock/(b--[0-9\-a-f]+)/", lambda x, y: self.one_object('datablock', x, y))
         self.add_api("/api/v1/stream/(s--[0-9\-a-f]+)/", lambda x, y: self.one_object('streams', x, y))
         self.add_api("/api/v1/project/([0-9\-a-f]+)/", lambda x, y: self.one_object('projects', x, y))
         self.add_api("/api/v1/vartype/([0-9\-a-zA-Z]+)/", self.get_vartype)
@@ -123,8 +125,8 @@ class MockIOTileCloud(object):
             results = [x for x in self.streams.values() if x['device'] == request.args['device']]
         elif 'project' in request.args:
             results = [x for x in self.streams.values() if x['project'] == request.args['project'] or x['project_id'] == request.args['project']]
-        elif 'block' in request.args:
-            results = [x for x in self.streams.values() if x['block'] == request.args['block']]
+        elif 'datablock' in request.args:
+            results = [x for x in self.streams.values() if x['datablock'] == request.args['datablock']]
 
         return self._paginate(results, request, 100)
 
@@ -303,6 +305,7 @@ class MockIOTileCloud(object):
 
         self.users.update(data.get('users', {}))
         self.devices.update({x['slug']: x for x in data.get('devices', [])})
+        self.datablock.update({x['slug']: x for x in data.get('datablocks', [])})
         self.streams.update({x['slug']: x for x in data.get('streams', [])})
         self.properties.update({x['name']: x for x in data.get('properties', [])})
         self.projects.update({x['id']: x for x in data.get('projects', [])})
