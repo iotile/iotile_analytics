@@ -64,13 +64,15 @@ class CloudSession(object):
             Middle Attack.  Obviously, the default option is True.  If you don't pass any option here
             the default is use the same verification options that were used in the last successful
             login to the domain that you are talking to.
+        token (str): An optional, manually entered IOTile token.
+            If valid, bypasses the user+password login, then proceeds as usual
     """
 
     MAX_CONCURRENCY = 10
     _login_cache = {}
 
     #pytest: disable=R0913; These arguments are all necessary and appropriate, with sane defaults
-    def __init__(self, user=None, password=None, domain=DOMAIN_NAME, concurrency=None, verify=None):
+    def __init__(self, user=None, password=None, domain=DOMAIN_NAME, concurrency=None, verify=None, token=None):
         if concurrency is None:
             concurrency = CloudSession.MAX_CONCURRENCY
 
@@ -86,8 +88,12 @@ class CloudSession(object):
             if user is not None and old_user is not None and old_user != user:
                 CloudSession._login_cache[domain] = {'requests': {}, 'request_lock': Lock()}
 
-        self.token = cache.get('token', None)
-        self.token_type = cache.get('token_type', None)
+        if token is not None:
+            self.token = token
+            self.token_type = None
+        else:
+            self.token = cache.get('token', None)
+            self.token_type = cache.get('token_type', None)
 
         if verify is not None:
             self.verify = verify
