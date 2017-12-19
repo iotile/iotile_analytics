@@ -2,6 +2,11 @@
 
 ## HEAD
 
+## 0.2.3
+
+- Enhance Cloud Mock to include data blocks
+- Enhance CloudSession to accept an optional token to avoid getting a password
+
 ## 0.2.2
 
 - Add channel.fetch_source_info() to fetch data on the Project, Device or DataBlock source object.
