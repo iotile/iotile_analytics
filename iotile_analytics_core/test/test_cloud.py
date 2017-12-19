@@ -41,6 +41,9 @@ def test_data_access(water_meter):
     data = api.device('d--0000-0000-0000-00d2').get()
     assert data['slug'] == 'd--0000-0000-0000-00d2'
 
+    data = api.datablock('b--0001-0000-0000-04e7').get()
+    assert data['slug'] == 'b--0001-0000-0000-04e7'
+
     stream = api.stream('s--0000-0077--0000-0000-0000-00d2--5002').get()
     assert stream['slug'] == 's--0000-0077--0000-0000-0000-00d2--5002'
 

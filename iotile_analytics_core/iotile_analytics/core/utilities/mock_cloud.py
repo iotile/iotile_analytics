@@ -51,7 +51,7 @@ class MockIOTileCloud(object):
 
         # APIs for querying single models
         self.add_api("/api/v1/device/(d--[0-9\-a-f]+)/", lambda x, y: self.one_object('devices', x, y))
-        self.add_api("/api/v1/datablock/(b--[0-9\-a-f]+)/", lambda x, y: self.one_object('datablock', x, y))
+        self.add_api("/api/v1/datablock/(b--[0-9\-a-f]+)/", lambda x, y: self.one_object('datablocks', x, y))
         self.add_api("/api/v1/stream/(s--[0-9\-a-f]+)/", lambda x, y: self.one_object('streams', x, y))
         self.add_api("/api/v1/project/([0-9\-a-f]+)/", lambda x, y: self.one_object('projects', x, y))
         self.add_api("/api/v1/vartype/([0-9\-a-zA-Z]+)/", self.get_vartype)

@@ -2,7 +2,7 @@
 
 ## HEAD
 
-## 0.2.3
+## 0.2.4
 
 - Enhance Cloud Mock to include data blocks
 - Enhance CloudSession to accept an optional token to avoid getting a password

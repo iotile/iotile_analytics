@@ -20,6 +20,21 @@
 		}
 	],
 
+    "datablocks":
+	[
+		{
+		    "id": 210,
+		    "slug": "b--0001-0000-0000-04e7",
+            "title": "Archive: POD1-M (04e7)",
+            "description": "test data",
+            "block": 3,
+            "org": "Acme",
+            "sg": "shipping-v1-0-0",
+            "created_on": "2017-11-30T18:32:49.804691Z",
+            "created_by": "user1"
+		}
+	],
+
     "properties":
     [
         {
