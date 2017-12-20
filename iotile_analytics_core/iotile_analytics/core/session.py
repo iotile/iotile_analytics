@@ -88,22 +88,31 @@ class CloudSession(object):
             if user is not None and old_user is not None and old_user != user:
                 CloudSession._login_cache[domain] = {'requests': {}, 'request_lock': Lock()}
 
-        if token is not None:
-            self.token = token
-            self.token_type = None
-        else:
-            self.token = cache.get('token', None)
-            self.token_type = cache.get('token_type', None)
+        self.domain = domain
 
         if verify is not None:
             self.verify = verify
         else:
             self.verify = cache.get('verify', True)
 
-        self.domain = domain
+        if token is not None:
+            self.token = token
+            self.token_type = "jwt"
+        else:
+            self.token = cache.get('token', None)
+            self.token_type = cache.get('token_type', None)
 
         self._api = Api(domain=domain, verify=self.verify)
         self._api.set_token(self.token, self.token_type)
+
+        if token is not None:
+            if self._check_token():
+                with cache['request_lock']:
+                    cache['token'] = self.token
+                    cache['token_type'] = self.token_type
+                    cache['verify'] = self.verify
+            else:
+                raise AuthenticationError("Could not login to IOTile.cloud", token=token, domain=domain)
 
         # Explictly log in if we're passed all of the right information
         # or our current token is invalid
