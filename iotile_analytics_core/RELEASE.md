@@ -2,6 +2,10 @@
 
 ## HEAD
 
+## 0.2.5
+
+- Cache session token for use with AnalyticsGroup
+
 ## 0.2.4
 
 - Fix minor bug in Datablock Mock functio
@@ -16,11 +20,11 @@
 - Add channel.fetch_source_info() to fetch data on the Project, Device or DataBlock source object.
   Option to get its properties as well.
 - Add docker/dev_dockerfile to build docker image with local changes
-  
+
 ## 0.2.1
 
 - Only get event waveforms if they exist
-  
+
 ## 0.2.0
 
 - Add CloudChannel to support multiple sources of data for creating Analysis
