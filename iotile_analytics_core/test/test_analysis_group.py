@@ -22,6 +22,17 @@ def test_session_login(water_meter):
     with pytest.raises(AuthenticationError):
         CloudSession('test@arch-iot.com', 'test2', domain=domain, verify=False)
 
+def test_token_login(water_meter):
+    """Make sure we can login successfully with a token"""
+
+    domain, _cloud = water_meter
+
+    session = CloudSession(token="JWT_USER", domain=domain, verify=False)
+
+    assert session.token == "JWT_USER"
+
+    with pytest.raises(AuthenticationError):
+        CloudSession(token="WRONG_TOKEN", domain=domain, verify=False)
 
 def test_ssl_verification(water_meter):
     """Make sure we default to verifying SSL partners."""
@@ -130,4 +141,3 @@ def test_channel_info(filter_group):
     assert device['org'] == 'test_org'
     assert device['CargoDescription'] == 'SO# 83469'
     assert device['Country'] == 'KOREA'
-
