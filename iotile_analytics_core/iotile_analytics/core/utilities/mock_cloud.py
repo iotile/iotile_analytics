@@ -44,6 +44,7 @@ class MockIOTileCloud(object):
             self.add_data(config_file)
 
         self.add_api("/api/v1/auth/login/", self.login)
+        self.add_api("/api/v1/account", self.account)
 
         # APIs for getting raw data
         self.add_api("/api/v1/stream/(s--[0-9\-a-f]+)/data/", self.get_stream_data)
@@ -251,6 +252,24 @@ class MockIOTileCloud(object):
         return {
             'username': user,
             'jwt': "JWT_USER"
+        }
+
+    def account(self, request):
+        self.verify_token(request)
+        return
+        {
+            "count": 1,
+            "next": null,
+            "previous": null,
+            "results": [
+                {
+                    "id": 1,
+                    "email": self.users[0],
+                    "username": self.users[0],
+                    "name": self.users[0],
+                    "slug": self.users[0]
+                }
+            ]
         }
 
     def verify_token(self, request):
