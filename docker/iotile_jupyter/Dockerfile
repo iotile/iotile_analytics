@@ -2,7 +2,7 @@
 # Distributed under the terms of the iotile_analytics license
 
 # Pick your favorite docker-stacks image
-FROM jupyter/datascience-notebook
+FROM jupyter/base-notebook
 
 USER jovyan
 
@@ -10,9 +10,8 @@ USER jovyan
 # e.g., RUN pip install jupyter_dashboards
 
 RUN pip install -U pip
-RUN pip install iotile-analytics-core iotile-analytics-interactive
-RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
-RUN jupyter nbextension enable --py --sys-prefix bqplot
+RUN pip install qgrid numpy pandas bqplot matplotlib iotile-analytics-core iotile-analytics-interactive
+RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension ; jupyter nbextension enable --py --sys-prefix bqplot
 
 EXPOSE 8888
 ENTRYPOINT ["jupyter", "notebook"]
