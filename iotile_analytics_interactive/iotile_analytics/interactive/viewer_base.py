@@ -147,7 +147,8 @@ class BaseViewer(object):
 
         mark_types = {
             'lines': bqplot.Lines,
-            'scatter': bqplot.Scatter
+            'scatter': bqplot.Scatter,
+            'bars': bqplot.Bars
         }
 
         mark = mark_types.get(mark_type)

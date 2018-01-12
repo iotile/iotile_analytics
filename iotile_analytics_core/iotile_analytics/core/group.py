@@ -51,7 +51,10 @@ class AnalysisGroup(object):
         self.source_info = channel.fetch_source_info(with_properties=True)
         self.streams = self._parse_stream_list(stream_list)
         self.stream_counts = channel.count_streams([x['slug'] for x in stream_list])
-        self.variable_types = channel.fetch_variable_types(set([x['var_type'] for x in viewvalues(self.streams)]))
+
+        var_type_slugs = set([x['var_type'] for x in viewvalues(self.streams) if x['var_type'] is not None])
+
+        self.variable_types = channel.fetch_variable_types(var_type_slugs)
         self._stream_table = [(slug.lower(), self._get_stream_name(stream).lower()) for slug, stream in viewitems(self.streams)]
 
     def stream_empty(self, slug):
@@ -198,8 +201,11 @@ class AnalysisGroup(object):
         raw = self._channel.fetch_datapoints(slug)
         raw.set_stream(self.streams[slug])
 
-        vartype = self.variable_types[stream['var_type']]
-        raw.set_vartype(vartype)
+        vartype_slug = stream['var_type']
+
+        if vartype_slug is not None:
+            vartype = self.variable_types[stream['var_type']]
+            raw.set_vartype(vartype)
 
         return raw
 
