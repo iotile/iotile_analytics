@@ -1,12 +1,12 @@
 """A class that lets you compare portions of multiple timeseries datasets."""
 
-from builtins import range
+from builtins import range, str
 from typedargs.exceptions import ArgumentError
 import pandas as pd
 import numpy as np
 
 
-class TimeseriesAggregator(object):
+class TimeseriesSelector(object):
     """A utility class for aggregating and selecting data from multiple timeseries.
 
     All timeseries added to the aggregator automatically have their indices resampled
@@ -18,49 +18,37 @@ class TimeseriesAggregator(object):
         granularity (str): The finest sampling granulatary that you wish to use for all
             added datasets.  This is passed to pandas dataframe.resample for all added
             data before processing so that equivalent time points are treated as equal.
-        resampling_function (str): The name of the resampling function to use to resample.
-            Defaults to the last data point of the period data.  This should be something
-            like 'mean', 'sum', etc.
         timezone (str): The timezone to use to localize all data coming in so that days
             correspond correctly to days in that timezone.  Default: UTC.  This should be
             a timzeone value like 'US/Central'.
     """
 
-    def __init__(self, granulatary, resampling_function='last', timezone='UTC'):
+    def __init__(self, granulatary, timezone='UTC'):
         self._granulatary = granulatary
-        self._resampling_function = resampling_function
         self._timezone = timezone
 
-        self._data = {}
         self.domain = None
 
-    def add_data(self, name, data):
+    def add_data(self, data):
         """Add a new dataset to the aggregator.
 
         The data is homogenized and the underlying domain of the aggregator is
-        extended if necessary.
+        extended if necessary.  The data itself is not stored.
 
         Args:
-            name (str): A unique name for this dataset so that it can be retrieved
-                later.
             data (pd.DataFrame): A dataframe to add to our aggregator.
         """
-
-        if name in self._data:
-            raise ArgumentError("Attempted to add data with the same name as an existing dataset", name=name)
 
         # First localize the data into the right timezone
         data = data.tz_localize('UTC').tz_convert(self._timezone)
 
         # Next, homogenize its index into the right granularity
-        data = getattr(data.resample(self._granulatary), self._resampling_function)()
+        data = data.resample(self._granulatary).last()
 
         if self.domain is None:
             self.domain = data.index
         else:
             self.domain = self.domain.union(data.index)
-
-        self._data[name] = data
 
     def dates(self, mask=None):
         """Get all of the datetimes in our data domain as a multidimensional array.
@@ -178,45 +166,54 @@ class TimeseriesAggregator(object):
         dates = self.dates(mask=(True, True, True, False, False, False, False, False))
         return self._deduplicate_in_order(dates)
 
-    def _create_mask(self, restrict):
+    def _create_mask(self, index, restrict):
         if len(restrict) != 8:
             raise ArgumentError("Invalid date restriction tuple")
 
-        if self.domain is None:
-            raise ArgumentError("You must add some data before creating a mask")
-
-        mask = np.ndarray(len(self.domain), dtype=np.bool)
+        mask = np.ndarray(len(index), dtype=np.bool)
         mask[:] = True
 
         if restrict[0] is not None:
-            mask &= self.domain.year == restrict[0]
+            mask &= index.year == restrict[0]
         if restrict[1] is not None:
-            mask &= self.domain.month == restrict[1]
+            mask &= index.month == restrict[1]
         if restrict[2] is not None:
-            mask &= self.domain.day == restrict[2]
+            mask &= index.day == restrict[2]
         if restrict[3] is not None:
-            mask &= self.domain.hour == restrict[3]
+            mask &= index.hour == restrict[3]
         if restrict[4] is not None:
-            mask &= self.domain.minute == restrict[4]
+            mask &= index.minute == restrict[4]
         if restrict[5] is not None:
-            mask &= self.domain.second == restrict[5]
+            mask &= index.second == restrict[5]
         if restrict[6] is not None:
-            mask &= self.domain.week == restrict[6]
+            mask &= index.week == restrict[6]
         if restrict[7] is not None:
-            mask &= self.domain.weekday == restrict[7]
+            mask &= index.weekday == restrict[7]
 
         return mask
 
-    def get(self, name, restrict=None, include_nan=False):
+    def extreme_dates(self, restrict):
+        data = self.domain[self._create_mask(self.domain, restrict)]
+        return data[0], data[-1]
+
+    def restrict(self, data, restrict=None, resample=None, include_nan=False):
         """Get a portion of a dataset restricted to a given time interval."""
 
-        if name not in self._data:
-            raise ArgumentError("Unknown dataset name", name=name, datasets=self._data.keys())
+        # First localize the data into the right timezone
+        data = data.tz_localize('UTC').tz_convert(self._timezone)
 
-        data = self._data[name]
+
+        if resample is not None:
+                sampler = data.resample(self._granulatary)
+                if isinstance(resample, str):
+                    data = getattr(sampler, resample)()
+                elif callable(resample):
+                    data = sampler.apply(resample)
+                else:
+                    raise ArgumentError("Unknown resampling function given to restrict, must be a string or callable")
 
         if restrict is not None:
-            mask = self._create_mask(restrict)
+            mask = self._create_mask(data.index, restrict)
             data = data[mask]
 
         if not include_nan:
