@@ -2,6 +2,7 @@
 
 from builtins import range, str
 from typedargs.exceptions import ArgumentError
+from iotile_analytics.core.exceptions import UsageError
 import pandas as pd
 import numpy as np
 
@@ -9,25 +10,25 @@ import numpy as np
 class TimeseriesSelector(object):
     """A utility class for aggregating and selecting data from multiple timeseries.
 
-    All timeseries added to the aggregator automatically have their indices resampled
-    to be uniform and are then concatenated into a global index.  You can easily select
-    subsets of the index to to see what data is present in each of the data sets for
-    that region of time.
+    The selector keeps track of the first and last timestamp that was added and lets
+    you restrict data to only a given day, week or month while iterating through every
+    such segment of the data.
+
+    This is particularly useful for producing coherent views and reports of data that
+    may cover different intersecting but not identical time spans.
+
 
     Args:
-        granularity (str): The finest sampling granulatary that you wish to use for all
-            added datasets.  This is passed to pandas dataframe.resample for all added
-            data before processing so that equivalent time points are treated as equal.
         timezone (str): The timezone to use to localize all data coming in so that days
             correspond correctly to days in that timezone.  Default: UTC.  This should be
             a timzeone value like 'US/Central'.
     """
 
-    def __init__(self, granulatary, timezone='UTC'):
-        self._granulatary = granulatary
+    def __init__(self, timezone='UTC'):
         self._timezone = timezone
 
-        self.domain = None
+        self.oldest_point = None
+        self.newest_point = None
 
     def add_data(self, data):
         """Add a new dataset to the aggregator.
@@ -40,92 +41,27 @@ class TimeseriesSelector(object):
         """
 
         # First localize the data into the right timezone
-        data = data.tz_localize('UTC').tz_convert(self._timezone)
+        if self._check_tz_naive(data):
+            data = data.tz_localize('UTC', copy=False)
 
-        # Next, homogenize its index into the right granularity
-        data = data.resample(self._granulatary).last()
+        data = data.tz_convert(self._timezone, copy=False)
 
-        if self.domain is None:
-            self.domain = data.index
-        else:
-            self.domain = self.domain.union(data.index)
+        oldest = data.index.min()
+        newest = data.index.max()
 
-    def dates(self, mask=None):
-        """Get all of the datetimes in our data domain as a multidimensional array.
+        if self.oldest_point is None or oldest < self.oldest_point:
+            self.oldest_point = oldest
+        if self.newest_point is None or newest > self.newest_point:
+            self.newest_point = newest
 
-        There will be 8 columns:
-        - year
-        - month
-        - day
-        - hour
-        - minute
-        - second
-        - week
-        - weekday
+    def _check_tz_naive(self, data):
+        return data.index.tzinfo is None
 
-        Args:
-            mask (tuple): Optional 8-tuple of bools that will cause parts of the dates to be masked
-                out with Nones to act as a wildcard.  Place False in an entry to mask out that portion
-                of the date.
+    def _generate_index(self, freq):
+        if self.oldest_point is None or self.newest_point is None:
+            raise UsageError("You must add at least one dataset to the selector first before trying to generate an index.")
 
-        Returns:
-            list of tuples: The resulting tuples for each date.
-        """
-
-        if self.domain is None:
-            return []
-
-        if mask is None:
-            mask = (True,)*8
-
-        num_dates = len(self.domain)
-        out_arr = []
-
-        year = self.domain.year
-        month = self.domain.month
-        day = self.domain.day
-        hour = self.domain.hour
-        minute = self.domain.minute
-        second = self.domain.second
-        week = self.domain.week
-        weekday = self.domain.weekday
-
-        for i in range(0, num_dates):
-            val = [None]*8
-
-            if mask[0]:
-                val[0] = year.values[i]
-            if mask[1]:
-                val[1] = month.values[i]
-            if mask[2]:
-                val[2] = day.values[i]
-            if mask[3]:
-                val[3] = hour.values[i]
-            if mask[4]:
-                val[4] = minute.values[i]
-            if mask[5]:
-                val[5] = second.values[i]
-            if mask[6]:
-                val[6] = week.values[i]
-            if mask[7]:
-                val[7] = weekday.values[i]
-
-            out_arr.append(tuple(val))
-
-        return out_arr
-
-    def _deduplicate_in_order(self, in_list):
-        out = []
-        seen = set()
-
-        for date in in_list:
-            if date in seen:
-                continue
-
-            out.append(date)
-            seen.add(date)
-
-        return out
+        return pd.PeriodIndex(start=self.oldest_point, end=self.newest_point, freq=freq)
 
     def months(self):
         """Get all of the unique months spanning our data domain.
@@ -133,12 +69,10 @@ class TimeseriesSelector(object):
         The results are returned in time order with duplicates removed.
 
         Returns:
-            list of datemasks: The month date masks that can be used to select a subset
-                of data from this aggregator.
+            pd.PeriodIndex
         """
 
-        dates = self.dates(mask=(True, True, False, False, False, False, False, False))
-        return self._deduplicate_in_order(dates)
+        return self._generate_index('M')
 
     def weeks(self):
         """Get all unique weeks spanning our data domain.
@@ -146,12 +80,10 @@ class TimeseriesSelector(object):
         The results are returned in time order with duplicates removed.
 
         Returns:
-            list of datemasks: The week date masks that can be used to select a subset
-                of data from this aggregator.
+            pd.PeriodIndex
         """
 
-        dates = self.dates(mask=(True, False, False, False, False, False, True, False))
-        return self._deduplicate_in_order(dates)
+        return self._generate_index('W')
 
     def days(self):
         """Get all unique days spanning our data domain.
@@ -163,60 +95,65 @@ class TimeseriesSelector(object):
                 of data from this aggregator.
         """
 
-        dates = self.dates(mask=(True, True, True, False, False, False, False, False))
-        return self._deduplicate_in_order(dates)
+        return self._generate_index('D')
 
-    def _create_mask(self, index, restrict):
-        if len(restrict) != 8:
-            raise ArgumentError("Invalid date restriction tuple")
+    def divide_period(self, period, freq):
+        """Turn a single period into a PeriodIndex with a given frequency.
 
-        mask = np.ndarray(len(index), dtype=np.bool)
-        mask[:] = True
+        For example you could subdivide a month into days or a week into hours.
+        The subdivision will be performed down to second precision by default.
 
-        if restrict[0] is not None:
-            mask &= index.year == restrict[0]
-        if restrict[1] is not None:
-            mask &= index.month == restrict[1]
-        if restrict[2] is not None:
-            mask &= index.day == restrict[2]
-        if restrict[3] is not None:
-            mask &= index.hour == restrict[3]
-        if restrict[4] is not None:
-            mask &= index.minute == restrict[4]
-        if restrict[5] is not None:
-            mask &= index.second == restrict[5]
-        if restrict[6] is not None:
-            mask &= index.week == restrict[6]
-        if restrict[7] is not None:
-            mask &= index.weekday == restrict[7]
+        Args:
+            period (pd.Period): The period that we wish to subdivid
+            freq (str): A Pandas frequency string to use to determine how big the
+                chunks are that we are going to subdivid period into.
 
-        return mask
+        Returns:
+            pd.DatetimeIndex: The subdivided period.
+        """
 
-    def extreme_dates(self, restrict):
-        data = self.domain[self._create_mask(self.domain, restrict)]
-        return data[0], data[-1]
+        start = period.to_timestamp('S', 'S')
+        end = period.to_timestamp('S', 'E')
 
-    def restrict(self, data, restrict=None, resample=None, include_nan=False):
-        """Get a portion of a dataset restricted to a given time interval."""
+        return pd.DatetimeIndex(start=start, end=end, freq=freq, tz=self._timezone)
+
+    def resample(self, data, period, freq, resample='last'):
+        """Convenience function to restrict and resample a data set.
+
+        The data set is restricted to the indicated period and if necessary
+        resampled to appropriate frequency.  If the data is already sampled
+        at the correct frequency then no resampling occurs and NaNs are used
+        to fill in any gaps in the indicated period.
+
+        Naive timestamps in data are assumed to be in UTC and localized to
+        the configured timezone of this selector before resampling.
+
+        Args:
+            data (pd.DataFrame): The data that we would like to sample.
+            period (pd.Period): The period that we want to look at.
+            freq (str): The sampling frequency that we would like to use.
+            resample (str): An optional resampling function in case we need to
+                resample the data we are given.
+        """
 
         # First localize the data into the right timezone
-        data = data.tz_localize('UTC').tz_convert(self._timezone)
+        if self._check_tz_naive(data):
+            data = data.tz_localize('UTC', copy=False)
 
+        data = data.tz_convert(self._timezone, copy=False)
 
-        if resample is not None:
-                sampler = data.resample(self._granulatary)
-                if isinstance(resample, str):
-                    data = getattr(sampler, resample)()
-                elif callable(resample):
-                    data = sampler.apply(resample)
-                else:
-                    raise ArgumentError("Unknown resampling function given to restrict, must be a string or callable")
+        # Create the final period index we will return
+        index = self.divide_period(period, freq)
 
-        if restrict is not None:
-            mask = self._create_mask(data.index, restrict)
-            data = data[mask]
+        # If the data sampling frequency does not match our desired
+        # final sampling frequency, we need to resample it before
+        # we can reindex it.
+        if data.index.freq != index.freq:
+            resampler = data.resample(freq)
 
-        if not include_nan:
-            data = data.dropna()
+            if isinstance(resample, str):
+                data = getattr(resampler, resample)()
+            else:
+                data = resampler.apply(resample)
 
-        return data
+        return data.reindex(index)

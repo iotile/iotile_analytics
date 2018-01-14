@@ -32,3 +32,12 @@ class MissingPackageError(KeyValueException):
     """
 
     pass
+
+
+class UsageError(KeyValueException):
+    """A method was called in an unacceptable way.
+
+    This exception is thrown when an API function is misused.
+    """
+
+    pass
