@@ -2,6 +2,10 @@
 
 ## HEAD
 
+## 0.1.1
+
+- Add support for bar charts to BaseViewer
+
 ## 0.1.0
 
 - Update Viewer to support Pandas DataFrame arguments
