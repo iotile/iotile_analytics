@@ -2,13 +2,18 @@
 
 ## HEAD
 
+## 0.3.0
+
+- Add support for Timeseries Selector that can be used to create day, week and
+  month views of multiple data streams. 
+
 ## 0.2.5
 
 - Cache session token for use with AnalyticsGroup
 
 ## 0.2.4
 
-- Fix minor bug in Datablock Mock functio
+- Fix minor bug in Datablock Mock function
 
 ## 0.2.3
 
