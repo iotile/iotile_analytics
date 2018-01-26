@@ -16,7 +16,7 @@ setup(
         "pandas>=0.20.3",
         "scipy>=1.0.0",
         "typedargs>=0.10.0",
-        "iotile_cloud>=0.7.4",
+        "iotile_cloud>=0.8.0",
         "tqdm>=4.19.4"
     ],
     description="A data science bridge for iotile.cloud",
