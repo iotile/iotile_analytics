@@ -23,7 +23,6 @@ def water_meter(mock_cloud):
 
     return domain, cloud
 
-
 @pytest.fixture(scope="function")
 def filter_group(water_meter):
     """An AnalysisGroup from a single water meter device."""
