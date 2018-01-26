@@ -1,6 +1,9 @@
 # Release Notes
 
-## HEAD
+## 0.3.1
+
+- Break mock_cloud out into python_iotile_cloud for better shareability across
+  other projects.  (Issue #24)
 
 ## 0.3.0
 

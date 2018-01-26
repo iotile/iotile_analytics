@@ -16,12 +16,9 @@ setup(
         "pandas>=0.20.3",
         "scipy>=1.0.0",
         "typedargs>=0.10.0",
-        "iotile_cloud>=0.7.3",
+        "iotile_cloud>=0.8.0",
         "tqdm>=4.19.4"
     ],
-    entry_points={
-        'pytest11': ['iotile-analytics = iotile_analytics.core.utilities.mock_cloud']
-    },
     description="A data science bridge for iotile.cloud",
     author="Arch",
     author_email="info@arch-iot.com",
