@@ -3,6 +3,8 @@
 import pandas as pd
 from typedargs.exceptions import ArgumentError
 
+from iotile_cloud.utils.mdo import MdoHelper
+
 
 class StreamSeries(pd.DataFrame):
     """A DataFrame subclass for handle stream timeseries data.
@@ -83,11 +85,12 @@ class StreamSeries(pd.DataFrame):
             units = {self._stream['output_unit']['unit_full']: self._stream['output_unit']}
 
         unit_data = units[unit]
-        m = unit_data.get('m', 1)
-        d = unit_data.get('d', 1)
-        o = unit_data.get('o', 0.0)
 
-        return (m, d, o)
+        return MdoHelper(
+            m=unit_data.get('m', 1),
+            d=unit_data.get('d', 1),
+            o=unit_data.get('o', 0.0)
+        )
 
     def convert(self, units):
         """Convert this stream to another set of supported units.
@@ -101,10 +104,9 @@ class StreamSeries(pd.DataFrame):
 
         out = pd.DataFrame(self.values, copy=True, index=self.index)
 
-        m, d, o = self._mdo_for_unit(units)
+        mdo = self._mdo_for_unit(units)
 
-        out[0] *= float(m)
-        out[0] /= float(d)
-        out[0] += float(o)
+        # Apply MDO transformation on every row
+        out[0] = out[0].apply(lambda x: mdo.compute(x))
 
         return out
