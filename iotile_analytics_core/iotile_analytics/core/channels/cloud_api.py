@@ -227,7 +227,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
                 point data.
         """
 
-        raw_data = self._api.df.get(filter=slug)
+        raw_data = self._api.df.get(filter=slug, format='json')
 
         dt_index = pd.to_datetime([x['row'] for x in raw_data])
         return pd.DataFrame([x['value'] for x in raw_data], index=dt_index)
