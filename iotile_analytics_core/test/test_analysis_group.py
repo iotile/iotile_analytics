@@ -76,7 +76,7 @@ def test_stream_download(filter_group):
     """Make sure we can download streams from an analysis group."""
 
     data = filter_group.fetch_stream('5001')
-    assert len(data) == 11
+    assert len(data) == 9
 
     assert isinstance(data, StreamSeries)
     assert set(data.available_units) == set(['Liters', 'Gallons', 'Cubic Meters', 'Acre Feet'])

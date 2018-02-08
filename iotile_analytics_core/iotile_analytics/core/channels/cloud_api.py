@@ -202,8 +202,11 @@ class IOTileCloudChannel(AnalysisGroupChannel):
                 point data.
         """
 
-        resource = self._api.data.get(filter=slug)
-        raw_data = self._session.fetch_all(resource, page_size=1000, message="Downloading Stream Data")
+        resource = self._api.data
+        # resource = self._api.stream(slug).data
+        raw_data = self._session.fetch_all(
+            resource, page_size=1000, message="Downloading Stream Data", filter=slug
+        )
 
         dt_index = pd.to_datetime([x['timestamp'] for x in raw_data])
         return StreamSeries([x['value'] for x in raw_data], index=dt_index)
