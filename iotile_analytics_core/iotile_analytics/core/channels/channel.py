@@ -98,3 +98,21 @@ class AnalysisGroupChannel(object):
         """
 
         raise NotImplementedError()
+
+    def fetch_dataframe(self, slug):
+        """Fetch all data points for this stream using the /api/v1/df API
+        which is faster, and already returns the value based on the stream
+        output units
+
+        These are time, value data pairs stored in the stream.
+
+        Args:
+            slug (str): The slug of the stream that we should fetch
+                raw data for.
+
+        Returns:
+            StreamSeries: A data fame with internal value as floating
+                point data.
+        """
+
+        raise NotImplementedError()

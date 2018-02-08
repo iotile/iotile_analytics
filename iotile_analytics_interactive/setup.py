@@ -11,7 +11,7 @@ setup(
     version=version,
     license="LGPLv3",
     install_requires=[
-        "iotile-analytics-core >= 0.1.0",
+        "iotile-analytics-core >= 0.3.1",
         "bqplot >= 0.10.0"
     ],
     description="A data science bridge for iotile.cloud",
