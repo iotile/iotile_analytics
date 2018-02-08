@@ -209,6 +209,34 @@ class AnalysisGroup(object):
 
         return raw
 
+    def fetch_stream_dataframe(self, slug_or_name):
+        """Fetch data from a stream by its slug or name using the faster cloud dataframe API
+
+        For example say you have the following stream in this analysis project:
+        s--0000-0011--0000-0000-0000-0222--5001 (Temperature)
+
+        You could fetch it by passing any of:
+         - temp
+         - 5001
+         - Temperature
+         - s--0000-0011--0000-0000-0000-0222--5001
+
+        Args:
+            slug_or_name (str): The stream that we want to fetch.  This
+                can be a partial match to a full stream slug or name so long
+                as it uniquely matches.  This is passed to find_stream so anything
+                that find_stream accepts will be accepted here.
+
+        Returns:
+            DataFrame: A pandas DataFrame subclass containing the data points as columns.
+                The index of the dataframe is time in UTC.
+        """
+
+        slug = self.find_stream(slug_or_name)
+        series = self._channel.fetch_dataframe(slug)
+
+        return series
+
     def fetch_events(self, slug_or_name):
         """Fetch event metadata from a stream by its slug or name.
 

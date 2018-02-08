@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division,
 from builtins import *
 
 import pytest
+import pandas as pd
 from typedargs.exceptions import ArgumentError
 from iotile_analytics.core import CloudSession, AnalysisGroup
 from iotile_analytics.core.stream_series import StreamSeries
@@ -87,6 +88,14 @@ def test_stream_download(filter_group):
     assert data.iloc[0][0] / 3.78541 == pytest.approx(outG.iloc[0][0])
     with pytest.raises(ArgumentError):
         data.convert('Test Unit')
+
+
+def test_stream_dataframe(filter_group):
+    """Make sure we can download streams from an analysis group."""
+
+    df = filter_group.fetch_stream_dataframe('s--0000-0077--0000-0000-0000-00d2--5001')
+    assert isinstance(df, pd.DataFrame)
+    assert not df.empty
 
 
 def test_invalid_stream(filter_group):

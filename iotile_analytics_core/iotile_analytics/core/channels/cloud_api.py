@@ -195,18 +195,39 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
         Args:
             slug (str): The slug of the stream that we should fetch
-                raw events for.
+                raw data for.
 
         Returns:
             StreamSeries: A data fame with internal value as floating
                 point data.
         """
 
-        resource = self._api.stream(slug).data
+        resource = self._api.data.get(filter=slug)
         raw_data = self._session.fetch_all(resource, page_size=1000, message="Downloading Stream Data")
 
         dt_index = pd.to_datetime([x['timestamp'] for x in raw_data])
         return StreamSeries([x['value'] for x in raw_data], index=dt_index)
+
+    def fetch_dataframe(self, slug):
+        """Fetch all data points for this stream using the /api/v1/df API
+        which is faster, and already returns the value based on the stream
+        output units
+
+        These are time, value data pairs stored in the stream.
+
+        Args:
+            slug (str): The slug of the stream that we should fetch
+                raw data for.
+
+        Returns:
+            StreamSeries: A data fame with internal value as floating
+                point data.
+        """
+
+        raw_data = self._api.df.get(filter=slug)
+
+        dt_index = pd.to_datetime([x['row'] for x in raw_data])
+        return pd.DataFrame([x['value'] for x in raw_data], index=dt_index)
 
     def _find_device_streams(self, device_slug):
         """Find all streams for a device by its slug."""
