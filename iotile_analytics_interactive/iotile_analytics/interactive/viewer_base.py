@@ -1,10 +1,10 @@
 """Base viewer class for interactive plots."""
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-from builtins import *
-import bqplot
-from bqplot.colorschemes import CATEGORY10
-from IPython.display import display
+from iotile_analytics.core import Environment
+from bokeh.plotting import figure
+from bokeh.io import show, push_notebook
+from bokeh.models import ColumnDataSource, LinearAxis, Range1d, Axis, DataRange1d
 import pandas as pd
 import numpy as np
 from typedargs.exceptions import ArgumentError
@@ -13,170 +13,285 @@ from typedargs.exceptions import ArgumentError
 class BaseViewer(object):
     """A simple interface to plot data.
 
-    Internally this object wraps a bqplot Figure object and
-    provides reasonable defaults for all of the settings, while
-    passing through access to traits that you may want to update
-    later.
+    Internally this object wraps a bqplot Figure object and provides
+    reasonable defaults for all of the settings, while passing through access
+    to traits that you may want to update later.
 
     Args:
-        data (Series): A pandas Series with the time series data that
-            we wish to display.
-        x_scale (bqplot.Scale): A scale for the x axis
-        y_scale (bqplot.Scale): A scale for the y axis
-        xticks (bool): Whether to show the x axis tick values, ticks
-            are usually shown when there is a single plot but hidden
-            when there are multiple plots stacked on top of each other
-            with a common x axis since you want the bottom plot to show
-            the ticks for all of the others.
-        xlabel (str): Optional label to display on the x axis
-        ylabel (str): Optional label to display on the y axis
-        size (tuple): Optional tuple of (width, height) as strings in either
-            % or pixels that are passed to Figure.layout to set its width and
-            height.
-        margin (dict): Optional margin values for the plot
+        size (tuple): Optional tuple of (width, height) as integers in pixels
+            if you wish this viewer to have a fixed size
+        x_type ('auto', 'linear', 'log', 'datetime'): Whether we should create a
+            log, linear, or time viewer.
+        y_type ('auto', 'linear', 'log', 'datetime'): What scaling type to use for
+            the y axis.
+        fixed_y (tuple): Optional tuple to use a fixed y axis.
+        y_name (str): Optional name for the default y axis so that we can refer to it
+            if there are multiple axes included in the plot.
     """
 
-    def __init__(self, x_scale, y_scale, data=None, size=None, ylabel=None, xlabel=None, xticks=True, margin=None):
-        self.x_scale = x_scale
-        self.y_scale = y_scale
-
-        x_ax = bqplot.Axis(scale=self.x_scale)
-        if xticks is False:
-            x_ax.num_ticks = 0
-        if xlabel is not None:
-            x_ax.label = xlabel
-
-        y_ax = bqplot.Axis(scale=self.y_scale, orientation="vertical")
-        if ylabel is not None:
-            y_ax.label = ylabel
-
-        if margin is None:
-            margin = {
-                'top': 30, 'bottom': 0, 'left': 50, 'right': 0
-            }
-
-            if xlabel is not None or xticks:
-                margin['bottom'] = 50
-
-        self.figure = bqplot.Figure(axes=[x_ax, y_ax], fig_margin=margin)
-
+    def __init__(self, size=None, x_type='auto', y_type='auto', fixed_y=None, y_name=None, y_label=None, y_color=None):
+        kwargs = {}
         if size is not None:
             width, height = size
-            self.figure.layout.width = width
-            self.figure.layout.height = height
+            kwargs['plot_width'] = width
+            kwargs['plot_height'] = height
 
-        if data is not None:
-            x_data, y_data = self._find_axes(data)
+        if fixed_y is not None:
+            y_min, y_max = fixed_y
+            kwargs['y_range'] = (y_min, y_max)
 
-            line = bqplot.Lines(x=x_data, y=y_data, scales={'x': self.x_scale, 'y': self.y_scale})
-            self.figure.marks = [line]
+        kwargs['toolbar_location'] = None
 
-        self.x_axis = x_ax
-        self.y_axis = y_ax
+        self.figure = figure(x_axis_type=x_type, y_axis_type=y_type, **kwargs)
+        self._notebook_handle = None
+        self._in_notebook = False
+        self._default_y_name = y_name
 
-    @property
-    def x_min(self):
-        return self.x_scale.min
+        env = Environment()
+        if env.interactivity == env.Notebook:
+            self._in_notebook = True
 
-    @x_min.setter
-    def x_min(self, value):
-        self.x_scale.min = value
+        self.sources = {}
 
-    @property
-    def x_max(self):
-        return self.x_scale.max
+        if y_label is not None:
+            self.label_axis(y_name, y_label)
 
-    @x_max.setter
-    def x_max(self, value):
-        self.x_scale.max = value
+        if y_color is not None:
+            self.color_axis(y_name, y_color)
 
-    def display(self):
-        display(self.figure)
+    def _find_axis(self, name):
+        if name == self._default_y_name:
+            axis = self.figure.yaxis
+            if not isinstance(axis, Axis):
+                return axis[0]
 
-    def _find_axes(self, input_data):
-        """Given a pandas series or numpy array return the X and Y axes."""
+            return axis
+
+        axes = self.figure.yaxis
+        if isinstance(axes, Axis):
+            raise ArgumentError("Named axis could not be found", name=name)
+
+        for axis in axes:
+            if axis.y_range_name == name:
+                return axis
+
+        raise ArgumentError("Named axis could not be found", name=name)
+
+    def label_axis(self, name, label):
+        """Set the label of an axis by name
+
+        Args:
+            name (str): The name of the axis that we wish to adjust.
+            label (str): The axis label that we would like to set.
+        """
+
+        axis = self._find_axis(name)
+        axis.axis_label = label
+
+    def color_axis(self, name, color):
+        """Set the color of one of the y axes."""
+
+        axis = self._find_axis(name)
+        axis.axis_line_color = color
+        axis.axis_label_text_color = color
+        axis.major_label_text_color = color
+        axis.major_tick_line_color = color
+        axis.minor_tick_line_color = color
+
+    def add_yaxis(self, name, y_range=None, location="right", label=None, color=None):
+        """Add another y axis to the graph.
+
+        You must provide a name for the axis and an optional fixed range
+        min/max. The name is used to refer to the axis later if you need to
+        modify it. If you want to color the entire axis you can pass a color
+        string in color and it will be as if you separately called
+        color_yaxis.
+
+        Args:
+            name (str): A unique name for this axis.
+            y_range (tuple(min, max)): A tuple with explicit min/max range for this axis.
+            location (str): The location for the axis, one of left or right.
+            label (str): The optional label to use for the axis.
+            color (str): An optional color that is used to color all aspects of the axis.
+        """
+
+        if y_range is not None and not isinstance(y_range, Range1d):
+            y_min, y_max = y_range
+            y_range = Range1d(start=y_min, end=y_max)
+        elif y_range is None:
+            y_range = DataRange1d()
+
+        self.figure.extra_y_ranges[name] = y_range
+
+        axis = LinearAxis(y_range_name=name, axis_label=label)
+        self.figure.add_layout(axis, location)
+
+        if color is not None:
+            self.color_axis(name, color)
+
+    def show(self):
+        """Show this figure."""
+
+        if self._in_notebook:
+            self._notebook_handle = show(self.figure, notebook_handle=True)
+        else:
+            show(self.figure)
+
+    def _sync_notebook(self):
+        if self._notebook_handle is not None:
+            push_notebook(handle=self._notebook_handle)
+
+    @classmethod
+    def _find_axes(cls, input_data, explicit_x=None):
+        """Given a pandas series or numpy array return the X and Y axes.
+
+        This function supports extracting a single X and Y axis from the following
+        input configurations:
+
+        - 2 1D arrays
+        - a single 2D array
+        - a list of numbers (x is implicitly linspace(0, len(input_data)))
+        - a Pandas Series
+        - the first column of a Pandas DataFrame
+        """
 
         if isinstance(input_data, pd.Series):
+            if explicit_x is not None:
+                raise ArgumentError("You cannot pass an explicit x axis with a pandas Series")
+
             return input_data.index, input_data.values
         elif isinstance(input_data, pd.DataFrame):
-            return input_data.index, input_data.values
+            if explicit_x is not None:
+                raise ArgumentError("You cannot pass an explicit x axis with a pandas DataFrame")
+
+            return input_data.index, input_data.values[:, 0]
         elif isinstance(input_data, np.ndarray):
-            return input_data[:, 0], input_data[:, 1]
+            if len(input_data.shape) == 2 and input_data.shape[0] == 2:
+                if explicit_x is not None:
+                    raise ArgumentError("You cannot pass an explicit x axis with a 2D array of input data")
+
+                return input_data[:, 0], input_data[:, 1]
+            elif len(input_data.shape) == 1:
+                if explicit_x is not None:
+                    if len(explicit_x) != len(input_data):
+                        raise ArgumentError("Your explicit x data has a different length that your y data", x_length=len(explicit_x), y_length=len(input_data))
+
+                    return explicit_x, input_data
+                else:
+                    return np.linspace(0, len(input_data) - 1, len(input_data)), input_data
+        elif explicit_x is not None:
+            return np.array(explicit_x), np.array(explicit_x)
 
         return np.linspace(0, len(input_data) - 1, len(input_data)), np.array(input_data)
 
-    def set_data(self, x_data, y_data, **kwargs):
-        """Add one or more lines to the plot based on the number of columns of data.
+    def add_series(self, data, x_data=None, name=None, label=None, mark='line', x_name='x', y_name='y', y_axis=None, color=None, bar_width=0.1):
+        """Add a new line to the plot.
 
-        This function clears any lines that were previously set on the plot.
+        This function does not clear the data that is already there so it
+        creates a new line.  If you pass an explicit column data source, that
+        is used and you must pass x_name and y_name explicitly with the column
+        names that should be used unless they are 'x' and 'y'.
 
-        Args:
-            x_data (ndarray): A 1D array of x values to plot
-            y_data (ndarray): An array of one or more y values to plot.  These all correspond
-                to the same x values listed as the first argument.  Each one becomes a separate line.
-                If this array has more than one dimension, separate lines are added for each dimension
-            names (list): Optional list of string names for each of the lines in data that
-                will be shown in the chart legend.  This must be passed as a keyword argument
-            mark_type (str): The type of mark to add.  Valid types strings are:
-                lines, scatter which translate to bqplot.Lines, bqplot.Scatter.  This must
-                be passed as a keyword argument.
-        """
-
-        self.figure.marks = []
-        self.add_data(x_data, y_data, **kwargs)
-
-    def add_data(self, x_data, y_data, **kwargs):
-        """Add one or more lines to the plot based on the number of columns of data.
-
-        This function does not clear the data that is already there so it creates a new line
+        You can choose to add the new data to the chart as a line, scatter or
+        bar
 
         Args:
-            x_data (ndarray): A 1D array of x values to plot
-            y_data (ndarray): An array of one or more y values to plot.  These all correspond
-                to the same x values listed as the first argument.  Each one becomes a separate line.
-                If this array has more than one dimension, separate lines are added for each dimension
-            names (list): Optional list of string names for each of the lines in data that
-                will be shown in the chart legend.  This must be passed as a keyword argument
-            mark_type (str): The type of mark to add.  Valid types strings are:
-                lines, scatter which translate to bqplot.Lines, bqplot.Scatter.  This must
-                be passed as a keyword argument.
+
+            data (ndarray, pd.Series or ColumnDataSource): An array of values
+                to plot.  If data is a Series, then it is plotted as is.  If
+                it is a 1D ndarray then this is interpreted as a series of y
+                values and you can pass the x values explicitly using the
+                x_data argument.
+            x_data (ndarray): An array of explicit x_values.  This can only be
+                passed if data is a 1D ndarray that is then interpreted as y
+                values.
+            x_name (str): Optional explicit x column name if data is a
+                ColumnDataSource, defaults to x.
+            y_name (str): Optional explicit y column name is data is a
+                ColumnDataSource, defaults to y.
+            y_axis (str): Optional name for the y axis that should be used to
+                plot this line.  If this is specified then the line is colored
+                with the same color as the axis.
+            name (str): Optional name for this data series.  This is used to
+                name the columns in self.source and also used to stream
+                updates by name.  If this is None, it defaults to series_N
+                where N is incremented for each new add_series call.
+            mark (str): The type of mark to add.  Valid types strings are:
+                line, scatter, bars
+            bar_width (int): For bar marks, the width of the bars.
+            color (str): Explicitly set the color of this line to the color
+                specified.  This overrides any default color that might be set
+                based on the y_axis that is used.
+            label (str): Show this line in the legend and use the following legend
+                string for it.
+
+        Returns:
+            str: The name of the data source added for this series, in case it is
+                autogenerated.
         """
 
-        mark_type = kwargs.get('mark_type', 'lines')
-        names = kwargs.get('names', [])
+        if name is None:
+            name = "series_{}".format(len(self.sources))
 
-        mark_types = {
-            'lines': bqplot.Lines,
-            'scatter': bqplot.Scatter,
-            'bars': bqplot.Bars
-        }
+        if mark not in ('line', 'scatter', 'bar'):
+            raise ArgumentError("Unknown glyph type in add_series", line_type=mark, known_types=('line', 'scatter'))
 
-        mark = mark_types.get(mark_type)
-        if mark is None:
-            raise ArgumentError("Unkown type of mark specified in mark_type", mark_type=mark_type, known_types=mark_types.keys())
-
-        num_lines = 1
-        if len(y_data.shape) == 2:
-            num_lines = y_data.shape[1]
-        if len(names) != 0 and len(names) != num_lines:
-            raise ArgumentError("You must pass the same number of names as line", num_lines=num_lines, y_shape=y_data.shape, num_names=len(names), names=names)
-
-        # BQPlot chokes on a scatter plot
-        if num_lines == 1 and len(names) == 1 and mark == 'scatter':
-            names = names[0]
-
-        if len(names) > 0:
-            line = mark(labels=names, display_legend=True, scales={'x': self.x_scale, 'y': self.y_scale})
+        if isinstance(data, ColumnDataSource):
+            source = data
         else:
-            line = mark(display_legend=False, scales={'x': self.x_scale, 'y': self.y_scale})
+            x_set, y_set = self._find_axes(data, x_data)
+            source = ColumnDataSource({x_name: x_set, y_name: y_set})
 
-        num_lines = 1
-        if len(y_data.shape) > 1:
-            num_lines = y_data.shape[1]
+        self.sources[name] = (source, x_name, y_name)
 
-        with line.hold_trait_notifications():
-            line.x = x_data
-            line.y = y_data
-            line.colors = CATEGORY10[len(self.figure.marks):len(self.figure.marks) + num_lines]
+        kwargs = {}
 
-        self.figure.marks = [x for x in self.figure.marks] + [line]
+        if y_axis is not None:
+            axis = self._find_axis(y_axis)
+
+            if y_axis != self._default_y_name:
+                kwargs['y_range_name'] = y_axis
+
+            kwargs['color'] = axis.axis_label_text_color
+
+        if color is not None:
+            kwargs['color'] = color
+
+        if mark == 'line':
+            self.figure.line(x=x_name, y=y_name, name=name, source=source, **kwargs)
+        elif mark == 'scatter':
+            self.figure.scatter(x=x_name, y=y_name, name=name, source=source, **kwargs)
+        elif mark == 'bar':
+            self.figure.vbar(x=x_name, width=bar_width, top=y_name, name=name, source=source, **kwargs)
+
+        self._sync_notebook()
+        return name
+
+    def update_series(self, name, data, x_data=None, rollover=None):
+        """Stream new data to a series previously added with add_series.
+
+        Args:
+            name (str): The name of the series added previously in add_series.
+                If the name was autogenerated by add_series, it would have been
+                returned from that function.
+            data (ndarray or pd.Series): An array of values to plot.  If data
+                is a Series, then it is plotted as is.  If it is a 1D ndarray
+                then this is interpreted as a series of y values and you can
+                pass the x values explicitly using the x_data argument.
+            x_data (ndarray): An array of explicit x_values.  This can only be
+                passed if data is a 1D ndarray that is then interpreted as y
+                values.
+            rollover (int): An optional maximum length for the columns to grow.
+                If you specify this, only the last rollover values will be kept.
+                This allows you to create continously updating plots by just streaming
+                new values as they become available.
+        """
+
+        source, x_name, y_name = self.sources.get(name, (None, None, None))
+        if source is None:
+            raise ArgumentError("Unknown source name", name=name, known_names=list(self.sources))
+
+        x_set, y_set = self._find_axes(data, x_data)
+
+        source.stream({x_name:x_set, y_name:y_set}, rollover=rollover)
+        self._sync_notebook()

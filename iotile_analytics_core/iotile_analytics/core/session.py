@@ -1,7 +1,14 @@
 """Simple session management system to save an iotile.cloud token."""
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-from builtins import *
+from builtins import str, range
+
+# For some reason using the future input = raw_input patch in builtins
+# does not work on jupyter so fall back to this manual patch.
+try:
+    input = raw_input
+except NameError:
+    pass
 
 import getpass
 import math
@@ -123,7 +130,7 @@ class CloudSession(object):
             return
 
         if user is None:
-            user = raw_input("Please enter your IOTile.cloud email: ")
+            user = input("Please enter your IOTile.cloud email: ")
 
         if password is None:
             password = getpass.getpass("Please enter your IOTile.cloud password:")
