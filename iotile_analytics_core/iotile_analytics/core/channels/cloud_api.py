@@ -168,10 +168,14 @@ class IOTileCloudChannel(AnalysisGroupChannel):
                 raw events for.
 
         Returns:
-            pd.DataFrame: All of the raw events.
+            pd.DataFrame: All of the raw events.  This will be empty if
+                there are no raw events.
         """
 
         events = self.fetch_events(slug)
+        if len(events) == 0:
+            return pd.DataFrame()
+
         event_ids = events['event_id'].values
         # event.has_raw_data is true if there is an associated raw JSON file stored on S3 for this event
         event_has_data = events['has_raw_data'].values
