@@ -381,6 +381,8 @@ class AnalysisGroup(object):
             for slug, vartype in viewitems(self.variable_types):
                 saver.save_vartype(slug, vartype)
 
+            saver.save_source_info(self.source_info)
+
     @classmethod
     def _find_save_format(cls, format_name):
         for entry in pkg_resources.iter_entry_points('iotile_analytics.save_format', format_name):

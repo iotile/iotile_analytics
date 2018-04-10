@@ -2,6 +2,9 @@
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
+from future.utils import viewitems
+from builtins import int
+from past.builtins import basestring
 import uuid
 import os.path
 import tables
@@ -9,7 +12,7 @@ import pandas as pd
 import numpy as np
 from iotile_analytics.core.stream_series import StreamSeries
 from typedargs.exceptions import ArgumentError
-from .table_descriptions import Stream, EventIndex
+from .table_descriptions import Stream, EventIndex, PropertyTable
 
 
 class OfflineDatabase(object):
@@ -57,6 +60,7 @@ class OfflineDatabase(object):
         self._file.create_vlarray(meta, 'archive_defintions', tables.ObjectAtom())
         self._file.create_vlarray(meta, 'device_definitions', tables.ObjectAtom())
         self._file.create_vlarray(meta, 'vartype_definitions', tables.ObjectAtom())
+        self._file.create_table(meta, 'source_info', PropertyTable)
 
     def save_stream(self, slug, definition, data=None, events=None, raw_events=None):
         """Save a stream with timeseries and event data.
@@ -81,7 +85,8 @@ class OfflineDatabase(object):
         if node_path in self._file:
             raise ArgumentError("Stream already exists in file, cannot save", slug=slug)
 
-        if raw_events is not None and len(raw_events) != len(events):
+        has_raw_events = raw_events is not None and len(raw_events) > 0
+        if has_raw_events and len(raw_events) != len(events):
             raise ArgumentError("If you pass raw events, you must pass the same number as the number of events")
 
         filters = tables.Filters(complevel=1)
@@ -108,7 +113,7 @@ class OfflineDatabase(object):
 
                 arr_events.append(event)
 
-                if raw_events is not None:
+                if has_raw_events:
                     arr_rawevents.append(raw_events.iloc[i].values)
 
             table_events.flush()
@@ -137,9 +142,71 @@ class OfflineDatabase(object):
         table = self._file.root.meta.vartype_definitions
         table.append(vartype)
 
+    def save_source_info(self, info):
+        """Save analysis group source metadata including properties if set.
+
+        Args:
+            info (dict): A dict of string -> string with the properties and data
+                about the analysis group source.
+        """
+
+        if self.read_only:
+            raise ArgumentError("Attempted to save source info in read only file")
+
+        table = self._file.root.meta.source_info
+
+        for key, value in viewitems(info):
+            entry = table.row
+            entry['key'] = key.encode('utf-8')
+
+            if isinstance(value, basestring):
+                entry['str_value'] = value.encode('utf-8')
+            elif isinstance(value, int):
+                entry['int_value'] = value
+            elif isinstance(value, bool):
+                entry['bool_value'] = value
+            elif value is None:
+                pass # Store a None as nothing
+            else:
+                raise ArgumentError("Unsupported data type in source_info", key=key, value=value, type=type(value))
+
+            entry.append()
+
+    def fetch_source_info(self, with_properties=False):
+        """Fetch presaved source info.
+
+        Args:
+            with_properties (bool): Include properties attached to
+                the object or not.  Support for this is currently
+                not implemented since there is no distinction between
+                property and non-property info.
+
+        Returns:
+            dict: A string -> string key-value store of source information.
+        """
+
+        table = self._file.root.meta.source_info
+
+        out_data = {}
+        for row in table.iterrows():
+            key = row['key'].decode('utf-8')
+
+            if row['str_value'] is not None:
+                value = row['str_value'].decode('utf-8')
+            elif row['int_value'] is not None:
+                value = int(row['int_value'])
+            elif row['bool_value'] is not None:
+                value = bool(row['bool_value'])
+            else:
+                value = None
+
+            out_data[key] = value
+
+        return out_data
+
     @classmethod
     def _to_timecol(cls, value):
-        return value.astype('int64')
+        return value.to_datetime64().astype(np.int64)
 
     def list_streams(self):
         """Return a list of all streams.
@@ -195,7 +262,7 @@ class OfflineDatabase(object):
         index = data.read(field='timestamp')
         values = data.read(field='internal_value')
 
-        dt_index = pd.to_datetime(index)
+        dt_index = pd.to_datetime(index, unit='ns')
         return StreamSeries(values, index=dt_index)
 
     def _get_event_index(self, name):
@@ -225,7 +292,7 @@ class OfflineDatabase(object):
 
         event_data = getattr(self._file.root.streams, name).events.read()
 
-        index = pd.to_datetime([x['timestamp'] for x in events])
+        index = pd.to_datetime([x['timestamp'] for x in events], unit='ns')
         return pd.DataFrame(event_data, index=index)
 
     def _count_stream(self, slug):
@@ -265,7 +332,7 @@ class OfflineDatabase(object):
 
         event_data = getattr(self._file.root.streams, name).raw_events.read()
 
-        index = pd.to_datetime([x['timestamp'] for x in events])
+        index = pd.to_datetime([x['timestamp'] for x in events], unit='ns')
         return pd.DataFrame(event_data, index=index)
 
     def count_streams(self, slugs):

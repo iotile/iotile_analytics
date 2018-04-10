@@ -59,6 +59,8 @@ def test_get_data(group, database):
     with pytest.raises(ArgumentError):
         database.fetch_datapoints('abc')
 
+    print(grp5002.values.dtype)
+    print(data5002.values.dtype)
     assert np.allclose(grp5001.values, data5001.values)
     assert np.allclose(grp5002.values, data5002.values)
     assert np.allclose(grp5001.index.astype('int64'), data5001.index.astype('int64'))
