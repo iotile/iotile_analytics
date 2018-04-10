@@ -14,6 +14,29 @@ from iotile_analytics.core.stream_series import StreamSeries
 from typedargs.exceptions import ArgumentError
 from .table_descriptions import Stream, EventIndex, PropertyTable
 
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
+
+class CompatibleObjectAtom(tables.ObjectAtom):
+    """An object atom with a lower cpickle protocol.
+
+    This enables sharing hdf5 files between python 2 and python 3.
+    """
+
+    def _tobuffer(self, object_):
+        return pickle.dumps(object_, 2)
+
+    def fromarray(self, array):
+        # We have to check for an empty array because of a possible
+        # bug in HDF5 which makes it claim that a dataset has one
+        # record when in fact it is empty.
+        if array.size == 0:
+            return None
+        return pickle.loads(array.tostring())
+
 
 class OfflineDatabase(object):
     """An offline database.
@@ -57,9 +80,9 @@ class OfflineDatabase(object):
         self._file.create_group(root, 'streams')
 
         meta = self._file.create_group(root, 'meta')
-        self._file.create_vlarray(meta, 'archive_defintions', tables.ObjectAtom())
-        self._file.create_vlarray(meta, 'device_definitions', tables.ObjectAtom())
-        self._file.create_vlarray(meta, 'vartype_definitions', tables.ObjectAtom())
+        self._file.create_vlarray(meta, 'archive_definitions', CompatibleObjectAtom())
+        self._file.create_vlarray(meta, 'device_definitions', CompatibleObjectAtom())
+        self._file.create_vlarray(meta, 'vartype_definitions', CompatibleObjectAtom())
         self._file.create_table(meta, 'source_info', PropertyTable)
 
     def save_stream(self, slug, definition, data=None, events=None, raw_events=None):
@@ -93,9 +116,9 @@ class OfflineDatabase(object):
 
         group = self._file.create_group('/streams', slug)
 
-        arr_def = self._file.create_vlarray(group, 'definition', tables.ObjectAtom(), filters=filters)
-        arr_events = self._file.create_vlarray(group, 'events', tables.ObjectAtom(), filters=filters)
-        arr_rawevents = self._file.create_vlarray(group, 'raw_events', tables.ObjectAtom(), filters=filters)
+        arr_def = self._file.create_vlarray(group, 'definition', CompatibleObjectAtom(), filters=filters)
+        arr_events = self._file.create_vlarray(group, 'events', CompatibleObjectAtom(), filters=filters)
+        arr_rawevents = self._file.create_vlarray(group, 'raw_events', CompatibleObjectAtom(), filters=filters)
         table_data = self._file.create_table(group, 'data', Stream)
         table_events = self._file.create_table(group, 'event_index', EventIndex)
 
@@ -114,7 +137,7 @@ class OfflineDatabase(object):
                 arr_events.append(event)
 
                 if has_raw_events:
-                    arr_rawevents.append(raw_events.iloc[i].values)
+                    arr_rawevents.append(raw_events.iloc[i].to_dict())
 
             table_events.flush()
 

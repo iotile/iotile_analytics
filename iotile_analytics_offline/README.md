@@ -11,14 +11,11 @@ differently.
 ## Prerequisites
 
 `iotile-analytics-offline` requires that you have a working copy of the HDF5
-file format engine installed.  This cannot be installed using `pip` but can
-be downloaded from:
+file format engine installed.  This is installed automatically be `pip` but can
+be downloaded from if you really want to:
 
 [https://support.hdfgroup.org/downloads/index.html](https://support.hdfgroup.org/downloads/index.html)
 
-Once you install HDF5 using the appropriate installer for your platform,
-`iotile-analytics-offline` should work.  Make sure you install the correct
-32 or 64 bit version that matches the python version that you are using.
 
 ## Installation
 

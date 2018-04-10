@@ -27,9 +27,13 @@ class BaseViewer(object):
         fixed_y (tuple): Optional tuple to use a fixed y axis.
         y_name (str): Optional name for the default y axis so that we can refer to it
             if there are multiple axes included in the plot.
+        x_label (str): The label for the x axis
+        y_label (str): The label for the default y axis
+        tools (list): A list of tools to be added to the toolbar.  If these are passed then
+            the toolbar is shown by default above the plot.
     """
 
-    def __init__(self, size=None, x_type='auto', y_type='auto', fixed_y=None, y_name=None, y_label=None, y_color=None):
+    def __init__(self, size=None, x_type='auto', y_type='auto', tools=None, fixed_y=None, y_name=None, x_label=None, y_label=None, y_color=None):
         kwargs = {}
         if size is not None:
             width, height = size
@@ -40,7 +44,12 @@ class BaseViewer(object):
             y_min, y_max = fixed_y
             kwargs['y_range'] = (y_min, y_max)
 
-        kwargs['toolbar_location'] = None
+        if tools is not None:
+            kwargs['toolbar_location'] = 'above'
+            kwargs['tools'] = tools
+        else:
+            kwargs['toolbar_location'] = None
+
 
         self.figure = figure(x_axis_type=x_type, y_axis_type=y_type, **kwargs)
         self._notebook_handle = None
@@ -55,6 +64,9 @@ class BaseViewer(object):
 
         if y_label is not None:
             self.label_axis(y_name, y_label)
+
+        if x_label is not None:
+            self.figure.xaxis.axis_label = x_label
 
         if y_color is not None:
             self.color_axis(y_name, y_color)
@@ -234,7 +246,7 @@ class BaseViewer(object):
             name = "series_{}".format(len(self.sources))
 
         if mark not in ('line', 'scatter', 'bar'):
-            raise ArgumentError("Unknown glyph type in add_series", line_type=mark, known_types=('line', 'scatter'))
+            raise ArgumentError("Unknown glyph type in add_series", line_type=mark, known_types=('line', 'scatter', 'bar'))
 
         if isinstance(data, ColumnDataSource):
             source = data
@@ -256,6 +268,9 @@ class BaseViewer(object):
 
         if color is not None:
             kwargs['color'] = color
+
+        if label is not None:
+            kwargs['legend'] = label
 
         if mark == 'line':
             self.figure.line(x=x_name, y=y_name, name=name, source=source, **kwargs)
