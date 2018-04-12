@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.3.2
+
+- Increase compatibility with iotile-analytics-offline.
+
 ## 0.3.1
 
 - Break mock_cloud out into python_iotile_cloud for better shareability across

@@ -12,7 +12,7 @@ setup(
     license="LGPLv3",
     install_requires=[
         "iotile-analytics-core >= 0.1.0",
-        "bokeh >= 0.12.14"
+        "bokeh >= 0.12.15"
     ],
     description="A data science bridge for iotile.cloud",
     author="Arch",
