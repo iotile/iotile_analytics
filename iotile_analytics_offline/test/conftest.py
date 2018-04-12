@@ -24,6 +24,29 @@ def water_meter(mock_cloud):
 
 
 @pytest.fixture(scope="module")
+def shipping(mock_cloud):
+    """Create a water meter cloud."""
+
+    domain, cloud = mock_cloud
+    base = os.path.dirname(__file__)
+    conf = os.path.join(base, 'data', 'mock_archive', 'shipping.json')
+    cloud.add_data(conf)
+    cloud.stream_folder = os.path.join(base, 'data', 'mock_archive')
+
+    return domain, cloud
+
+
+@pytest.fixture(scope="module")
+def shipping_group(shipping):
+    domain, cloud = shipping
+
+    CloudSession('test@arch-iot.com', 'test', domain=domain, verify=False)
+
+    group = AnalysisGroup.FromArchive('b--0001-0000-0000-04e7', domain=domain)
+    return group
+
+
+@pytest.fixture(scope="module")
 def group(water_meter):
     """An AnalysisGroup from a single water meter device."""
 
