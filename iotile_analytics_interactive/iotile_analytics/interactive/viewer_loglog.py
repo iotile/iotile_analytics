@@ -30,6 +30,12 @@ class LogLogViewer(BaseViewer):
     def __init__(self, x_decade_mantissa=(1, 2, 5), x_sciformat=True, y_decade_mantissa=(1, 2, 5),
                  y_sciformat=True, **kwargs):
 
+        if 'x_type' not in kwargs:
+            kwargs['x_type'] = 'log'
+
+        if 'y_type' not in kwargs:
+            kwargs['y_type'] = 'log'
+
         super(LogLogViewer, self).__init__(**kwargs)
 
         x_ticker = LogTicker(base=10, mantissas=x_decade_mantissa)

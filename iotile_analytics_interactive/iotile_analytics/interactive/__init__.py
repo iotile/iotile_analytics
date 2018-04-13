@@ -4,4 +4,4 @@ from .viewer_linear import LinearViewer
 from .viewer_base import BaseViewer
 from .app import AnalyticsObject, AnalyticsApplication, show
 
-__all__ = ['TimeseriesViewer', 'LogLogViewer', 'LinearViewer', 'BaseViewer', 'AnalyticsApplication', 'AnalyticsObject', 'show']
+__all__ = ['LogLogViewer', 'BaseViewer', 'AnalyticsApplication', 'AnalyticsObject', 'show']
