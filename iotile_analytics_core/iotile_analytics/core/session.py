@@ -130,10 +130,10 @@ class CloudSession(object):
             return
 
         if user is None:
-            user = input("Please enter your IOTile.cloud email: ")
+            user = input("Please enter your IOTile.cloud email: ".encode('utf-8'))
 
         if password is None:
-            password = getpass.getpass("Please enter your IOTile.cloud password:")
+            password = getpass.getpass("Please enter your IOTile.cloud password: ".encode('utf-8'))
 
         if self.verify is False:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)

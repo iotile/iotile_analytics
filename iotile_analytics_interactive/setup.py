@@ -14,6 +14,9 @@ setup(
         "iotile-analytics-core >= 0.1.0",
         "bokeh >= 0.12.15"
     ],
+    entry_points={
+        'console_scripts': ['analytics-report = iotile_analytics.interactive.scripts.analytics_report:main']
+    },
     description="A data science bridge for iotile.cloud",
     author="Arch",
     author_email="info@arch-iot.com",

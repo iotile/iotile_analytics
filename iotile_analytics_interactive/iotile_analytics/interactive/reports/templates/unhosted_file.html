@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{{ title|e if title else "Live Report" }}</title>
+        <style>
+            {% include "report_style.css" %}
+        </style>
+        {{ bokeh_css }}
+        {{ bokeh_js }}
+
+        <!-- Auogenerated script tag to load in jsonp files into a specific data source -->
+        <script type="text/javascript">
+            function load_jsonp(model_id, identifier) {
+                var safe_id = model_id.replace('-', '_');
+                var script = document.createElement('script');
+                script.src = 'data/' + safe_id + "_" + identifier + ".jsonp";
+                document.getElementsByTagName('head')[0].appendChild(script);
+            }
+
+            {% for model_id, load_obj in loadable_models.items() %}
+                //Function to load data into model {{ model_id }}
+                function {{ load_obj.load_function }}(data) {
+                    var model = Bokeh.documents[0].get_model_by_id("{{ model_id }}");
+                    model.data = data;
+                }
+
+                function {{load_obj.trigger_function}}(identifier) {
+                    load_jsonp("{{ load_obj.safe_id }}", identifier);
+                }
+            {% endfor %}
+
+            
+        </script>
+    </head>
+    <body>
+        <div class="outercontainer">
+            {% if header %}
+            {{ header }}
+            <hr class="header-divider">
+            {% endif %}
+            {{ plot_div|indent(8) }}
+            {{ plot_script|indent(8) }}
+
+            <hr class="header-divider">
+
+            <div class="footer">
+                Generated on {{ timestamp }}.
+            </div>
+        </div>
+    </body>
+</html>

@@ -9,8 +9,9 @@ from iotile_analytics.core.exceptions import UsageError
 class AnalyticsObject(object):
     """Base class for all objects that can be added to an AnalyticsApplication.
 
-    These objects must have a root property that returns a Model or LayoutDOM object
-    that corresponds to the root object that should be added to the application.
+    These objects must have a root property that returns a Model or LayoutDOM
+    object that corresponds to the root object that should be added to the
+    application.
     """
 
     pass

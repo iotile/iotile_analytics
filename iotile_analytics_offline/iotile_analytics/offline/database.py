@@ -59,7 +59,12 @@ class OfflineDatabase(object):
             self._file = tables.open_file(str(uuid.uuid4()), "w", driver="H5FD_CORE", driver_core_backing_store=0)
             self._initialize_database()
             self.read_only = False
-        elif os.path.isfile(path):
+            return
+
+        # NB. It is important that this is a real str object and not a future.newstr
+        # otherwise pytables will throw an exception when it tries to open the file.
+        path = str(path)
+        if os.path.isfile(path):
             self._file = tables.open_file(path, mode="r")
             self.read_only = True
         else:
@@ -386,3 +391,41 @@ class OfflineDatabase(object):
         vartypes = self._file.root.meta.vartype_definitions.read()
 
         return {x['slug']: x for x in vartypes if x['slug'] in slugs}
+
+
+# Register hook to silently close files at process exit
+# From: http://www.pytables.org/cookbook/tailoring_atexit_hooks.html
+def _silently_close_open_files(verbose):
+    open_files = tables.file._open_files
+
+    are_open_files = len(open_files) > 0
+
+    if verbose and are_open_files:
+        sys.stderr.write("Closing remaining open files:")
+
+    if StrictVersion(tables.__version__) >= StrictVersion("3.1.0"):
+        # make a copy of the open_files.handlers container for the iteration
+        handlers = list(open_files.handlers)
+    else:
+        # for older versions of pytables, setup the handlers list from the
+        # keys
+        keys = open_files.keys()
+        handlers = []
+        for key in keys:
+            handlers.append(open_files[key])
+
+    for fileh in handlers:
+        if verbose:
+            sys.stderr.write("%s..." % fileh.filename)
+
+        fileh.close()
+
+        if verbose:
+            sys.stderr.write("done")
+
+    if verbose and are_open_files:
+        sys.stderr.write("\n")
+
+import sys, atexit
+from distutils.version import StrictVersion
+atexit.register(_silently_close_open_files, False)
