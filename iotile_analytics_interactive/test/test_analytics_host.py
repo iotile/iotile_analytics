@@ -114,7 +114,7 @@ def test_info_report_to_file(water_meter, tmpdir):
 
     # Make sure we saved the file with a relative path and no root dir
     with zip_obj.open('temp_file.txt', 'r') as infile:
-        out = infile.read()
+        out = infile.read().decode('utf-8')
 
     # We write different line endings on windows and linux
     assert out.splitlines() == DEVICE_DATA.splitlines()
