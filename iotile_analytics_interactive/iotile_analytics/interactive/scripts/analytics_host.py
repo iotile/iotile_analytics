@@ -6,6 +6,7 @@ import os
 from future.utils import viewitems
 import argparse
 import logging
+from iotile_cloud.api.connection import DOMAIN_NAME
 import pkg_resources
 from builtins import str
 from iotile_analytics.core import CloudSession, AnalysisGroup, Environment
@@ -23,11 +24,13 @@ def build_args():
     parser = argparse.ArgumentParser(description=DESCRIPTION, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('-v', '--verbose', action="count", default=0, help="Increase logging level (goes error, warn, info, debug)")
     parser.add_argument('-u', '--user', default=None, type=str, help="Your iotile.cloud user name.")
+    parser.add_argument('-n', '--no-verify', action="store_true", help="Do not verify the SSL certificate of iotile.cloud")
     parser.add_argument('-p', '--password', default=None, type=str, help="Your iotile.cloud password.  If not specified it will be prompted when needed.")
     parser.add_argument('-o', '--output', type=str, default=None, help="The output path that you wish to save the report at.")
     parser.add_argument('-t', '--report', type=str, help="The name of the report to generate")
     parser.add_argument('-l', '--list', action="store_true", help="List all known report types without running one")
     parser.add_argument('-b', '--bundle', action="store_true", help="Bundle the rendered output into a zip file")
+    parser.add_argument('-d', '--domain', default=DOMAIN_NAME, help="Domain to use for remote queries, defaults to https://iotile.cloud")
     parser.add_argument('analysis_group', default=None, nargs='?', help="The slug or path of the object you want to generate a report on")
 
     return parser
@@ -103,10 +106,10 @@ def find_analysis_group(args):
 
     if group.startswith('d--'):
         is_cloud = True
-        generator = AnalysisGroup.FromDevice
+        generator = lambda x: AnalysisGroup.FromDevice(x, domain=args.domain)
     elif group.startswith('b--'):
         is_cloud = True
-        generator = AnalysisGroup.FromArchive
+        generator = lambda x: AnalysisGroup.FromArchive(x, domain=args.domain)
     elif os.path.exists(group):
         _name, ext = os.path.splitext(group)
         if ext != '.hdf5':
@@ -115,7 +118,7 @@ def find_analysis_group(args):
         generator = lambda x: AnalysisGroup.FromSaved(x, 'hdf5')
 
     if is_cloud:
-        CloudSession(user=args.user, password=args.password)
+        CloudSession(user=args.user, password=args.password, domain=args.domain, verify=not args.no_verify)
 
     return generator(group)
 
@@ -166,6 +169,7 @@ def main(argv=None):
             print("Rendered report to: %s" % rendered_path)
     except ValueError as exc:
         print("ERROR: %s" % exc.message)
+        raise
         return 1
 
     return 0

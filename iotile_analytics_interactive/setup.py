@@ -15,7 +15,8 @@ setup(
         "bokeh >= 0.12.15"
     ],
     entry_points={
-        'console_scripts': ['analytics-report = iotile_analytics.interactive.scripts.analytics_report:main']
+        'console_scripts': ['analytics-host = iotile_analytics.interactive.scripts.analytics_host:main'],
+        'iotile_analytics.live_report': ['basic_info = iotile_analytics.interactive.reports.info_report:SourceInfoReport']
     },
     description="A data science bridge for iotile.cloud",
     author="Arch",

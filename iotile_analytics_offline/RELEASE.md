@@ -6,3 +6,5 @@
 - Supports saving an AnalysisGroup to an HDF5 file and loading that group back
   from a file later.  Use `.save('<path>', 'hdf5')` to save and use
   `AnalysisGroup.FromSaved('<path>', 'hdf5')` to load.
+- Adds `save_hdf5` LiveReport plugin for quickly exporting data to hdf5 from an
+  AnalysisGroup using `analytics-host`.

@@ -7,6 +7,12 @@
 - Switch to Bokeh for visualizations
 - Create AnalyticsApp and AnalyticsObject to facilitate integration of Bokeh
   apps with python callbacks running inside of a notebook or jupyter lab.
+- Add LiveReport objects that render interactive html documents containing
+  graphs and other information.  LiveReports support loading local data using
+  a JSONP based callback mechanism that works without needing a web browser.
+- Add `analytics-host` command line program that allows you to pick a report
+  that you would like to run against an AnalysisGroup and saves the output to
+  a file on your computer.
 
 ## 0.1.1
 

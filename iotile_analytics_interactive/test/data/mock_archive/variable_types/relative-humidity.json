@@ -1,0 +1,37 @@
+{
+    "name": "Relative Humidity",
+    "slug": "relative-humidity",
+    "available_input_units": [
+        {
+            "slug": "in--relative-humidity--lansmont-saver",
+            "unit_full": "Lansmont Saver",
+            "unit_short": "% RH",
+            "m": 1,
+            "d": 1000000,
+            "o": 0.0
+        },
+        {
+            "slug": "in--relative-humidity--pod1-m",
+            "unit_full": "POD1-M",
+            "unit_short": "%",
+            "m": 1,
+            "d": 1024,
+            "o": 0.0
+        }
+    ],
+    "available_output_units": [
+        {
+            "slug": "out--relative-humidity--percent",
+            "unit_full": "Percent",
+            "unit_short": "% RH",
+            "m": 1,
+            "d": 1,
+            "o": 0.0,
+            "decimal_places": 1,
+            "derived_units": {}
+        }
+    ],
+    "decoder": null,
+    "storage_units_full": "Percent RH",
+    "storage_units_short": ""
+}
