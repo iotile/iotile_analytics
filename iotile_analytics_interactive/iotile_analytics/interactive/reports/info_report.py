@@ -4,6 +4,7 @@ from __future__ import unicode_literals, absolute_import
 from past.builtins import basestring
 import sys
 import os
+from io import open
 import zipfile
 from iotile_analytics.core.exceptions import UsageError
 from .report import LiveReport
@@ -57,7 +58,7 @@ class SourceInfoReport(object):
             bundle_path = output_path + ".zip"
             output_path = output_path + ".txt"
 
-            output_file = open(output_path, 'w')
+            output_file = open(output_path, 'w', encoding='utf-8')
 
         try:
             output_file.write("Source Properties\n")
@@ -73,7 +74,7 @@ class SourceInfoReport(object):
                     val = val.encode('utf-8').decode('utf-8')
                 else:
                     val = str(val)
-                output_file.write('{0:30s} {1}\n'.format(key, val.replace('\n', new_line)).encode('utf-8'))
+                output_file.write('{0:30s} {1}\n'.format(key, val.replace('\n', new_line)))
         finally:
             if output_path is not None:
                 output_file.close()
