@@ -59,17 +59,18 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
         return self._stream_finder(self._cloud_id)
 
-    def fetch_source_info(self, with_properties=False):
+    def fetch_source_info(self):
         """Fetch the record associated to the channel object (project, device or datablock)
 
-        This is the object dictionary for the project, device or datablock this channel is based on
+        This is the object dictionary for the project, device or datablock
+        this channel is based on
 
         Args:
-            with_properties: If True, will also fetch object properties and add them as dictionary entries
+            with_properties: If True, will also fetch object properties and
+                add them as dictionary entries
 
         Returns:
-            dict(<name>: <value>): A dict mapping object attribute names and values (including properties
-            if with_properties=True)
+            dict: The raw source object that our analytics group was generated from.
         """
 
         resource = getattr(self._api, self._source_type)
@@ -78,15 +79,25 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         except RestHttpBaseException as exc:
             raise CloudError("Error calling method on iotile.cloud", exception=exc, response=exc.response.status_code)
 
-        if with_properties:
-            try:
-                property_data = self._api.property.get(target=self._cloud_id)
-                if 'count' in property_data and property_data['count']:
-                    for item in property_data['results']:
-                        data[item['name']] = item['value']
-            except RestHttpBaseException as exc:
-                raise CloudError("Error calling method on iotile.cloud", exception=exc,
-                                 response=exc.response.status_code)
+        return data
+
+    def fetch_properties(self):
+        """Fetch all properties for a given object (project, device or datablock).
+
+        Returns:
+            dict: A dict of property names and values.
+        """
+
+        data = {}
+
+        try:
+            property_data = self._api.property.get(target=self._cloud_id)
+            if 'count' in property_data and property_data['count']:
+                for item in property_data['results']:
+                    data[item['name']] = item['value']
+        except RestHttpBaseException as exc:
+            raise CloudError("Error calling method on iotile.cloud", exception=exc,
+                             response=exc.response.status_code)
 
         return data
 

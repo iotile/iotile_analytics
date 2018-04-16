@@ -2,6 +2,7 @@
 
 from .stream import Stream
 from .event_index import EventIndex
-from .properties import PropertyTable
+from .info import DatabaseInfoTable
+from .properties import PropertyTable, PropertyTypes
 
-__all__ = ['Stream', 'EventIndex', 'PropertyTable']
+__all__ = ['Stream', 'EventIndex', 'DatabaseInfoTable', 'PropertyTable', 'PropertyTypes']

@@ -49,7 +49,8 @@ class AnalysisGroup(object):
         self._channel = channel
 
         stream_list = channel.list_streams()
-        self.source_info = channel.fetch_source_info(with_properties=True)
+        self.source_info = channel.fetch_source_info()
+        self.properties = channel.fetch_properties()
         self.streams = self._parse_stream_list(stream_list)
         self.stream_counts = channel.count_streams([x['slug'] for x in stream_list])
 
@@ -381,7 +382,7 @@ class AnalysisGroup(object):
             for slug, vartype in viewitems(self.variable_types):
                 saver.save_vartype(slug, vartype)
 
-            saver.save_source_info(self.source_info)
+            saver.save_source_info(self.source_info, self.properties)
 
     @classmethod
     def _find_save_format(cls, format_name):
