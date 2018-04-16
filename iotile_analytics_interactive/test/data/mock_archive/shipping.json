@@ -1,0 +1,4739 @@
+{
+	"users":
+	{
+		"test@arch-iot.com": "test"
+	},
+
+    "datablocks":
+    [
+        {
+            "id": 25,
+            "slug": "b--0001-0000-0000-04e7",
+            "title": "Archive: Test Saver Device (04e7)",
+            "description": "Test archive for analysis purposes",
+            "block": 1,
+            "org": "arch-internal",
+            "sg": "saver-v1-0-0",
+            "created_on": "2017-10-27T21:23:36Z",
+            "created_by": "tim",
+            "pid": ""
+        }
+    ],
+	
+	"streams":
+	[
+        {
+            "id": "5e542174-3fd1-4bcb-9583-68f5fff26cda",
+            "project_id": null,
+            "project": "p--0000-00a8",
+            "device": "d--0000-0000-0000-04e7",
+            "block": "b--0001-0000-0000-04e7",
+            "data_label": "",
+            "variable": "v--0000-00a8--5020",
+            "var_type": "default",
+            "var_name": "Accelerometer",
+            "var_lid": 20512,
+            "input_unit": {
+                "m": 1,
+                "unit_full": "Unit",
+                "slug": "in--default--unit",
+                "unit_short": "",
+                "d": 1,
+                "o": 0.0
+            },
+            "output_unit": {
+                "derived_units": {},
+                "unit_full": "Unit",
+                "m": 1,
+                "slug": "out--default--unit",
+                "unit_short": "",
+                "d": 1,
+                "decimal_places": 1,
+                "o": 0.0
+            },
+            "derived_stream": null,
+            "raw_value_format": "auto",
+            "mdo_type": "S",
+            "mdo_label": "",
+            "multiplication_factor": 1,
+            "division_factor": 1,
+            "offset": 0.0,
+            "org": "arch-internal",
+            "created_on": "2017-10-27T21:23:47.926840Z",
+            "slug": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "enabled": true
+        },
+        {
+            "id": "042018a4-4738-4b93-b070-21dccb43726c",
+            "project_id": null,
+            "project": "p--0000-00a8",
+            "device": "d--0000-0000-0000-04e7",
+            "block": "b--0001-0000-0000-04e7",
+            "data_label": "",
+            "variable": "v--0000-00a8--5021",
+            "var_type": "pressure",
+            "var_name": "Pressure",
+            "var_lid": 20513,
+            "input_unit": {
+                "m": 100,
+                "unit_full": "Lansmont Saver",
+                "slug": "in--pressure--lansmont-saver",
+                "unit_short": "",
+                "d": 1000000,
+                "o": 0.0
+            },
+            "output_unit": {
+                "derived_units": {},
+                "unit_full": "Millibar",
+                "m": 1,
+                "slug": "out--pressure--millibar",
+                "unit_short": "Mbar",
+                "d": 100,
+                "decimal_places": 0,
+                "o": 0.0
+            },
+            "derived_stream": null,
+            "raw_value_format": "<l",
+            "mdo_type": "S",
+            "mdo_label": "",
+            "multiplication_factor": 1,
+            "division_factor": 1,
+            "offset": 0.0,
+            "org": "arch-internal",
+            "created_on": "2017-10-27T21:23:47.939864Z",
+            "slug": "s--0000-00a8--0001-0000-0000-04e7--5021",
+            "enabled": true
+        },
+        {
+            "id": "94f89fa8-79d0-4fbd-9c8e-235f414d33e2",
+            "project_id": null,
+            "project": "p--0000-00a8",
+            "device": "d--0000-0000-0000-04e7",
+            "block": "b--0001-0000-0000-04e7",
+            "data_label": "",
+            "variable": "v--0000-00a8--5022",
+            "var_type": "relative-humidity",
+            "var_name": "Relative Humidity",
+            "var_lid": 20514,
+            "input_unit": {
+                "m": 1,
+                "unit_full": "Lansmont Saver",
+                "slug": "in--relative-humidity--lansmont-saver",
+                "unit_short": "% RH",
+                "d": 1000000,
+                "o": 0.0
+            },
+            "output_unit": {
+                "derived_units": {},
+                "unit_full": "Percent",
+                "m": 1,
+                "slug": "out--relative-humidity--percent",
+                "unit_short": "% RH",
+                "d": 1,
+                "decimal_places": 1,
+                "o": 0.0
+            },
+            "derived_stream": null,
+            "raw_value_format": "<l",
+            "mdo_type": "S",
+            "mdo_label": "",
+            "multiplication_factor": 1,
+            "division_factor": 1,
+            "offset": 0.0,
+            "org": "arch-internal",
+            "created_on": "2017-10-27T21:23:47.957498Z",
+            "slug": "s--0000-00a8--0001-0000-0000-04e7--5022",
+            "enabled": true
+        },
+        {
+            "id": "a84fba7a-6c95-44a7-be2e-7e3e8a72fa98",
+            "project_id": null,
+            "project": "p--0000-00a8",
+            "device": "d--0000-0000-0000-04e7",
+            "block": "b--0001-0000-0000-04e7",
+            "data_label": "",
+            "variable": "v--0000-00a8--5023",
+            "var_type": "temp",
+            "var_name": "Temperature",
+            "var_lid": 20515,
+            "input_unit": {
+                "m": 1,
+                "unit_full": "Lansmont Saver",
+                "slug": "in--temp--lansmont-saver",
+                "unit_short": "C",
+                "d": 1000000,
+                "o": 273.15
+            },
+            "output_unit": {
+                "derived_units": {},
+                "unit_full": "Celsius",
+                "m": 1,
+                "slug": "out--temp--celsius",
+                "unit_short": "C",
+                "d": 1,
+                "decimal_places": 1,
+                "o": -273.15
+            },
+            "derived_stream": null,
+            "raw_value_format": "<l",
+            "mdo_type": "S",
+            "mdo_label": "",
+            "multiplication_factor": 1,
+            "division_factor": 1,
+            "offset": 0.0,
+            "org": "arch-internal",
+            "created_on": "2017-10-27T21:23:47.969387Z",
+            "slug": "s--0000-00a8--0001-0000-0000-04e7--5023",
+            "enabled": true
+        },
+        {
+            "id": "13e67f92-15f7-42a8-ab60-dafbb323fd04",
+            "project_id": null,
+            "project": "p--0000-00a8",
+            "device": "d--0000-0000-0000-04e7",
+            "block": "b--0001-0000-0000-04e7",
+            "data_label": "",
+            "variable": "v--0000-00a8--5024",
+            "var_type": "default",
+            "var_name": "Trip Done",
+            "var_lid": 20516,
+            "input_unit": {
+                "m": 1,
+                "unit_full": "Unit",
+                "slug": "in--default--unit",
+                "unit_short": "",
+                "d": 1,
+                "o": 0.0
+            },
+            "output_unit": {
+                "derived_units": {},
+                "unit_full": "Unit",
+                "m": 1,
+                "slug": "out--default--unit",
+                "unit_short": "",
+                "d": 1,
+                "decimal_places": 1,
+                "o": 0.0
+            },
+            "derived_stream": null,
+            "raw_value_format": "<L",
+            "mdo_type": "S",
+            "mdo_label": "",
+            "multiplication_factor": 1,
+            "division_factor": 1,
+            "offset": 0.0,
+            "org": "arch-internal",
+            "created_on": "2017-10-27T21:23:47.983967Z",
+            "slug": "s--0000-00a8--0001-0000-0000-04e7--5024",
+            "enabled": true
+        }
+    ],
+
+	"events":
+	[
+        {
+            "id": 19577,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/050e2597-b499-42a7-894a-18592c3e61bb.json",
+            "ext": "json", "has_raw_data": true,
+            "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-23T10:58:31Z",
+            "streamer_local_id": 519994711,
+
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.3214111328125,
+                "axis": {
+                    "y": {
+                        "peak": 0.7080078125,
+                        "i": 280
+                    },
+                    "x": {
+                        "peak": 0.8819580078125,
+                        "i": 356
+                    },
+                    "z": {
+                        "peak": 1.3214111328125,
+                        "i": 266
+                    }
+                },
+                "max_g_i": 266,
+                "type": "Shock",
+                "max_g": 1.4221420613680658,
+                "duration": 0.0244140625,
+                "n": 1024,
+                "g_rmsi": 0.3651480225034534,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 25.28125,
+                "temperature": 28.265625,
+                "end": 279,
+                "max_peak_i": 266,
+                "delta_v": 0.5548447370529175,
+                "pressure": 978.6
+            }
+        },
+        {
+            "id": 19578,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/6cd5ac54-c26f-49a9-868e-6ec2a4a894ae.json",
+            "ext": "json", "has_raw_data": true,
+            "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-23T17:21:08Z",
+            "streamer_local_id": 520017668,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 2.0172119140625,
+                "axis": {
+                    "y": {
+                        "peak": 0.3570556640625,
+                        "i": 256
+                    },
+                    "x": {
+                        "peak": 0.5859375,
+                        "i": 255
+                    },
+                    "z": {
+                        "peak": 2.0172119140625,
+                        "i": 267
+                    }
+                },
+                "max_g_i": 267,
+                "type": "Shock",
+                "max_g": 2.0755475811130224,
+                "duration": 0.001953125,
+                "n": 1024,
+                "g_rmsi": 0.2517299367324706,
+                "start": 266,
+                "max_peak_direction": "z",
+                "relative_humidity": 24.859375,
+                "temperature": 29.06640625,
+                "end": 267,
+                "max_peak_i": 267,
+                "delta_v": 0.0072002410888671875,
+                "pressure": 1000.2
+            }
+        },
+        {
+            "id": 19579,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "has_raw_data": true,
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/900e919d-b2bc-4452-b0ab-f187afbd5b54.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-24T11:52:44Z",
+            "streamer_local_id": 520084364,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0650634765625,
+                "axis": {
+                    "y": {
+                        "peak": 1.0650634765625,
+                        "i": 256
+                    },
+                    "x": {
+                        "peak": 0.3692626953125,
+                        "i": 327
+                    },
+                    "z": {
+                        "peak": 0.9063720703125,
+                        "i": 339
+                    }
+                },
+                "max_g_i": 350,
+                "type": "Shock",
+                "max_g": 1.2078909852163242,
+                "duration": 0.0390625,
+                "n": 1024,
+                "g_rmsi": 0.30202587055334756,
+                "start": 231,
+                "max_peak_direction": "y",
+                "relative_humidity": 23.19921875,
+                "temperature": 26.1875,
+                "end": 270,
+                "max_peak_i": 256,
+                "delta_v": 1.2344121932983398,
+                "pressure": 998.8
+            }
+        },
+        {
+            "id": 19580,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/d99f9aff-9e26-4cf2-a2fc-bbd774da2cd7.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T01:00:17Z",
+            "streamer_local_id": 520131617,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0467529296875,
+                "axis": {
+                    "y": {
+                        "peak": 0.286865234375,
+                        "i": 120
+                    },
+                    "x": {
+                        "peak": 0.29296875,
+                        "i": 97
+                    },
+                    "z": {
+                        "peak": 1.0467529296875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 257,
+                "type": "Shock",
+                "max_g": 1.0588764080758313,
+                "duration": 0.0205078125,
+                "n": 1024,
+                "g_rmsi": 0.40618384131976987,
+                "start": 244,
+                "max_peak_direction": "z",
+                "relative_humidity": 21.96875,
+                "temperature": 24.1875,
+                "end": 264,
+                "max_peak_i": 256,
+                "delta_v": 0.33295154571533203,
+                "pressure": 999.2
+            }
+        },
+        {
+            "id": 19581,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/f15777c6-938f-4c49-bf46-cd800595d2b6.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T01:00:29Z",
+            "streamer_local_id": 520131629,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.4678955078125,
+                "axis": {
+                    "y": {
+                        "peak": 0.640869140625,
+                        "i": 889
+                    },
+                    "x": {
+                        "peak": 0.2227783203125,
+                        "i": 370
+                    },
+                    "z": {
+                        "peak": 1.4678955078125,
+                        "i": 940
+                    }
+                },
+                "max_g_i": 263,
+                "type": "Shock",
+                "max_g": 1.5070122685480438,
+                "duration": 0.00390625,
+                "n": 1024,
+                "g_rmsi": 0.41511167739502636,
+                "start": 939,
+                "max_peak_direction": "z",
+                "relative_humidity": 21.96875,
+                "temperature": 24.1875,
+                "end": 942,
+                "max_peak_i": 940,
+                "delta_v": 0.017201900482177734,
+                "pressure": 999.3
+            }
+        },
+        {
+            "id": 19582,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/436f296e-5a3a-4da3-b6e3-5faf50221ae4.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T01:00:31Z",
+            "streamer_local_id": 520131631,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.18408203125,
+                "axis": {
+                    "y": {
+                        "peak": 0.50048828125,
+                        "i": 289
+                    },
+                    "x": {
+                        "peak": 0.2960205078125,
+                        "i": 273
+                    },
+                    "z": {
+                        "peak": 1.18408203125,
+                        "i": 262
+                    }
+                },
+                "max_g_i": 467,
+                "type": "Shock",
+                "max_g": 1.2274782989685264,
+                "duration": 0.056640625,
+                "n": 1024,
+                "g_rmsi": 0.5437640627938436,
+                "start": 229,
+                "max_peak_direction": "z",
+                "relative_humidity": 21.96875,
+                "temperature": 24.1875,
+                "end": 286,
+                "max_peak_i": 262,
+                "delta_v": 2.6434481143951416,
+                "pressure": 999.3
+            }
+        },
+        {
+            "id": 19583,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/4b76b417-4e53-4818-b60a-3475ee2304f8.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T01:00:37Z",
+            "streamer_local_id": 520131637,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0467529296875,
+                "axis": {
+                    "y": {
+                        "peak": 0.286865234375,
+                        "i": 119
+                    },
+                    "x": {
+                        "peak": 0.2227783203125,
+                        "i": 256
+                    },
+                    "z": {
+                        "peak": 1.0467529296875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.070197120072103,
+                "duration": 0.0244140625,
+                "n": 1024,
+                "g_rmsi": 0.2854787867087042,
+                "start": 249,
+                "max_peak_direction": "z",
+                "relative_humidity": 21.96875,
+                "temperature": 24.1875,
+                "end": 273,
+                "max_peak_i": 256,
+                "delta_v": 0.5103647708892822,
+                "pressure": 999.3
+            }
+        },
+        {
+            "id": 19584,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/6bba274c-305c-4dfe-8f4e-acdabdba36aa.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T01:00:58Z",
+            "streamer_local_id": 520131658,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 2.1636962890625,
+                "axis": {
+                    "y": {
+                        "peak": 0.50048828125,
+                        "i": 1007
+                    },
+                    "x": {
+                        "peak": 0.3692626953125,
+                        "i": 985
+                    },
+                    "z": {
+                        "peak": 2.1636962890625,
+                        "i": 443
+                    }
+                },
+                "max_g_i": 443,
+                "type": "Shock",
+                "max_g": 2.1763676686933846,
+                "duration": 0.03125,
+                "n": 1024,
+                "g_rmsi": 0.6019124344066158,
+                "start": 430,
+                "max_peak_direction": "z",
+                "relative_humidity": 21.96875,
+                "temperature": 24.1875,
+                "end": 461,
+                "max_peak_i": 443,
+                "delta_v": 1.35345458984375,
+                "pressure": 999.6
+            }
+        },
+        {
+            "id": 19585,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/ff31537b-fc22-4d1f-b84c-5f6545dd7972.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T01:04:46Z",
+            "streamer_local_id": 520131886,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.116943359375,
+                "axis": {
+                    "y": {
+                        "peak": 0.3570556640625,
+                        "i": 242
+                    },
+                    "x": {
+                        "peak": 0.1495361328125,
+                        "i": 106
+                    },
+                    "z": {
+                        "peak": 1.116943359375,
+                        "i": 265
+                    }
+                },
+                "max_g_i": 265,
+                "type": "Shock",
+                "max_g": 1.116943359375,
+                "duration": 0.0263671875,
+                "n": 1024,
+                "g_rmsi": 0.3477590623114888,
+                "start": 247,
+                "max_peak_direction": "z",
+                "relative_humidity": 22.0390625,
+                "temperature": 24.1484375,
+                "end": 273,
+                "max_peak_i": 265,
+                "delta_v": 0.5954504013061523,
+                "pressure": 999.6
+            }
+        },
+        {
+            "id": 19586,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/8c14c44a-dc7a-4f97-a337-1cd6325dc211.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T01:04:48Z",
+            "streamer_local_id": 520131888,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.2542724609375,
+                "axis": {
+                    "y": {
+                        "peak": 0.4974365234375,
+                        "i": 275
+                    },
+                    "x": {
+                        "peak": 0.2197265625,
+                        "i": 923
+                    },
+                    "z": {
+                        "peak": 1.2542724609375,
+                        "i": 266
+                    }
+                },
+                "max_g_i": 266,
+                "type": "Shock",
+                "max_g": 1.2723341591037989,
+                "duration": 0.017578125,
+                "n": 1024,
+                "g_rmsi": 0.2764776517682641,
+                "start": 251,
+                "max_peak_direction": "z",
+                "relative_humidity": 22.00390625,
+                "temperature": 24.1484375,
+                "end": 268,
+                "max_peak_i": 266,
+                "delta_v": 0.2941310405731201,
+                "pressure": 999.2
+            }
+        },
+        {
+            "id": 19587,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/a64d11ee-7647-4718-8ea1-afad5886ef86.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T01:04:50Z",
+            "streamer_local_id": 520131890,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.74560546875,
+                "axis": {
+                    "y": {
+                        "peak": 0.7110595703125,
+                        "i": 272
+                    },
+                    "x": {
+                        "peak": 0.445556640625,
+                        "i": 267
+                    },
+                    "z": {
+                        "peak": 1.74560546875,
+                        "i": 852
+                    }
+                },
+                "max_g_i": 852,
+                "type": "Shock",
+                "max_g": 1.797858363050107,
+                "duration": 0.025390625,
+                "n": 1024,
+                "g_rmsi": 0.39355554304018103,
+                "start": 834,
+                "max_peak_direction": "z",
+                "relative_humidity": 21.96484375,
+                "temperature": 24.1484375,
+                "end": 859,
+                "max_peak_i": 852,
+                "delta_v": 0.6354629993438721,
+                "pressure": 999.4
+            }
+        },
+        {
+            "id": 19588,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/65109586-6380-4a35-b4dc-fbe1533d53cd.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T17:41:41Z",
+            "streamer_local_id": 520191701,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.4678955078125,
+                "axis": {
+                    "y": {
+                        "peak": 0.5706787109375,
+                        "i": 293
+                    },
+                    "x": {
+                        "peak": 1.0345458984375,
+                        "i": 289
+                    },
+                    "z": {
+                        "peak": 1.4678955078125,
+                        "i": 268
+                    }
+                },
+                "max_g_i": 287,
+                "type": "Shock",
+                "max_g": 1.5806220100528408,
+                "duration": 0.001953125,
+                "n": 1024,
+                "g_rmsi": 0.3008467171745567,
+                "start": 268,
+                "max_peak_direction": "z",
+                "relative_humidity": 22.41796875,
+                "temperature": 20.98828125,
+                "end": 269,
+                "max_peak_i": 268,
+                "delta_v": 0.004637241363525391,
+                "pressure": 992.6
+            }
+        },
+        {
+            "id": 19589,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/2451e659-b500-4196-9f98-6c6b530e17a0.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T17:42:35Z",
+            "streamer_local_id": 520191755,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 2.935791015625,
+                "axis": {
+                    "y": {
+                        "peak": 0.50048828125,
+                        "i": 258
+                    },
+                    "x": {
+                        "peak": 1.4068603515625,
+                        "i": 259
+                    },
+                    "z": {
+                        "peak": 2.935791015625,
+                        "i": 262
+                    }
+                },
+                "max_g_i": 262,
+                "type": "Shock",
+                "max_g": 3.0689275301763637,
+                "duration": 0.0146484375,
+                "n": 1024,
+                "g_rmsi": 0.37137928119682323,
+                "start": 256,
+                "max_peak_direction": "z",
+                "relative_humidity": 22.41796875,
+                "temperature": 20.98828125,
+                "end": 270,
+                "max_peak_i": 262,
+                "delta_v": 0.32445788383483887,
+                "pressure": 992.7
+            }
+        },
+        {
+            "id": 19590,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/6fe482d2-34b7-4ae4-896d-76cb26f1d2b7.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T19:18:08Z",
+            "streamer_local_id": 520197488,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.1871337890625,
+                "axis": {
+                    "y": {
+                        "peak": 0.42724609375,
+                        "i": 190
+                    },
+                    "x": {
+                        "peak": 0.2227783203125,
+                        "i": 342
+                    },
+                    "z": {
+                        "peak": 1.1871337890625,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.1893910421571507,
+                "duration": 0.00390625,
+                "n": 1024,
+                "g_rmsi": 0.29143235427295683,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 22.41796875,
+                "temperature": 20.98828125,
+                "end": 258,
+                "max_peak_i": 256,
+                "delta_v": 0.01417398452758789,
+                "pressure": 994.5
+            }
+        },
+        {
+            "id": 19591,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/fd67c8e4-9969-4ae2-b915-393f027639c7.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T19:23:22Z",
+            "streamer_local_id": 520197802,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.9561767578125,
+                "axis": {
+                    "y": {
+                        "peak": 0.360107421875,
+                        "i": 262
+                    },
+                    "x": {
+                        "peak": 0.2197265625,
+                        "i": 268
+                    },
+                    "z": {
+                        "peak": 1.9561767578125,
+                        "i": 262
+                    }
+                },
+                "max_g_i": 262,
+                "type": "Shock",
+                "max_g": 1.9903942526859015,
+                "duration": 0.0205078125,
+                "n": 1024,
+                "g_rmsi": 0.4106421276732623,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 22.34375,
+                "temperature": 20.98828125,
+                "end": 275,
+                "max_peak_i": 262,
+                "delta_v": 0.5128204822540283,
+                "pressure": 995.4
+            }
+        },
+        {
+            "id": 19592,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/45a9e56f-5500-409d-b29c-57f78673e5b9.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T19:25:00Z",
+            "streamer_local_id": 520197900,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.116943359375,
+                "axis": {
+                    "y": {
+                        "peak": 0.1434326171875,
+                        "i": 4
+                    },
+                    "x": {
+                        "peak": 0.1495361328125,
+                        "i": 207
+                    },
+                    "z": {
+                        "peak": 1.116943359375,
+                        "i": 257
+                    }
+                },
+                "max_g_i": 261,
+                "type": "Shock",
+                "max_g": 1.119342166668305,
+                "duration": 0.01953125,
+                "n": 1024,
+                "g_rmsi": 0.3972163433555647,
+                "start": 250,
+                "max_peak_direction": "z",
+                "relative_humidity": 22.41796875,
+                "temperature": 20.98828125,
+                "end": 269,
+                "max_peak_i": 257,
+                "delta_v": 0.3040432929992676,
+                "pressure": 998.5
+            }
+        },
+        {
+            "id": 19593,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/d526c700-8f4c-4ff5-b58d-5804bc701efe.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T19:25:14Z",
+            "streamer_local_id": 520197914,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.397705078125,
+                "axis": {
+                    "y": {
+                        "peak": 0.286865234375,
+                        "i": 257
+                    },
+                    "x": {
+                        "peak": 0.2197265625,
+                        "i": 249
+                    },
+                    "z": {
+                        "peak": 1.397705078125,
+                        "i": 257
+                    }
+                },
+                "max_g_i": 257,
+                "type": "Shock",
+                "max_g": 1.4343391580196703,
+                "duration": 0.009765625,
+                "n": 1024,
+                "g_rmsi": 0.4553580054364682,
+                "start": 256,
+                "max_peak_direction": "z",
+                "relative_humidity": 22.41796875,
+                "temperature": 20.98828125,
+                "end": 265,
+                "max_peak_i": 257,
+                "delta_v": 0.09614229202270508,
+                "pressure": 999.3
+            }
+        },
+        {
+            "id": 19594,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/9d742e42-73c3-4872-ba25-78807fd3016f.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T19:25:37Z",
+            "streamer_local_id": 520197937,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.3275146484375,
+                "axis": {
+                    "y": {
+                        "peak": 0.286865234375,
+                        "i": 144
+                    },
+                    "x": {
+                        "peak": 0.2197265625,
+                        "i": 224
+                    },
+                    "z": {
+                        "peak": 1.3275146484375,
+                        "i": 262
+                    }
+                },
+                "max_g_i": 262,
+                "type": "Shock",
+                "max_g": 1.3295335873327625,
+                "duration": 0.0185546875,
+                "n": 1024,
+                "g_rmsi": 0.3275026048565459,
+                "start": 252,
+                "max_peak_direction": "z",
+                "relative_humidity": 22.41796875,
+                "temperature": 20.98828125,
+                "end": 270,
+                "max_peak_i": 262,
+                "delta_v": 0.3199845552444458,
+                "pressure": 1001.3
+            }
+        },
+        {
+            "id": 19595,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/79c0ecb5-90eb-466a-a37e-789bc7d37199.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T19:25:46Z",
+            "streamer_local_id": 520197946,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.116943359375,
+                "axis": {
+                    "y": {
+                        "peak": 0.2166748046875,
+                        "i": 309
+                    },
+                    "x": {
+                        "peak": 0.1495361328125,
+                        "i": 72
+                    },
+                    "z": {
+                        "peak": 1.116943359375,
+                        "i": 261
+                    }
+                },
+                "max_g_i": 261,
+                "type": "Shock",
+                "max_g": 1.121540718164709,
+                "duration": 0.01953125,
+                "n": 1024,
+                "g_rmsi": 0.384422745591685,
+                "start": 251,
+                "max_peak_direction": "z",
+                "relative_humidity": 22.41796875,
+                "temperature": 20.98828125,
+                "end": 270,
+                "max_peak_i": 261,
+                "delta_v": 0.30547380447387695,
+                "pressure": 1002.0
+            }
+        },
+        {
+            "id": 19596,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/2d7ac646-bc06-4cdd-833f-7426b9b5e8cd.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T19:25:56Z",
+            "streamer_local_id": 520197956,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0467529296875,
+                "axis": {
+                    "y": {
+                        "peak": 0.2166748046875,
+                        "i": 80
+                    },
+                    "x": {
+                        "peak": 0.1495361328125,
+                        "i": 269
+                    },
+                    "z": {
+                        "peak": 1.0467529296875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.0495296384098503,
+                "duration": 0.0107421875,
+                "n": 1024,
+                "g_rmsi": 0.26822864521292367,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 22.41796875,
+                "temperature": 20.98828125,
+                "end": 265,
+                "max_peak_i": 256,
+                "delta_v": 0.09070932865142822,
+                "pressure": 1003.0
+            }
+        },
+        {
+            "id": 19597,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/e46c9309-f7da-42ee-b7bb-950f4169d75d.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-25T19:46:09Z",
+            "streamer_local_id": 520199169,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.25732421875,
+                "axis": {
+                    "y": {
+                        "peak": 0.4302978515625,
+                        "i": 204
+                    },
+                    "x": {
+                        "peak": 0.2197265625,
+                        "i": 254
+                    },
+                    "z": {
+                        "peak": 1.25732421875,
+                        "i": 263
+                    }
+                },
+                "max_g_i": 263,
+                "type": "Shock",
+                "max_g": 1.2654790028793657,
+                "duration": 0.017578125,
+                "n": 1024,
+                "g_rmsi": 0.35488533020586216,
+                "start": 254,
+                "max_peak_direction": "z",
+                "relative_humidity": 22.5625,
+                "temperature": 20.98828125,
+                "end": 271,
+                "max_peak_i": 263,
+                "delta_v": 0.30791759490966797,
+                "pressure": 1009.0
+            }
+        },
+        {
+            "id": 19598,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/57883fee-49e4-4cd1-baf7-19efe5da3973.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-26T00:46:19Z",
+            "streamer_local_id": 520217179,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.1871337890625,
+                "axis": {
+                    "y": {
+                        "peak": 0.286865234375,
+                        "i": 420
+                    },
+                    "x": {
+                        "peak": 0.1495361328125,
+                        "i": 91
+                    },
+                    "z": {
+                        "peak": 1.1871337890625,
+                        "i": 257
+                    }
+                },
+                "max_g_i": 257,
+                "type": "Shock",
+                "max_g": 1.2091548164778576,
+                "duration": 0.0224609375,
+                "n": 1024,
+                "g_rmsi": 0.3545930523900878,
+                "start": 250,
+                "max_peak_direction": "z",
+                "relative_humidity": 21.9296875,
+                "temperature": 20.1875,
+                "end": 272,
+                "max_peak_i": 257,
+                "delta_v": 0.4720717668533325,
+                "pressure": 1009.5
+            }
+        },
+        {
+            "id": 19599,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/82407758-4c6a-4811-b7b4-752467aea905.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-26T00:49:07Z",
+            "streamer_local_id": 520217347,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0467529296875,
+                "axis": {
+                    "y": {
+                        "peak": 0.2166748046875,
+                        "i": 180
+                    },
+                    "x": {
+                        "peak": 0.2197265625,
+                        "i": 245
+                    },
+                    "z": {
+                        "peak": 1.0467529296875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.0590698888706096,
+                "duration": 0.0146484375,
+                "n": 1024,
+                "g_rmsi": 0.30068847586700115,
+                "start": 249,
+                "max_peak_direction": "z",
+                "relative_humidity": 21.9296875,
+                "temperature": 20.1875,
+                "end": 263,
+                "max_peak_i": 256,
+                "delta_v": 0.16777217388153076,
+                "pressure": 1010.6
+            }
+        },
+        {
+            "id": 19600,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/69107e31-933f-4a8d-9822-57893a80e448.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-26T00:50:02Z",
+            "streamer_local_id": 520217402,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0467529296875,
+                "axis": {
+                    "y": {
+                        "peak": 0.286865234375,
+                        "i": 347
+                    },
+                    "x": {
+                        "peak": 0.2197265625,
+                        "i": 157
+                    },
+                    "z": {
+                        "peak": 1.0467529296875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.0491036136764949,
+                "duration": 0.009765625,
+                "n": 1024,
+                "g_rmsi": 0.31504633568483176,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 21.9296875,
+                "temperature": 20.1484375,
+                "end": 264,
+                "max_peak_i": 256,
+                "delta_v": 0.0750422477722168,
+                "pressure": 1010.6
+            }
+        },
+        {
+            "id": 19601,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/6bc4b625-0d54-4f76-8fa5-1b7ad55960db.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-27T14:00:18Z",
+            "streamer_local_id": 520351218,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 2.3773193359375,
+                "axis": {
+                    "y": {
+                        "peak": 0.360107421875,
+                        "i": 271
+                    },
+                    "x": {
+                        "peak": 0.89111328125,
+                        "i": 274
+                    },
+                    "z": {
+                        "peak": 2.3773193359375,
+                        "i": 271
+                    }
+                },
+                "max_g_i": 271,
+                "type": "Shock",
+                "max_g": 2.4597716976125343,
+                "duration": 0.0400390625,
+                "n": 1024,
+                "g_rmsi": 0.4066820200909408,
+                "start": 250,
+                "max_peak_direction": "z",
+                "relative_humidity": 20.66015625,
+                "temperature": 19.66796875,
+                "end": 290,
+                "max_peak_i": 271,
+                "delta_v": 2.2746801376342773,
+                "pressure": 1015.9
+            }
+        },
+        {
+            "id": 19602,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/49811379-7a39-4005-a708-4ea7cf9b10b2.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-27T14:00:19Z",
+            "streamer_local_id": 520351219,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.25732421875,
+                "axis": {
+                    "y": {
+                        "peak": 0.286865234375,
+                        "i": 961
+                    },
+                    "x": {
+                        "peak": 1.25732421875,
+                        "i": 262
+                    },
+                    "z": {
+                        "peak": 0.76904296875,
+                        "i": 470
+                    }
+                },
+                "max_g_i": 262,
+                "type": "Shock",
+                "max_g": 1.45426746802834,
+                "duration": 0.0224609375,
+                "n": 1024,
+                "g_rmsi": 0.30045024626962613,
+                "start": 247,
+                "max_peak_direction": "x",
+                "relative_humidity": 20.66015625,
+                "temperature": 19.66796875,
+                "end": 269,
+                "max_peak_i": 262,
+                "delta_v": 0.438690185546875,
+                "pressure": 1015.7
+            }
+        },
+        {
+            "id": 19603,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/748ad7d4-56d7-45b5-9239-a457f031c12a.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-29T22:57:26Z",
+            "streamer_local_id": 520556246,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0498046875,
+                "axis": {
+                    "y": {
+                        "peak": 0.2166748046875,
+                        "i": 239
+                    },
+                    "x": {
+                        "peak": 0.1495361328125,
+                        "i": 529
+                    },
+                    "z": {
+                        "peak": 1.0498046875,
+                        "i": 259
+                    }
+                },
+                "max_g_i": 277,
+                "type": "Shock",
+                "max_g": 1.0738198666829164,
+                "duration": 0.001953125,
+                "n": 1024,
+                "g_rmsi": 0.2130949355544452,
+                "start": 259,
+                "max_peak_direction": "z",
+                "relative_humidity": 20.43359375,
+                "temperature": 19.546875,
+                "end": 260,
+                "max_peak_i": 259,
+                "delta_v": 0.003421306610107422,
+                "pressure": 1008.1
+            }
+        },
+        {
+            "id": 19604,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/aa74dc3c-fc83-4d20-8344-b27a94b4a303.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-06-29T22:58:05Z",
+            "streamer_local_id": 520556285,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.6815185546875,
+                "axis": {
+                    "y": {
+                        "peak": 0.5035400390625,
+                        "i": 260
+                    },
+                    "x": {
+                        "peak": 0.5950927734375,
+                        "i": 247
+                    },
+                    "z": {
+                        "peak": 1.6815185546875,
+                        "i": 262
+                    }
+                },
+                "max_g_i": 262,
+                "type": "Shock",
+                "max_g": 1.6950337624703815,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.20546191072911602,
+                "start": 262,
+                "max_peak_direction": "z",
+                "relative_humidity": 20.43359375,
+                "temperature": 19.546875,
+                "end": 264,
+                "max_peak_i": 262,
+                "delta_v": 0.010469555854797363,
+                "pressure": 1008.0
+            }
+        },
+        {
+            "id": 19605,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/e616b307-3905-4de7-b9f5-6a31f1824098.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-02T22:34:56Z",
+            "streamer_local_id": 520814096,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.116943359375,
+                "axis": {
+                    "y": {
+                        "peak": 0.6439208984375,
+                        "i": 248
+                    },
+                    "x": {
+                        "peak": 0.299072265625,
+                        "i": 142
+                    },
+                    "z": {
+                        "peak": 1.116943359375,
+                        "i": 262
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.2015518889932173,
+                "duration": 0.025390625,
+                "n": 1024,
+                "g_rmsi": 0.3797211985683009,
+                "start": 245,
+                "max_peak_direction": "z",
+                "relative_humidity": 42.953125,
+                "temperature": 18.91015625,
+                "end": 270,
+                "max_peak_i": 262,
+                "delta_v": 0.5286097526550293,
+                "pressure": 1014.4
+            }
+        },
+        {
+            "id": 19606,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/ba460b98-e9f2-457b-8e78-38d1aa6b9fbe.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-02T22:35:16Z",
+            "streamer_local_id": 520814116,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0498046875,
+                "axis": {
+                    "y": {
+                        "peak": 0.4302978515625,
+                        "i": 277
+                    },
+                    "x": {
+                        "peak": 0.445556640625,
+                        "i": 215
+                    },
+                    "z": {
+                        "peak": 1.0498046875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.0623010701592912,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.2918235772565439,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 42.953125,
+                "temperature": 18.91015625,
+                "end": 257,
+                "max_peak_i": 256,
+                "delta_v": 0.007599592208862305,
+                "pressure": 1014.6
+            }
+        },
+        {
+            "id": 19607,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/089242fd-b049-447a-8e6e-6e1fd0e02b0a.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-02T22:35:19Z",
+            "streamer_local_id": 520814119,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.678466796875,
+                "axis": {
+                    "y": {
+                        "peak": 0.64697265625,
+                        "i": 346
+                    },
+                    "x": {
+                        "peak": 0.372314453125,
+                        "i": 264
+                    },
+                    "z": {
+                        "peak": 1.678466796875,
+                        "i": 257
+                    }
+                },
+                "max_g_i": 257,
+                "type": "Shock",
+                "max_g": 1.6815296318118582,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.37975227455494986,
+                "start": 256,
+                "max_peak_direction": "z",
+                "relative_humidity": 42.984375,
+                "temperature": 18.91015625,
+                "end": 258,
+                "max_peak_i": 257,
+                "delta_v": 0.01207888126373291,
+                "pressure": 1014.4
+            }
+        },
+        {
+            "id": 19608,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/d71d709c-5bbe-4bf6-a9fc-8e1b9d7ce9a0.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-02T22:35:21Z",
+            "streamer_local_id": 520814121,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 2.2369384765625,
+                "axis": {
+                    "y": {
+                        "peak": 1.0040283203125,
+                        "i": 279
+                    },
+                    "x": {
+                        "peak": 0.372314453125,
+                        "i": 392
+                    },
+                    "z": {
+                        "peak": 2.2369384765625,
+                        "i": 270
+                    }
+                },
+                "max_g_i": 270,
+                "type": "Shock",
+                "max_g": 2.4014328571041683,
+                "duration": 0.0322265625,
+                "n": 1024,
+                "g_rmsi": 0.4801312817805211,
+                "start": 254,
+                "max_peak_direction": "z",
+                "relative_humidity": 42.984375,
+                "temperature": 18.91015625,
+                "end": 286,
+                "max_peak_i": 270,
+                "delta_v": 1.2337714433670044,
+                "pressure": 1014.3
+            }
+        },
+        {
+            "id": 19609,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/a1b18fb5-7672-45cb-8f5a-adfc6682d07c.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-02T22:35:22Z",
+            "streamer_local_id": 520814122,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 3.1463623046875,
+                "axis": {
+                    "y": {
+                        "peak": 0.9307861328125,
+                        "i": 259
+                    },
+                    "x": {
+                        "peak": 0.445556640625,
+                        "i": 272
+                    },
+                    "z": {
+                        "peak": 3.1463623046875,
+                        "i": 245
+                    }
+                },
+                "max_g_i": 245,
+                "type": "Shock",
+                "max_g": 3.1536059611997493,
+                "duration": 0.03125,
+                "n": 1024,
+                "g_rmsi": 0.5484265829313081,
+                "start": 227,
+                "max_peak_direction": "z",
+                "relative_humidity": 42.953125,
+                "temperature": 18.91015625,
+                "end": 258,
+                "max_peak_i": 245,
+                "delta_v": 1.5439987182617188,
+                "pressure": 1014.4
+            }
+        },
+        {
+            "id": 19610,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/8d08b66d-835b-4260-9f74-0c62401eed64.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-02T22:35:25Z",
+            "streamer_local_id": 520814125,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.25732421875,
+                "axis": {
+                    "y": {
+                        "peak": 0.4302978515625,
+                        "i": 150
+                    },
+                    "x": {
+                        "peak": 0.372314453125,
+                        "i": 997
+                    },
+                    "z": {
+                        "peak": 1.25732421875,
+                        "i": 269
+                    }
+                },
+                "max_g_i": 269,
+                "type": "Shock",
+                "max_g": 1.2845906807454979,
+                "duration": 0.0185546875,
+                "n": 1024,
+                "g_rmsi": 0.28646050916271226,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 42.984375,
+                "temperature": 18.91015625,
+                "end": 273,
+                "max_peak_i": 269,
+                "delta_v": 0.2890676259994507,
+                "pressure": 1014.2
+            }
+        },
+        {
+            "id": 19611,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/c18d57fb-1da8-4999-bc9f-9d1b8066677e.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-02T22:37:07Z",
+            "streamer_local_id": 520814227,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.81884765625,
+                "axis": {
+                    "y": {
+                        "peak": 0.360107421875,
+                        "i": 162
+                    },
+                    "x": {
+                        "peak": 0.3692626953125,
+                        "i": 316
+                    },
+                    "z": {
+                        "peak": 1.81884765625,
+                        "i": 329
+                    }
+                },
+                "max_g_i": 329,
+                "type": "Shock",
+                "max_g": 1.8303653691103627,
+                "duration": 0.01953125,
+                "n": 1024,
+                "g_rmsi": 0.4874497463922809,
+                "start": 321,
+                "max_peak_direction": "z",
+                "relative_humidity": 43.0859375,
+                "temperature": 18.91015625,
+                "end": 340,
+                "max_peak_i": 329,
+                "delta_v": 0.44214725494384766,
+                "pressure": 1014.3
+            }
+        },
+        {
+            "id": 19612,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/97172fee-dfc7-41f8-b023-bb4b807c6ce9.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-02T23:37:30Z",
+            "streamer_local_id": 520817850,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0467529296875,
+                "axis": {
+                    "y": {
+                        "peak": 0.360107421875,
+                        "i": 30
+                    },
+                    "x": {
+                        "peak": 0.299072265625,
+                        "i": 550
+                    },
+                    "z": {
+                        "peak": 1.0467529296875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.0491036136764949,
+                "duration": 0.0048828125,
+                "n": 1024,
+                "g_rmsi": 0.2119467737236777,
+                "start": 254,
+                "max_peak_direction": "z",
+                "relative_humidity": 44.46484375,
+                "temperature": 18.70703125,
+                "end": 258,
+                "max_peak_i": 256,
+                "delta_v": 0.01977384090423584,
+                "pressure": 1014.8
+            }
+        },
+        {
+            "id": 19613,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/7b0cb7fa-7dfc-4a80-8a53-3d7e201b42b1.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-04T20:53:19Z",
+            "streamer_local_id": 520980799,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.324462890625,
+                "axis": {
+                    "y": {
+                        "peak": 0.4241943359375,
+                        "i": 277
+                    },
+                    "x": {
+                        "peak": 0.439453125,
+                        "i": 92
+                    },
+                    "z": {
+                        "peak": 1.324462890625,
+                        "i": 265
+                    }
+                },
+                "max_g_i": 265,
+                "type": "Shock",
+                "max_g": 1.3264864743647091,
+                "duration": 0.01953125,
+                "n": 1024,
+                "g_rmsi": 0.4612644661157603,
+                "start": 249,
+                "max_peak_direction": "z",
+                "relative_humidity": 55.6875,
+                "temperature": 26.06640625,
+                "end": 268,
+                "max_peak_i": 265,
+                "delta_v": 0.39190053939819336,
+                "pressure": 1015.6
+            }
+        },
+        {
+            "id": 19614,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/fb4b7271-4c5c-4c6c-9489-4a1825423dff.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-04T20:53:52Z",
+            "streamer_local_id": 520980832,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.116943359375,
+                "axis": {
+                    "y": {
+                        "peak": 0.714111328125,
+                        "i": 298
+                    },
+                    "x": {
+                        "peak": 0.3692626953125,
+                        "i": 791
+                    },
+                    "z": {
+                        "peak": 1.116943359375,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.119545994652858,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.46569441200696104,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 55.6796875,
+                "temperature": 26.02734375,
+                "end": 257,
+                "max_peak_i": 256,
+                "delta_v": 0.007161498069763184,
+                "pressure": 1015.4
+            }
+        },
+        {
+            "id": 19615,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/5cb0e65a-60c3-424b-a85b-9bd88dfc08da.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-04T20:54:10Z",
+            "streamer_local_id": 520980850,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.812744140625,
+                "axis": {
+                    "y": {
+                        "peak": 0.6378173828125,
+                        "i": 237
+                    },
+                    "x": {
+                        "peak": 0.3692626953125,
+                        "i": 240
+                    },
+                    "z": {
+                        "peak": 1.812744140625,
+                        "i": 272
+                    }
+                },
+                "max_g_i": 272,
+                "type": "Shock",
+                "max_g": 1.9063254091324686,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.4230606866298915,
+                "start": 271,
+                "max_peak_direction": "z",
+                "relative_humidity": 55.6875,
+                "temperature": 26.06640625,
+                "end": 273,
+                "max_peak_i": 272,
+                "delta_v": 0.012248754501342773,
+                "pressure": 1015.9
+            }
+        },
+        {
+            "id": 19616,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/6f4dbe69-95fa-482c-aa71-6fe5ea19fd9c.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-04T20:54:16Z",
+            "streamer_local_id": 520980856,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.18408203125,
+                "axis": {
+                    "y": {
+                        "peak": 0.2838134765625,
+                        "i": 254
+                    },
+                    "x": {
+                        "peak": 0.29296875,
+                        "i": 260
+                    },
+                    "z": {
+                        "peak": 1.18408203125,
+                        "i": 261
+                    }
+                },
+                "max_g_i": 261,
+                "type": "Shock",
+                "max_g": 1.2063402154520542,
+                "duration": 0.0263671875,
+                "n": 1024,
+                "g_rmsi": 0.46849328203598406,
+                "start": 246,
+                "max_peak_direction": "z",
+                "relative_humidity": 55.6484375,
+                "temperature": 26.02734375,
+                "end": 272,
+                "max_peak_i": 261,
+                "delta_v": 0.5839437246322632,
+                "pressure": 1015.7
+            }
+        },
+        {
+            "id": 19617,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/d0a6559c-8fa8-4a60-ba47-5e5990cab3ce.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T04:57:49Z",
+            "streamer_local_id": 521009869,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0467529296875,
+                "axis": {
+                    "y": {
+                        "peak": 0.2166748046875,
+                        "i": 515
+                    },
+                    "x": {
+                        "peak": 0.3692626953125,
+                        "i": 130
+                    },
+                    "z": {
+                        "peak": 1.0467529296875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.0493122098971066,
+                "duration": 0.01171875,
+                "n": 1024,
+                "g_rmsi": 0.36346869141805366,
+                "start": 246,
+                "max_peak_direction": "z",
+                "relative_humidity": 59.37890625,
+                "temperature": 23.94921875,
+                "end": 257,
+                "max_peak_i": 256,
+                "delta_v": 0.09806156158447266,
+                "pressure": 982.0
+            }
+        },
+        {
+            "id": 19618,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/8be4d014-b234-4f52-870c-5274e2fce1b9.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T04:57:51Z",
+            "streamer_local_id": 521009871,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0498046875,
+                "axis": {
+                    "y": {
+                        "peak": 0.213623046875,
+                        "i": 257
+                    },
+                    "x": {
+                        "peak": 0.3692626953125,
+                        "i": 184
+                    },
+                    "z": {
+                        "peak": 1.0498046875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 187,
+                "type": "Shock",
+                "max_g": 1.053851113881348,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.31888747258756406,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 59.37890625,
+                "temperature": 23.94921875,
+                "end": 257,
+                "max_peak_i": 256,
+                "delta_v": 0.007992982864379883,
+                "pressure": 982.0
+            }
+        },
+        {
+            "id": 19619,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/9ec164ea-5f86-4d20-a21c-74dc4cca5e67.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T04:57:57Z",
+            "streamer_local_id": 521009877,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.4678955078125,
+                "axis": {
+                    "y": {
+                        "peak": 0.2166748046875,
+                        "i": 734
+                    },
+                    "x": {
+                        "peak": 0.445556640625,
+                        "i": 679
+                    },
+                    "z": {
+                        "peak": 1.4678955078125,
+                        "i": 479
+                    }
+                },
+                "max_g_i": 479,
+                "type": "Shock",
+                "max_g": 1.4745928277104092,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.5725121307425864,
+                "start": 478,
+                "max_peak_direction": "z",
+                "relative_humidity": 59.375,
+                "temperature": 23.90625,
+                "end": 480,
+                "max_peak_i": 479,
+                "delta_v": 0.010442733764648438,
+                "pressure": 982.1
+            }
+        },
+        {
+            "id": 19620,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/feabc243-56ef-4f89-8fa5-2025b8242509.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T04:57:58Z",
+            "streamer_local_id": 521009878,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.116943359375,
+                "axis": {
+                    "y": {
+                        "peak": 0.2166748046875,
+                        "i": 224
+                    },
+                    "x": {
+                        "peak": 0.2960205078125,
+                        "i": 139
+                    },
+                    "z": {
+                        "peak": 1.116943359375,
+                        "i": 257
+                    }
+                },
+                "max_g_i": 257,
+                "type": "Shock",
+                "max_g": 1.140120544972356,
+                "duration": 0.0107421875,
+                "n": 1024,
+                "g_rmsi": 0.3751757427344565,
+                "start": 248,
+                "max_peak_direction": "z",
+                "relative_humidity": 59.375,
+                "temperature": 23.90625,
+                "end": 258,
+                "max_peak_i": 257,
+                "delta_v": 0.0966101884841919,
+                "pressure": 981.9
+            }
+        },
+        {
+            "id": 19621,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/c0076167-e00e-4e6d-bba2-cf5773702d29.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T04:58:01Z",
+            "streamer_local_id": 521009881,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.46484375,
+                "axis": {
+                    "y": {
+                        "peak": 0.2166748046875,
+                        "i": 52
+                    },
+                    "x": {
+                        "peak": 0.5157470703125,
+                        "i": 8
+                    },
+                    "z": {
+                        "peak": 1.46484375,
+                        "i": 265
+                    }
+                },
+                "max_g_i": 265,
+                "type": "Shock",
+                "max_g": 1.531106766988866,
+                "duration": 0.029296875,
+                "n": 1024,
+                "g_rmsi": 0.3746204848131873,
+                "start": 250,
+                "max_peak_direction": "z",
+                "relative_humidity": 59.375,
+                "temperature": 23.90625,
+                "end": 279,
+                "max_peak_i": 265,
+                "delta_v": 0.8933544158935547,
+                "pressure": 982.0
+            }
+        },
+        {
+            "id": 19622,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/a08a8685-11db-44c0-892c-f9593cf0f3ff.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T04:58:03Z",
+            "streamer_local_id": 521009883,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.324462890625,
+                "axis": {
+                    "y": {
+                        "peak": 0.2838134765625,
+                        "i": 129
+                    },
+                    "x": {
+                        "peak": 0.3692626953125,
+                        "i": 386
+                    },
+                    "z": {
+                        "peak": 1.324462890625,
+                        "i": 265
+                    }
+                },
+                "max_g_i": 266,
+                "type": "Shock",
+                "max_g": 1.3322067648514575,
+                "duration": 0.0380859375,
+                "n": 1024,
+                "g_rmsi": 0.5008302369405252,
+                "start": 243,
+                "max_peak_direction": "z",
+                "relative_humidity": 59.37890625,
+                "temperature": 23.94921875,
+                "end": 281,
+                "max_peak_i": 265,
+                "delta_v": 1.4030009508132935,
+                "pressure": 981.9
+            }
+        },
+        {
+            "id": 19623,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/ae03005f-7846-4c6e-bd58-bfa62e60a2da.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T04:58:08Z",
+            "streamer_local_id": 521009888,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0467529296875,
+                "axis": {
+                    "y": {
+                        "peak": 0.2166748046875,
+                        "i": 846
+                    },
+                    "x": {
+                        "peak": 0.2960205078125,
+                        "i": 400
+                    },
+                    "z": {
+                        "peak": 1.0467529296875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.0467529296875,
+                "duration": 0.0322265625,
+                "n": 1024,
+                "g_rmsi": 0.40347955329793445,
+                "start": 245,
+                "max_peak_direction": "z",
+                "relative_humidity": 59.37890625,
+                "temperature": 23.94921875,
+                "end": 277,
+                "max_peak_i": 256,
+                "delta_v": 0.8085161447525024,
+                "pressure": 982.0
+            }
+        },
+        {
+            "id": 19624,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/fc97e04d-380f-4524-bf53-ba6904aacdac.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T04:58:11Z",
+            "streamer_local_id": 521009891,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.116943359375,
+                "axis": {
+                    "y": {
+                        "peak": 0.4302978515625,
+                        "i": 1007
+                    },
+                    "x": {
+                        "peak": 0.518798828125,
+                        "i": 1015
+                    },
+                    "z": {
+                        "peak": 1.116943359375,
+                        "i": 257
+                    }
+                },
+                "max_g_i": 1012,
+                "type": "Shock",
+                "max_g": 1.1904633026759455,
+                "duration": 0.02734375,
+                "n": 1024,
+                "g_rmsi": 0.3812990522045088,
+                "start": 246,
+                "max_peak_direction": "z",
+                "relative_humidity": 59.37890625,
+                "temperature": 23.94921875,
+                "end": 273,
+                "max_peak_i": 257,
+                "delta_v": 0.6442904472351074,
+                "pressure": 982.1
+            }
+        },
+        {
+            "id": 19625,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/567d132e-d773-48fb-bf75-92434afbf353.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T04:58:34Z",
+            "streamer_local_id": 521009914,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.953125,
+                "axis": {
+                    "y": {
+                        "peak": 0.5706787109375,
+                        "i": 944
+                    },
+                    "x": {
+                        "peak": 0.7354736328125,
+                        "i": 271
+                    },
+                    "z": {
+                        "peak": 1.953125,
+                        "i": 257
+                    }
+                },
+                "max_g_i": 257,
+                "type": "Shock",
+                "max_g": 1.9871607172973274,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.4714561976726873,
+                "start": 256,
+                "max_peak_direction": "z",
+                "relative_humidity": 59.41015625,
+                "temperature": 23.94921875,
+                "end": 258,
+                "max_peak_i": 257,
+                "delta_v": 0.012677907943725586,
+                "pressure": 981.9
+            }
+        },
+        {
+            "id": 19626,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/fe2428a4-b1bd-4f1a-a38f-23e1259ad1de.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T05:00:19Z",
+            "streamer_local_id": 521010019,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 2.093505859375,
+                "axis": {
+                    "y": {
+                        "peak": 0.6439208984375,
+                        "i": 1022
+                    },
+                    "x": {
+                        "peak": 0.665283203125,
+                        "i": 1013
+                    },
+                    "z": {
+                        "peak": 2.093505859375,
+                        "i": 1003
+                    }
+                },
+                "max_g_i": 1012,
+                "type": "Shock",
+                "max_g": 2.2310520384828805,
+                "duration": 0.0302734375,
+                "n": 1024,
+                "g_rmsi": 0.4368260520479143,
+                "start": 993,
+                "max_peak_direction": "z",
+                "relative_humidity": 59.375,
+                "temperature": 23.90625,
+                "end": 1023,
+                "max_peak_i": 1003,
+                "delta_v": 1.3350874185562134,
+                "pressure": 981.8
+            }
+        },
+        {
+            "id": 19627,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/70b0e95f-9c09-44da-b9da-66877b24a821.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T06:22:19Z",
+            "streamer_local_id": 521014939,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.25732421875,
+                "axis": {
+                    "y": {
+                        "peak": 0.42724609375,
+                        "i": 900
+                    },
+                    "x": {
+                        "peak": 0.5889892578125,
+                        "i": 888
+                    },
+                    "z": {
+                        "peak": 1.25732421875,
+                        "i": 723
+                    }
+                },
+                "max_g_i": 723,
+                "type": "Shock",
+                "max_g": 1.3224925490243353,
+                "duration": 0.017578125,
+                "n": 1024,
+                "g_rmsi": 0.4757881355706183,
+                "start": 712,
+                "max_peak_direction": "z",
+                "relative_humidity": 59.1796875,
+                "temperature": 23.62890625,
+                "end": 729,
+                "max_peak_i": 723,
+                "delta_v": 0.3065764904022217,
+                "pressure": 982.1
+            }
+        },
+        {
+            "id": 19628,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/4c364b0d-0917-4e4f-b4cb-efe7fedac6d2.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T06:22:21Z",
+            "streamer_local_id": 521014941,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 2.3040771484375,
+                "axis": {
+                    "y": {
+                        "peak": 0.5706787109375,
+                        "i": 349
+                    },
+                    "x": {
+                        "peak": 0.592041015625,
+                        "i": 209
+                    },
+                    "z": {
+                        "peak": 2.3040771484375,
+                        "i": 14
+                    }
+                },
+                "max_g_i": 14,
+                "type": "Shock",
+                "max_g": 2.3578083097699993,
+                "duration": 0.0048828125,
+                "n": 1024,
+                "g_rmsi": 0.5791298848314738,
+                "start": 12,
+                "max_peak_direction": "z",
+                "relative_humidity": 59.1796875,
+                "temperature": 23.62890625,
+                "end": 16,
+                "max_peak_i": 14,
+                "delta_v": 0.031694769859313965,
+                "pressure": 982.0
+            }
+        },
+        {
+            "id": 19629,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/68aab7ba-d066-43b3-a9db-3610546293b3.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T18:42:27Z",
+            "streamer_local_id": 521059347,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.8157958984375,
+                "axis": {
+                    "y": {
+                        "peak": 0.57373046875,
+                        "i": 648
+                    },
+                    "x": {
+                        "peak": 0.592041015625,
+                        "i": 282
+                    },
+                    "z": {
+                        "peak": 1.8157958984375,
+                        "i": 263
+                    }
+                },
+                "max_g_i": 263,
+                "type": "Shock",
+                "max_g": 1.8347892823053469,
+                "duration": 0.021484375,
+                "n": 1024,
+                "g_rmsi": 0.43346916945352887,
+                "start": 253,
+                "max_peak_direction": "z",
+                "relative_humidity": 61.8671875,
+                "temperature": 21.98828125,
+                "end": 274,
+                "max_peak_i": 263,
+                "delta_v": 0.5278646945953369,
+                "pressure": 1005.8
+            }
+        },
+        {
+            "id": 19630,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/1069cfa9-373e-4090-9d5e-4a6c58103c65.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T18:42:29Z",
+            "streamer_local_id": 521059349,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.46484375,
+                "axis": {
+                    "y": {
+                        "peak": 0.4302978515625,
+                        "i": 404
+                    },
+                    "x": {
+                        "peak": 0.592041015625,
+                        "i": 252
+                    },
+                    "z": {
+                        "peak": 1.46484375,
+                        "i": 367
+                    }
+                },
+                "max_g_i": 367,
+                "type": "Shock",
+                "max_g": 1.4686566637697167,
+                "duration": 0.01953125,
+                "n": 1024,
+                "g_rmsi": 0.3481010017561624,
+                "start": 358,
+                "max_peak_direction": "z",
+                "relative_humidity": 61.8671875,
+                "temperature": 21.98828125,
+                "end": 377,
+                "max_peak_i": 367,
+                "delta_v": 0.35440921783447266,
+                "pressure": 1005.8
+            }
+        },
+        {
+            "id": 19631,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/f395deb8-caa1-4473-8c57-74b1f61dac5f.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T18:42:32Z",
+            "streamer_local_id": 521059352,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0467529296875,
+                "axis": {
+                    "y": {
+                        "peak": 0.360107421875,
+                        "i": 283
+                    },
+                    "x": {
+                        "peak": 0.3692626953125,
+                        "i": 929
+                    },
+                    "z": {
+                        "peak": 1.0467529296875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.0666406534544617,
+                "duration": 0.001953125,
+                "n": 1024,
+                "g_rmsi": 0.39426594085380334,
+                "start": 256,
+                "max_peak_direction": "z",
+                "relative_humidity": 61.8359375,
+                "temperature": 21.98828125,
+                "end": 257,
+                "max_peak_i": 256,
+                "delta_v": 0.0039517879486083984,
+                "pressure": 1005.7
+            }
+        },
+        {
+            "id": 19632,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/2eae9358-300f-4ba4-81f3-31a9745b42d2.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T18:42:33Z",
+            "streamer_local_id": 521059353,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.46484375,
+                "axis": {
+                    "y": {
+                        "peak": 0.4302978515625,
+                        "i": 817
+                    },
+                    "x": {
+                        "peak": 0.372314453125,
+                        "i": 260
+                    },
+                    "z": {
+                        "peak": 1.46484375,
+                        "i": 264
+                    }
+                },
+                "max_g_i": 264,
+                "type": "Shock",
+                "max_g": 1.501322173496711,
+                "duration": 0.0166015625,
+                "n": 1024,
+                "g_rmsi": 0.3819441110672705,
+                "start": 254,
+                "max_peak_direction": "z",
+                "relative_humidity": 61.8359375,
+                "temperature": 21.98828125,
+                "end": 270,
+                "max_peak_i": 264,
+                "delta_v": 0.29081106185913086,
+                "pressure": 1005.8
+            }
+        },
+        {
+            "id": 19633,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/25b04164-e082-4ebf-9f52-22280e8214ed.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T18:42:48Z",
+            "streamer_local_id": 521059368,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.959228515625,
+                "axis": {
+                    "y": {
+                        "peak": 0.57373046875,
+                        "i": 405
+                    },
+                    "x": {
+                        "peak": 0.665283203125,
+                        "i": 245
+                    },
+                    "z": {
+                        "peak": 1.959228515625,
+                        "i": 742
+                    }
+                },
+                "max_g_i": 742,
+                "type": "Shock",
+                "max_g": 2.013378569649241,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.5037590024001467,
+                "start": 741,
+                "max_peak_direction": "z",
+                "relative_humidity": 61.8671875,
+                "temperature": 21.98828125,
+                "end": 743,
+                "max_peak_i": 742,
+                "delta_v": 0.012302398681640625,
+                "pressure": 1005.7
+            }
+        },
+        {
+            "id": 19634,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/ed7c8af1-f9d4-4aa5-b966-379768295f1e.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T22:06:33Z",
+            "streamer_local_id": 521071593,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.25732421875,
+                "axis": {
+                    "y": {
+                        "peak": 0.360107421875,
+                        "i": 262
+                    },
+                    "x": {
+                        "peak": 0.2227783203125,
+                        "i": 154
+                    },
+                    "z": {
+                        "peak": 1.25732421875,
+                        "i": 257
+                    }
+                },
+                "max_g_i": 257,
+                "type": "Shock",
+                "max_g": 1.2594556796827283,
+                "duration": 0.013671875,
+                "n": 1024,
+                "g_rmsi": 0.25233319541020444,
+                "start": 254,
+                "max_peak_direction": "z",
+                "relative_humidity": 63.18359375,
+                "temperature": 21.90625,
+                "end": 267,
+                "max_peak_i": 257,
+                "delta_v": 0.1678943634033203,
+                "pressure": 1006.3
+            }
+        },
+        {
+            "id": 19635,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/39321965-bdbf-4374-8c27-3acfcbd682e1.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T22:07:02Z",
+            "streamer_local_id": 521071622,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 2.23388671875,
+                "axis": {
+                    "y": {
+                        "peak": 0.57373046875,
+                        "i": 281
+                    },
+                    "x": {
+                        "peak": 0.592041015625,
+                        "i": 296
+                    },
+                    "z": {
+                        "peak": 2.23388671875,
+                        "i": 430
+                    }
+                },
+                "max_g_i": 430,
+                "type": "Shock",
+                "max_g": 2.2350870878418645,
+                "duration": 0.0498046875,
+                "n": 1024,
+                "g_rmsi": 0.6031678383958935,
+                "start": 416,
+                "max_peak_direction": "z",
+                "relative_humidity": 63.125,
+                "temperature": 21.90625,
+                "end": 466,
+                "max_peak_i": 430,
+                "delta_v": 3.0977457761764526,
+                "pressure": 1006.2
+            }
+        },
+        {
+            "id": 19636,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/a26278c6-9b02-4175-9653-1821f0bc5d32.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T22:11:19Z",
+            "streamer_local_id": 521071879,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.885986328125,
+                "axis": {
+                    "y": {
+                        "peak": 1.8585205078125,
+                        "i": 332
+                    },
+                    "x": {
+                        "peak": 0.592041015625,
+                        "i": 247
+                    },
+                    "z": {
+                        "peak": 1.885986328125,
+                        "i": 325
+                    }
+                },
+                "max_g_i": 332,
+                "type": "Shock",
+                "max_g": 2.541581151779629,
+                "duration": 0.0517578125,
+                "n": 1024,
+                "g_rmsi": 0.6974976210572535,
+                "start": 306,
+                "max_peak_direction": "z",
+                "relative_humidity": 63.20703125,
+                "temperature": 21.8671875,
+                "end": 358,
+                "max_peak_i": 325,
+                "delta_v": 3.208327293395996,
+                "pressure": 1006.1
+            }
+        },
+        {
+            "id": 19637,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/c953a652-d448-4279-a45f-96b190bc57ca.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-05T22:13:28Z",
+            "streamer_local_id": 521072008,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.33056640625,
+                "axis": {
+                    "y": {
+                        "peak": 0.50048828125,
+                        "i": 224
+                    },
+                    "x": {
+                        "peak": 0.5889892578125,
+                        "i": 222
+                    },
+                    "z": {
+                        "peak": 1.33056640625,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.3510742242645606,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.26181314645590803,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 63.2421875,
+                "temperature": 21.90625,
+                "end": 257,
+                "max_peak_i": 256,
+                "delta_v": 0.009226799011230469,
+                "pressure": 1006.3
+            }
+        },
+        {
+            "id": 19638,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/d9bece33-ca83-457a-af5b-255d9ef121d5.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-06T01:50:54Z",
+            "streamer_local_id": 521085054,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 2.5848388671875,
+                "axis": {
+                    "y": {
+                        "peak": 0.7843017578125,
+                        "i": 466
+                    },
+                    "x": {
+                        "peak": 0.665283203125,
+                        "i": 301
+                    },
+                    "z": {
+                        "peak": 2.5848388671875,
+                        "i": 469
+                    }
+                },
+                "max_g_i": 469,
+                "type": "Shock",
+                "max_g": 2.6171576797152944,
+                "duration": 0.0048828125,
+                "n": 1024,
+                "g_rmsi": 0.5916001304194398,
+                "start": 467,
+                "max_peak_direction": "z",
+                "relative_humidity": 66.484375,
+                "temperature": 22.46875,
+                "end": 471,
+                "max_peak_i": 469,
+                "delta_v": 0.03476440906524658,
+                "pressure": 1006.8
+            }
+        },
+        {
+            "id": 19639,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/b418a34b-456f-49e3-ad05-af8f90163964.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-06T01:51:00Z",
+            "streamer_local_id": 521085060,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.6754150390625,
+                "axis": {
+                    "y": {
+                        "peak": 0.714111328125,
+                        "i": 728
+                    },
+                    "x": {
+                        "peak": 0.445556640625,
+                        "i": 732
+                    },
+                    "z": {
+                        "peak": 1.6754150390625,
+                        "i": 680
+                    }
+                },
+                "max_g_i": 680,
+                "type": "Shock",
+                "max_g": 1.7362410112633035,
+                "duration": 0.0185546875,
+                "n": 1024,
+                "g_rmsi": 0.4311064679074104,
+                "start": 664,
+                "max_peak_direction": "z",
+                "relative_humidity": 66.46484375,
+                "temperature": 22.5078125,
+                "end": 682,
+                "max_peak_i": 680,
+                "delta_v": 0.3132462501525879,
+                "pressure": 1006.6
+            }
+        },
+        {
+            "id": 19640,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/e4fdc3dc-1d84-44c4-81cb-9c54d87f49a9.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-06T01:51:05Z",
+            "streamer_local_id": 521085065,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.25732421875,
+                "axis": {
+                    "y": {
+                        "peak": 0.4302978515625,
+                        "i": 521
+                    },
+                    "x": {
+                        "peak": 0.372314453125,
+                        "i": 350
+                    },
+                    "z": {
+                        "peak": 1.25732421875,
+                        "i": 257
+                    }
+                },
+                "max_g_i": 257,
+                "type": "Shock",
+                "max_g": 1.284239009748888,
+                "duration": 0.0234375,
+                "n": 1024,
+                "g_rmsi": 0.38059784672182306,
+                "start": 248,
+                "max_peak_direction": "z",
+                "relative_humidity": 66.44921875,
+                "temperature": 22.42578125,
+                "end": 271,
+                "max_peak_i": 257,
+                "delta_v": 0.49674510955810547,
+                "pressure": 1007.0
+            }
+        },
+        {
+            "id": 19641,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/c80f8f97-d223-4d7d-8781-f91ebfe1f867.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-06T01:51:49Z",
+            "streamer_local_id": 521085109,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.1871337890625,
+                "axis": {
+                    "y": {
+                        "peak": 0.4302978515625,
+                        "i": 269
+                    },
+                    "x": {
+                        "peak": 0.29296875,
+                        "i": 238
+                    },
+                    "z": {
+                        "peak": 1.1871337890625,
+                        "i": 268
+                    }
+                },
+                "max_g_i": 268,
+                "type": "Shock",
+                "max_g": 1.2396674474926739,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.35930884441694905,
+                "start": 267,
+                "max_peak_direction": "z",
+                "relative_humidity": 66.40625,
+                "temperature": 22.5078125,
+                "end": 269,
+                "max_peak_i": 268,
+                "delta_v": 0.00858306884765625,
+                "pressure": 1006.9
+            }
+        },
+        {
+            "id": 19642,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/ac5906d2-c0fe-49f0-9c0d-58d562aa407d.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-06T01:52:06Z",
+            "streamer_local_id": 521085126,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.1871337890625,
+                "axis": {
+                    "y": {
+                        "peak": 0.3570556640625,
+                        "i": 307
+                    },
+                    "x": {
+                        "peak": 0.3692626953125,
+                        "i": 258
+                    },
+                    "z": {
+                        "peak": 1.1871337890625,
+                        "i": 262
+                    }
+                },
+                "max_g_i": 262,
+                "type": "Shock",
+                "max_g": 1.20729714461766,
+                "duration": 0.04296875,
+                "n": 1024,
+                "g_rmsi": 0.37266999362407105,
+                "start": 236,
+                "max_peak_direction": "z",
+                "relative_humidity": 66.37890625,
+                "temperature": 22.5078125,
+                "end": 279,
+                "max_peak_i": 262,
+                "delta_v": 1.642143726348877,
+                "pressure": 1007.0
+            }
+        },
+        {
+            "id": 19643,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/a12ea46f-c42f-4621-98c1-cedbd207455c.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-06T01:52:13Z",
+            "streamer_local_id": 521085133,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.8157958984375,
+                "axis": {
+                    "y": {
+                        "peak": 0.6439208984375,
+                        "i": 280
+                    },
+                    "x": {
+                        "peak": 0.445556640625,
+                        "i": 267
+                    },
+                    "z": {
+                        "peak": 1.8157958984375,
+                        "i": 413
+                    }
+                },
+                "max_g_i": 413,
+                "type": "Shock",
+                "max_g": 1.905687753432951,
+                "duration": 0.001953125,
+                "n": 1024,
+                "g_rmsi": 0.4667767685361672,
+                "start": 413,
+                "max_peak_direction": "z",
+                "relative_humidity": 66.34765625,
+                "temperature": 22.5078125,
+                "end": 414,
+                "max_peak_i": 413,
+                "delta_v": 0.006544589996337891,
+                "pressure": 1007.1
+            }
+        },
+        {
+            "id": 19644,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/cd1f7e68-40ad-4311-a614-af3843ca022b.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-06T01:53:58Z",
+            "streamer_local_id": 521085238,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.6754150390625,
+                "axis": {
+                    "y": {
+                        "peak": 0.4302978515625,
+                        "i": 275
+                    },
+                    "x": {
+                        "peak": 0.592041015625,
+                        "i": 305
+                    },
+                    "z": {
+                        "peak": 1.6754150390625,
+                        "i": 261
+                    }
+                },
+                "max_g_i": 261,
+                "type": "Shock",
+                "max_g": 1.7015075615174824,
+                "duration": 0.02734375,
+                "n": 1024,
+                "g_rmsi": 0.4388257729350426,
+                "start": 251,
+                "max_peak_direction": "z",
+                "relative_humidity": 66.15234375,
+                "temperature": 22.546875,
+                "end": 278,
+                "max_peak_i": 261,
+                "delta_v": 0.7862329483032227,
+                "pressure": 1006.8
+            }
+        },
+        {
+            "id": 19645,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/3b650dc7-b7da-4b1f-9a56-f512580bfe42.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-06T01:54:36Z",
+            "streamer_local_id": 521085276,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.885986328125,
+                "axis": {
+                    "y": {
+                        "peak": 0.6439208984375,
+                        "i": 321
+                    },
+                    "x": {
+                        "peak": 0.665283203125,
+                        "i": 873
+                    },
+                    "z": {
+                        "peak": 1.885986328125,
+                        "i": 266
+                    }
+                },
+                "max_g_i": 266,
+                "type": "Shock",
+                "max_g": 1.8872920087506693,
+                "duration": 0.00390625,
+                "n": 1024,
+                "g_rmsi": 0.4277710797140765,
+                "start": 265,
+                "max_peak_direction": "z",
+                "relative_humidity": 66.09375,
+                "temperature": 22.546875,
+                "end": 268,
+                "max_peak_i": 266,
+                "delta_v": 0.020182132720947266,
+                "pressure": 1006.9
+            }
+        },
+        {
+            "id": 19646,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/623adb1d-2bcd-4198-ba9b-2f08cef537d8.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-06T02:37:46Z",
+            "streamer_local_id": 521087866,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.190185546875,
+                "axis": {
+                    "y": {
+                        "peak": 0.50048828125,
+                        "i": 800
+                    },
+                    "x": {
+                        "peak": 0.29296875,
+                        "i": 727
+                    },
+                    "z": {
+                        "peak": 1.190185546875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.1926283587444537,
+                "duration": 0.0048828125,
+                "n": 1024,
+                "g_rmsi": 0.3003089531515211,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 67.9453125,
+                "temperature": 22.74609375,
+                "end": 259,
+                "max_peak_i": 256,
+                "delta_v": 0.019803643226623535,
+                "pressure": 1006.4
+            }
+        },
+        {
+            "id": 19647,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/7ca03806-d89e-4dd5-bf52-7c61efc328cd.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-06T02:37:48Z",
+            "streamer_local_id": 521087868,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.3946533203125,
+                "axis": {
+                    "y": {
+                        "peak": 0.6439208984375,
+                        "i": 441
+                    },
+                    "x": {
+                        "peak": 0.5157470703125,
+                        "i": 791
+                    },
+                    "z": {
+                        "peak": 1.3946533203125,
+                        "i": 435
+                    }
+                },
+                "max_g_i": 435,
+                "type": "Shock",
+                "max_g": 1.4837004986245057,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.46880181126807074,
+                "start": 434,
+                "max_peak_direction": "z",
+                "relative_humidity": 67.9140625,
+                "temperature": 22.74609375,
+                "end": 436,
+                "max_peak_i": 435,
+                "delta_v": 0.008171796798706055,
+                "pressure": 1006.5
+            }
+        },
+        {
+            "id": 19648,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/20d5d500-c53c-4924-9e35-b44be1cd2e75.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-08T03:01:42Z",
+            "streamer_local_id": 521262102,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.25732421875,
+                "axis": {
+                    "y": {
+                        "peak": 0.3570556640625,
+                        "i": 259
+                    },
+                    "x": {
+                        "peak": 0.2960205078125,
+                        "i": 260
+                    },
+                    "z": {
+                        "peak": 1.25732421875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.2769081294504145,
+                "duration": 0.001953125,
+                "n": 1024,
+                "g_rmsi": 0.2052695740987038,
+                "start": 256,
+                "max_peak_direction": "z",
+                "relative_humidity": 69.1015625,
+                "temperature": 25.06640625,
+                "end": 257,
+                "max_peak_i": 256,
+                "delta_v": 0.004369020462036133,
+                "pressure": 1003.8
+            }
+        },
+        {
+            "id": 19649,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/8bcb2ba4-9c00-4a74-be08-696e535eb954.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-08T03:19:00Z",
+            "streamer_local_id": 521263140,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.324462890625,
+                "axis": {
+                    "y": {
+                        "peak": 0.2166748046875,
+                        "i": 290
+                    },
+                    "x": {
+                        "peak": 0.2960205078125,
+                        "i": 1011
+                    },
+                    "z": {
+                        "peak": 1.324462890625,
+                        "i": 353
+                    }
+                },
+                "max_g_i": 353,
+                "type": "Shock",
+                "max_g": 1.3286787169078396,
+                "duration": 0.02734375,
+                "n": 1024,
+                "g_rmsi": 0.35641676236476905,
+                "start": 337,
+                "max_peak_direction": "z",
+                "relative_humidity": 69.015625,
+                "temperature": 25.06640625,
+                "end": 364,
+                "max_peak_i": 353,
+                "delta_v": 0.7149696350097656,
+                "pressure": 1004.5
+            }
+        },
+        {
+            "id": 19650,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/fe4d6d8e-a525-460e-a56b-eeb247791599.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-08T03:19:14Z",
+            "streamer_local_id": 521263154,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0467529296875,
+                "axis": {
+                    "y": {
+                        "peak": 0.2166748046875,
+                        "i": 474
+                    },
+                    "x": {
+                        "peak": 0.1495361328125,
+                        "i": 358
+                    },
+                    "z": {
+                        "peak": 1.0467529296875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 352,
+                "type": "Shock",
+                "max_g": 1.0592853145276615,
+                "duration": 0.025390625,
+                "n": 1024,
+                "g_rmsi": 0.3983044615694447,
+                "start": 248,
+                "max_peak_direction": "z",
+                "relative_humidity": 69.015625,
+                "temperature": 25.06640625,
+                "end": 273,
+                "max_peak_i": 256,
+                "delta_v": 0.5574345588684082,
+                "pressure": 1004.5
+            }
+        },
+        {
+            "id": 19651,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/a94fa217-7f8d-420c-bd24-f0f249e73630.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:05:53Z",
+            "streamer_local_id": 521532353,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 2.5115966796875,
+                "axis": {
+                    "y": {
+                        "peak": 0.286865234375,
+                        "i": 260
+                    },
+                    "x": {
+                        "peak": 2.5115966796875,
+                        "i": 258
+                    },
+                    "z": {
+                        "peak": 0.836181640625,
+                        "i": 259
+                    }
+                },
+                "max_g_i": 258,
+                "type": "Shock",
+                "max_g": 2.597877736795413,
+                "duration": 0.00390625,
+                "n": 1024,
+                "g_rmsi": 0.16040047889791234,
+                "start": 256,
+                "max_peak_direction": "x",
+                "relative_humidity": 58.80078125,
+                "temperature": 23.94921875,
+                "end": 259,
+                "max_peak_i": 258,
+                "delta_v": 0.030863285064697266,
+                "pressure": 993.0
+            }
+        },
+        {
+            "id": 19652,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/69f8ddf1-1184-4683-a043-544d1fe16450.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:05:55Z",
+            "streamer_local_id": 521532355,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.5350341796875,
+                "axis": {
+                    "y": {
+                        "peak": 0.3570556640625,
+                        "i": 256
+                    },
+                    "x": {
+                        "peak": 1.18408203125,
+                        "i": 522
+                    },
+                    "z": {
+                        "peak": 1.5350341796875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.5778591338073673,
+                "duration": 0.0009765625,
+                "n": 1024,
+                "g_rmsi": 0.15586697348453468,
+                "start": 256,
+                "max_peak_direction": "z",
+                "relative_humidity": 58.83203125,
+                "temperature": 23.94921875,
+                "end": 256,
+                "max_peak_i": 256,
+                "delta_v": 0.0014990568161010742,
+                "pressure": 993.0
+            }
+        },
+        {
+            "id": 19653,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/a0cf5154-09e5-4b25-89bc-625dde4418f3.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:05:59Z",
+            "streamer_local_id": 521532359,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 3.472900390625,
+                "axis": {
+                    "y": {
+                        "peak": 3.06396484375,
+                        "i": 745
+                    },
+                    "x": {
+                        "peak": 3.472900390625,
+                        "i": 746
+                    },
+                    "z": {
+                        "peak": 1.324462890625,
+                        "i": 262
+                    }
+                },
+                "max_g_i": 746,
+                "type": "Shock",
+                "max_g": 4.19490170909561,
+                "duration": 0.0068359375,
+                "n": 1024,
+                "g_rmsi": 0.3204215847517693,
+                "start": 743,
+                "max_peak_direction": "x",
+                "relative_humidity": 58.8984375,
+                "temperature": 23.98828125,
+                "end": 749,
+                "max_peak_i": 746,
+                "delta_v": 0.08125603199005127,
+                "pressure": 993.1
+            }
+        },
+        {
+            "id": 19654,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/ca544b7e-abe0-47e3-a1a4-f41b4ffc0594.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:06:06Z",
+            "streamer_local_id": 521532366,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.2542724609375,
+                "axis": {
+                    "y": {
+                        "peak": 0.4302978515625,
+                        "i": 609
+                    },
+                    "x": {
+                        "peak": 1.2542724609375,
+                        "i": 256
+                    },
+                    "z": {
+                        "peak": 0.7659912109375,
+                        "i": 449
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.2932901703233202,
+                "duration": 0.001953125,
+                "n": 1024,
+                "g_rmsi": 0.10709669158609673,
+                "start": 256,
+                "max_peak_direction": "x",
+                "relative_humidity": 58.80859375,
+                "temperature": 23.98828125,
+                "end": 257,
+                "max_peak_i": 256,
+                "delta_v": 0.0038862228393554688,
+                "pressure": 993.2
+            }
+        },
+        {
+            "id": 19655,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/c4379aa7-7133-4127-9b00-c56f78f0e9c5.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:06:10Z",
+            "streamer_local_id": 521532370,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 31.43310546875,
+                "axis": {
+                    "y": {
+                        "peak": 20.5352783203125,
+                        "i": 348
+                    },
+                    "x": {
+                        "peak": 7.977294921875,
+                        "i": 419
+                    },
+                    "z": {
+                        "peak": 31.43310546875,
+                        "i": 419
+                    }
+                },
+                "max_g_i": 419,
+                "type": "Shock",
+                "max_g": 32.81164679099198,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 2.2468330964143446,
+                "start": 418,
+                "max_peak_direction": "z",
+                "relative_humidity": 58.87109375,
+                "temperature": 23.98828125,
+                "end": 420,
+                "max_peak_i": 419,
+                "delta_v": 0.17597973346710205,
+                "pressure": 993.1
+            }
+        },
+        {
+            "id": 19656,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/d34c7237-9021-4a55-87a6-e38661ca47a2.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:06:12Z",
+            "streamer_local_id": 521532372,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 3.3538818359375,
+                "axis": {
+                    "y": {
+                        "peak": 3.3538818359375,
+                        "i": 887
+                    },
+                    "x": {
+                        "peak": 2.5848388671875,
+                        "i": 262
+                    },
+                    "z": {
+                        "peak": 2.3773193359375,
+                        "i": 887
+                    }
+                },
+                "max_g_i": 887,
+                "type": "Shock",
+                "max_g": 4.393583831385206,
+                "duration": 0.009765625,
+                "n": 1024,
+                "g_rmsi": 0.5402411974686574,
+                "start": 885,
+                "max_peak_direction": "y",
+                "relative_humidity": 59.421875,
+                "temperature": 24.02734375,
+                "end": 894,
+                "max_peak_i": 887,
+                "delta_v": 0.15473365783691406,
+                "pressure": 992.9
+            }
+        },
+        {
+            "id": 19657,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/911c9808-40db-4beb-88c8-a88273caeef4.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:06:13Z",
+            "streamer_local_id": 521532373,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 31.6802978515625,
+                "axis": {
+                    "y": {
+                        "peak": 25.7415771484375,
+                        "i": 257
+                    },
+                    "x": {
+                        "peak": 31.6802978515625,
+                        "i": 257
+                    },
+                    "z": {
+                        "peak": 29.827880859375,
+                        "i": 284
+                    }
+                },
+                "max_g_i": 257,
+                "type": "Shock",
+                "max_g": 48.88372641095166,
+                "duration": 0.15625,
+                "n": 1024,
+                "g_rmsi": 3.012217711204168,
+                "start": 102,
+                "max_peak_direction": "x",
+                "relative_humidity": 59.78125,
+                "temperature": 23.98828125,
+                "end": 261,
+                "max_peak_i": 257,
+                "delta_v": 30.895233154296875,
+                "pressure": 992.9
+            }
+        },
+        {
+            "id": 19658,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/8b16a652-c4b4-4186-a43f-a76e2d378202.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:06:17Z",
+            "streamer_local_id": 521532377,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.641845703125,
+                "axis": {
+                    "y": {
+                        "peak": 1.641845703125,
+                        "i": 257
+                    },
+                    "x": {
+                        "peak": 0.592041015625,
+                        "i": 275
+                    },
+                    "z": {
+                        "peak": 1.4678955078125,
+                        "i": 633
+                    }
+                },
+                "max_g_i": 257,
+                "type": "Shock",
+                "max_g": 1.654078071653551,
+                "duration": 0.0048828125,
+                "n": 1024,
+                "g_rmsi": 0.2951584108568446,
+                "start": 256,
+                "max_peak_direction": "y",
+                "relative_humidity": 60.453125,
+                "temperature": 24.02734375,
+                "end": 260,
+                "max_peak_i": 257,
+                "delta_v": 0.0251084566116333,
+                "pressure": 993.0
+            }
+        },
+        {
+            "id": 19659,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/e1cd1530-a4ef-43f4-88c3-fa7d531dcd5e.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:06:19Z",
+            "streamer_local_id": 521532379,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 15.36865234375,
+                "axis": {
+                    "y": {
+                        "peak": 2.142333984375,
+                        "i": 404
+                    },
+                    "x": {
+                        "peak": 3.3966064453125,
+                        "i": 404
+                    },
+                    "z": {
+                        "peak": 15.36865234375,
+                        "i": 349
+                    }
+                },
+                "max_g_i": 349,
+                "type": "Shock",
+                "max_g": 15.50001762854435,
+                "duration": 0.3779296875,
+                "n": 1024,
+                "g_rmsi": 1.0714313129677808,
+                "start": 16,
+                "max_peak_direction": "z",
+                "relative_humidity": 60.84375,
+                "temperature": 24.02734375,
+                "end": 402,
+                "max_peak_i": 349,
+                "delta_v": 131.93053901195526,
+                "pressure": 993.1
+            }
+        },
+        {
+            "id": 19660,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/d7f2ce28-d3b4-4015-a7f9-8a858e24a674.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:06:42Z",
+            "streamer_local_id": 521532402,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.4678955078125,
+                "axis": {
+                    "y": {
+                        "peak": 0.714111328125,
+                        "i": 128
+                    },
+                    "x": {
+                        "peak": 0.5157470703125,
+                        "i": 465
+                    },
+                    "z": {
+                        "peak": 1.4678955078125,
+                        "i": 334
+                    }
+                },
+                "max_g_i": 298,
+                "type": "Shock",
+                "max_g": 1.549154148688211,
+                "duration": 0.58203125,
+                "n": 1024,
+                "g_rmsi": 0.9404339637676454,
+                "start": 180,
+                "max_peak_direction": "z",
+                "relative_humidity": 63.5234375,
+                "temperature": 24.1484375,
+                "end": 775,
+                "max_peak_i": 334,
+                "delta_v": 355.3449273109436,
+                "pressure": 993.0
+            }
+        },
+        {
+            "id": 19661,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/6af41a1a-0daa-4f7e-82a6-8380f0318284.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:07:13Z",
+            "streamer_local_id": 521532433,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.324462890625,
+                "axis": {
+                    "y": {
+                        "peak": 0.286865234375,
+                        "i": 176
+                    },
+                    "x": {
+                        "peak": 0.885009765625,
+                        "i": 148
+                    },
+                    "z": {
+                        "peak": 1.324462890625,
+                        "i": 332
+                    }
+                },
+                "max_g_i": 350,
+                "type": "Shock",
+                "max_g": 1.3266584770520549,
+                "duration": 0.60546875,
+                "n": 1024,
+                "g_rmsi": 0.8082074578362609,
+                "start": 224,
+                "max_peak_direction": "z",
+                "relative_humidity": 67.12890625,
+                "temperature": 24.5078125,
+                "end": 843,
+                "max_peak_i": 332,
+                "delta_v": 320.8422660827637,
+                "pressure": 993.0
+            }
+        },
+        {
+            "id": 19662,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/90fb5bfb-4146-4f6f-a204-a25ebfd48bd0.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:07:29Z",
+            "streamer_local_id": 521532449,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.2847900390625,
+                "axis": {
+                    "y": {
+                        "peak": 1.2847900390625,
+                        "i": 293
+                    },
+                    "x": {
+                        "peak": 0.2197265625,
+                        "i": 108
+                    },
+                    "z": {
+                        "peak": 0.421142578125,
+                        "i": 185
+                    }
+                },
+                "max_g_i": 293,
+                "type": "Shock",
+                "max_g": 1.2931137291798278,
+                "duration": 0.4697265625,
+                "n": 1024,
+                "g_rmsi": 0.6691357554054569,
+                "start": 221,
+                "max_peak_direction": "y",
+                "relative_humidity": 66.203125,
+                "temperature": 24.70703125,
+                "end": 701,
+                "max_peak_i": 293,
+                "delta_v": 186.49297058582306,
+                "pressure": 993.0
+            }
+        },
+        {
+            "id": 19663,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/bdca8e08-6d5f-4948-9370-0a393793f305.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:07:31Z",
+            "streamer_local_id": 521532451,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.4739990234375,
+                "axis": {
+                    "y": {
+                        "peak": 0.9246826171875,
+                        "i": 169
+                    },
+                    "x": {
+                        "peak": 1.4739990234375,
+                        "i": 312
+                    },
+                    "z": {
+                        "peak": 0.76904296875,
+                        "i": 234
+                    }
+                },
+                "max_g_i": 312,
+                "type": "Shock",
+                "max_g": 1.6557832231084175,
+                "duration": 0.318359375,
+                "n": 1024,
+                "g_rmsi": 0.7878284191112017,
+                "start": 145,
+                "max_peak_direction": "x",
+                "relative_humidity": 66.18359375,
+                "temperature": 24.74609375,
+                "end": 470,
+                "max_peak_i": 312,
+                "delta_v": 93.84839534759521,
+                "pressure": 993.2
+            }
+        },
+        {
+            "id": 19664,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/07b1cf1b-b245-4558-8235-f63a3cf324a7.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:07:38Z",
+            "streamer_local_id": 521532458,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.47705078125,
+                "axis": {
+                    "y": {
+                        "peak": 0.50048828125,
+                        "i": 43
+                    },
+                    "x": {
+                        "peak": 1.47705078125,
+                        "i": 438
+                    },
+                    "z": {
+                        "peak": 0.48828125,
+                        "i": 0
+                    }
+                },
+                "max_g_i": 438,
+                "type": "Shock",
+                "max_g": 1.4852250325560896,
+                "duration": 0.6923828125,
+                "n": 1024,
+                "g_rmsi": 0.9578308980700729,
+                "start": 235,
+                "max_peak_direction": "x",
+                "relative_humidity": 65.34765625,
+                "temperature": 24.828125,
+                "end": 943,
+                "max_peak_i": 438,
+                "delta_v": 506.34719133377075,
+                "pressure": 993.0
+            }
+        },
+        {
+            "id": 19665,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/8638648f-8ce2-4ba4-9a0a-9609b1f87c79.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:07:39Z",
+            "streamer_local_id": 521532459,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0498046875,
+                "axis": {
+                    "y": {
+                        "peak": 0.8575439453125,
+                        "i": 374
+                    },
+                    "x": {
+                        "peak": 0.958251953125,
+                        "i": 383
+                    },
+                    "z": {
+                        "peak": 1.0498046875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 383,
+                "type": "Shock",
+                "max_g": 1.2478107414070805,
+                "duration": 0.1181640625,
+                "n": 1024,
+                "g_rmsi": 0.6868415790997812,
+                "start": 213,
+                "max_peak_direction": "z",
+                "relative_humidity": 65.171875,
+                "temperature": 24.828125,
+                "end": 333,
+                "max_peak_i": 256,
+                "delta_v": 12.091189622879028,
+                "pressure": 992.9
+            }
+        },
+        {
+            "id": 19666,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/dbb7e466-185c-44d1-93a0-2c40af87e5be.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:07:41Z",
+            "streamer_local_id": 521532461,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.141357421875,
+                "axis": {
+                    "y": {
+                        "peak": 1.141357421875,
+                        "i": 276
+                    },
+                    "x": {
+                        "peak": 0.958251953125,
+                        "i": 384
+                    },
+                    "z": {
+                        "peak": 0.9063720703125,
+                        "i": 399
+                    }
+                },
+                "max_g_i": 278,
+                "type": "Shock",
+                "max_g": 1.321428752543831,
+                "duration": 0.138671875,
+                "n": 1024,
+                "g_rmsi": 0.7083940454465661,
+                "start": 220,
+                "max_peak_direction": "y",
+                "relative_humidity": 64.9921875,
+                "temperature": 24.828125,
+                "end": 361,
+                "max_peak_i": 276,
+                "delta_v": 17.373764514923096,
+                "pressure": 993.1
+            }
+        },
+        {
+            "id": 19667,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/f0ffcd5f-1cfc-403b-8215-c0a83e153ac1.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-11T06:07:43Z",
+            "streamer_local_id": 521532463,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.2847900390625,
+                "axis": {
+                    "y": {
+                        "peak": 1.2847900390625,
+                        "i": 263
+                    },
+                    "x": {
+                        "peak": 0.592041015625,
+                        "i": 261
+                    },
+                    "z": {
+                        "peak": 0.5615234375,
+                        "i": 321
+                    }
+                },
+                "max_g_i": 265,
+                "type": "Shock",
+                "max_g": 1.4965348601880493,
+                "duration": 0.0517578125,
+                "n": 1024,
+                "g_rmsi": 0.49079000005888423,
+                "start": 243,
+                "max_peak_direction": "y",
+                "relative_humidity": 64.734375,
+                "temperature": 24.8671875,
+                "end": 295,
+                "max_peak_i": 263,
+                "delta_v": 2.68724262714386,
+                "pressure": 993.1
+            }
+        },
+        {
+            "id": 19668,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/b9c5cf7a-73fa-44ca-8c72-a00eb463a168.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-12T03:33:26Z",
+            "streamer_local_id": 521609606,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0467529296875,
+                "axis": {
+                    "y": {
+                        "peak": 0.5706787109375,
+                        "i": 0
+                    },
+                    "x": {
+                        "peak": 0.445556640625,
+                        "i": 257
+                    },
+                    "z": {
+                        "peak": 1.0467529296875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 257,
+                "type": "Shock",
+                "max_g": 1.1732451058953637,
+                "duration": 0.01171875,
+                "n": 1024,
+                "g_rmsi": 0.293729274293953,
+                "start": 253,
+                "max_peak_direction": "z",
+                "relative_humidity": 52.0703125,
+                "temperature": 24.30859375,
+                "end": 264,
+                "max_peak_i": 256,
+                "delta_v": 0.1200556755065918,
+                "pressure": 993.4
+            }
+        },
+        {
+            "id": 19669,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/8874af40-58a2-4aea-b2cf-963e5cf9d082.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-12T03:40:50Z",
+            "streamer_local_id": 521610050,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.25732421875,
+                "axis": {
+                    "y": {
+                        "peak": 0.50048828125,
+                        "i": 275
+                    },
+                    "x": {
+                        "peak": 1.25732421875,
+                        "i": 257
+                    },
+                    "z": {
+                        "peak": 0.4913330078125,
+                        "i": 57
+                    }
+                },
+                "max_g_i": 257,
+                "type": "Shock",
+                "max_g": 1.273241490215983,
+                "duration": 0.0244140625,
+                "n": 1024,
+                "g_rmsi": 0.42036263315521316,
+                "start": 244,
+                "max_peak_direction": "x",
+                "relative_humidity": 51.49609375,
+                "temperature": 24.5078125,
+                "end": 268,
+                "max_peak_i": 257,
+                "delta_v": 0.48935413360595703,
+                "pressure": 993.4
+            }
+        },
+        {
+            "id": 19670,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/07efdc50-05f9-4f6d-a391-055be06f812f.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-12T03:40:58Z",
+            "streamer_local_id": 521610058,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.46484375,
+                "axis": {
+                    "y": {
+                        "peak": 0.6439208984375,
+                        "i": 256
+                    },
+                    "x": {
+                        "peak": 0.29296875,
+                        "i": 785
+                    },
+                    "z": {
+                        "peak": 1.46484375,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.6001254123844855,
+                "duration": 0.00390625,
+                "n": 1024,
+                "g_rmsi": 0.19649121068362385,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 52.26171875,
+                "temperature": 24.546875,
+                "end": 258,
+                "max_peak_i": 256,
+                "delta_v": 0.016069412231445312,
+                "pressure": 993.5
+            }
+        },
+        {
+            "id": 19671,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/e10fc6de-81fe-4c9d-956b-f2da9a3e069b.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-12T03:40:59Z",
+            "streamer_local_id": 521610059,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.605224609375,
+                "axis": {
+                    "y": {
+                        "peak": 0.42724609375,
+                        "i": 263
+                    },
+                    "x": {
+                        "peak": 0.518798828125,
+                        "i": 256
+                    },
+                    "z": {
+                        "peak": 1.605224609375,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 256,
+                "type": "Shock",
+                "max_g": 1.7106865171870291,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.1921248097354204,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 52.421875,
+                "temperature": 24.546875,
+                "end": 257,
+                "max_peak_i": 256,
+                "delta_v": 0.009807944297790527,
+                "pressure": 993.6
+            }
+        },
+        {
+            "id": 19672,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/a3598e71-efec-488b-b430-8dd6eae2d748.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-12T03:51:20Z",
+            "streamer_local_id": 521610680,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.0467529296875,
+                "axis": {
+                    "y": {
+                        "peak": 0.9979248046875,
+                        "i": 444
+                    },
+                    "x": {
+                        "peak": 0.4425048828125,
+                        "i": 181
+                    },
+                    "z": {
+                        "peak": 1.0467529296875,
+                        "i": 256
+                    }
+                },
+                "max_g_i": 473,
+                "type": "Shock",
+                "max_g": 1.2578759325511697,
+                "duration": 0.1611328125,
+                "n": 1024,
+                "g_rmsi": 0.7433592158398424,
+                "start": 192,
+                "max_peak_direction": "z",
+                "relative_humidity": 51.53125,
+                "temperature": 25.5078125,
+                "end": 356,
+                "max_peak_i": 256,
+                "delta_v": 21.85826003551483,
+                "pressure": 993.6
+            }
+        },
+        {
+            "id": 19673,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/c6966537-42c8-4204-8f40-f30fc2701ddc.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-12T03:51:27Z",
+            "streamer_local_id": 521610687,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.46484375,
+                "axis": {
+                    "y": {
+                        "peak": 0.6378173828125,
+                        "i": 763
+                    },
+                    "x": {
+                        "peak": 0.3692626953125,
+                        "i": 742
+                    },
+                    "z": {
+                        "peak": 1.46484375,
+                        "i": 258
+                    }
+                },
+                "max_g_i": 258,
+                "type": "Shock",
+                "max_g": 1.4965753103979647,
+                "duration": 0.0087890625,
+                "n": 1024,
+                "g_rmsi": 0.2502145364451332,
+                "start": 255,
+                "max_peak_direction": "z",
+                "relative_humidity": 55.67578125,
+                "temperature": 25.546875,
+                "end": 263,
+                "max_peak_i": 258,
+                "delta_v": 0.08636713027954102,
+                "pressure": 993.5
+            }
+        },
+        {
+            "id": 19674,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/a4f46e4d-84c8-4192-9d6e-64901c7b4cdb.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-12T03:53:03Z",
+            "streamer_local_id": 521610783,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.1810302734375,
+                "axis": {
+                    "y": {
+                        "peak": 0.78125,
+                        "i": 718
+                    },
+                    "x": {
+                        "peak": 1.1810302734375,
+                        "i": 256
+                    },
+                    "z": {
+                        "peak": 0.76904296875,
+                        "i": 737
+                    }
+                },
+                "max_g_i": 739,
+                "type": "Shock",
+                "max_g": 1.2444625330247323,
+                "duration": 0.0693359375,
+                "n": 1024,
+                "g_rmsi": 0.7100356093076569,
+                "start": 254,
+                "max_peak_direction": "x",
+                "relative_humidity": 49.20703125,
+                "temperature": 25.9453125,
+                "end": 324,
+                "max_peak_i": 256,
+                "delta_v": 3.4904956817626953,
+                "pressure": 993.6
+            }
+        },
+        {
+            "id": 19675,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/6089f9a9-3d66-4956-9bf0-a277437e5770.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-12T05:04:02Z",
+            "streamer_local_id": 521615042,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 1.3275146484375,
+                "axis": {
+                    "y": {
+                        "peak": 0.2838134765625,
+                        "i": 914
+                    },
+                    "x": {
+                        "peak": 1.3275146484375,
+                        "i": 913
+                    },
+                    "z": {
+                        "peak": 0.3509521484375,
+                        "i": 9
+                    }
+                },
+                "max_g_i": 913,
+                "type": "Shock",
+                "max_g": 1.3464236496704942,
+                "duration": 0.001953125,
+                "n": 1024,
+                "g_rmsi": 0.2567048047124057,
+                "start": 913,
+                "max_peak_direction": "x",
+                "relative_humidity": 55.890625,
+                "temperature": 24.66796875,
+                "end": 914,
+                "max_peak_i": 913,
+                "delta_v": 0.00489354133605957,
+                "pressure": 993.1
+            }
+        },
+        {
+            "id": 19676,
+            "stream": "s--0000-00a8--0001-0000-0000-04e7--5020",
+            "project": "",
+            "device": "b--0001-0000-0000-04e7",
+            "variable": "v--0000-00a8--5020",
+            "s3bucket": "iotile-cloud-stream-event-data",
+            "s3key": "prod/2017/10/27/21/873ed325-dc3a-4683-a6d7-a4ff319d83c1.json",
+            "ext": "json", "has_raw_data": true,
+            "device_timestamp": null,
+            "timestamp": "2016-07-12T05:04:05Z",
+            "streamer_local_id": 521615045,
+            "dirty_ts": false,
+            "extra_data": {
+                "max_peak": 2.2796630859375,
+                "axis": {
+                    "y": {
+                        "peak": 2.2796630859375,
+                        "i": 369
+                    },
+                    "x": {
+                        "peak": 0.8880615234375,
+                        "i": 259
+                    },
+                    "z": {
+                        "peak": 0.1373291015625,
+                        "i": 33
+                    }
+                },
+                "max_g_i": 369,
+                "type": "Shock",
+                "max_g": 2.2850697655899688,
+                "duration": 0.0029296875,
+                "n": 1024,
+                "g_rmsi": 0.5674711024356475,
+                "start": 368,
+                "max_peak_direction": "y",
+                "relative_humidity": 56.640625,
+                "temperature": 24.70703125,
+                "end": 370,
+                "max_peak_i": 369,
+                "delta_v": 0.01417994499206543,
+                "pressure": 993.1
+            }
+        }
+	]
+}

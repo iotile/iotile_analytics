@@ -1,0 +1,40 @@
+div.outercontainer
+{
+    -webkit-box-shadow: 6px 6px 4px #aaaaaa;
+    -moz-box-shadow: 6px 6px 4px #aaaaaa;
+    box-shadow: 6px 6px 4px #aaaaaa;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    padding: 20px 20px 0.5em 20px;
+
+    background-color: #FFFFFF;
+
+    border-style: solid;
+    border-color: rgba(0,0,0, 0.5);
+    border-width: 1px;
+
+    width: 1000px;
+}
+
+div.footer
+{
+    font-size: 12px;
+}
+
+body
+{
+    background-color: #ecf0f5;
+}
+
+hr.header-divider 
+{ 
+    display: block;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: inset;
+    border-width: 1px;
+}

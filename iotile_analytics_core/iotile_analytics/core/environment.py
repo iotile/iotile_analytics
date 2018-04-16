@@ -17,31 +17,19 @@ class Environment(object):
 
     @classmethod
     def SetupNotebook(cls):
-        """Configure iotile_analytics for a Jupyter Notebook.
-
-        This changes the way input is requested and progress is
-        displayed to be appropriate for an interactive notebook
-        environment.  It also sets up matplotlib for inline
-        graphics display.
-        """
-
-        try:
-            import ipywidgets  # pylint:disable=W0612; We just want to test importability
-        except ImportError:
-            raise MissingPackageError("Missing required package ipywidgets", package="ipywidgets", suggestion="pip install ipywidgets")
+        """Configure iotile_analytics for a Jupyter Notebook."""
 
         try:
             import tqdm  # pylint:disable=W0612; We just want to test importability
         except ImportError:
             raise MissingPackageError("Missing required package tqdm", package="tqdm", suggestion="pip install tqdm")
 
+        # If we are using bokeh, make sure we set it up for notebook output
         try:
-            from IPython import get_ipython
-
-            ipython = get_ipython()
-            ipython.magic("matplotlib inline")
+            from bokeh.io import output_notebook
+            output_notebook(hide_banner=True)
         except ImportError:
-            raise MissingPackageError("Missing required package IPython", package="IPython")
+            pass
 
         cls._settings['interactivity'] = Environment.Notebook
 

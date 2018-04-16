@@ -12,8 +12,12 @@ setup(
     license="LGPLv3",
     install_requires=[
         "iotile-analytics-core >= 0.1.0",
-        "bqplot >= 0.10.0"
+        "bokeh >= 0.12.15"
     ],
+    entry_points={
+        'console_scripts': ['analytics-host = iotile_analytics.interactive.scripts.analytics_host:main'],
+        'iotile_analytics.live_report': ['basic_info = iotile_analytics.interactive.reports.info_report:SourceInfoReport']
+    },
     description="A data science bridge for iotile.cloud",
     author="Arch",
     author_email="info@arch-iot.com",
@@ -35,8 +39,9 @@ setup(
 IOTile Analytics Interactive
 ----------------------------
 
-This package provides interactive IPython widgets for viewing, plotting and interacting
-with iotile.cloud data.  It builds on the core functionality in iotile-analytics-core.
+This package provides interactive IPython widgets for viewing, plotting and
+interacting with iotile.cloud data.  It builds on the core functionality in
+iotile-analytics-core.
 
 ```
 pip install iotile-analytics-interactive
