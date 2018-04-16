@@ -64,7 +64,7 @@ class SourceInfoReport(object):
             output_file.write("-----------------\n")
 
             new_line = '\n' + ' ' * 31
-            for key in self._group.source_info:
+            for key in sorted(self._group.source_info):
                 if len(key) > 27:
                     key = key[:27] + '...'
 

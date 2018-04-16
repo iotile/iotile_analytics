@@ -9,35 +9,36 @@ from iotile_analytics.core import CloudSession
 ARCHIVE_DATA = (
 "Source Properties\n"
 "-----------------\n"
-"description                    Test archive for analysis purposes\n"
-"title                          Archive: Test Saver Device (04e7)\n"
-"pid                            \n"
+"block                          1\n"
 "created_by                     tim\n"
-"id                             25\n"
 "created_on                     2017-10-27T21:23:36Z\n"
+"description                    Test archive for analysis purposes\n"
+"id                             25\n"
 "org                            arch-internal\n"
+"pid                            \n"
 "sg                             saver-v1-0-0\n"
 "slug                           b--0001-0000-0000-04e7\n"
-"block                          1\n")
+"title                          Archive: Test Saver Device (04e7)\n")
 
 DEVICE_DATA = (
 "Source Properties\n"
 "-----------------\n"
-"external_id                    \n"
-"id                             210\n"
-"lon                            None\n"
-"label                          Filtration Flow\n"
-"project                        1c07fdd0-3fad-4549-bd56-5af2aca18d5b\n"
 "active                         True\n"
-"created_on                     2017-01-11T03:39:14.394521Z\n"
-"gid                            0000-0000-0000-00d2\n"
-"template                       1d1p2bt101es-v2-0-0\n"
-"lat                            None\n"
-"org                            test_org\n"
 "claimed_by                     test\n"
+"claimed_on                     None\n"
+"created_on                     2017-01-11T03:39:14.394521Z\n"
+"external_id                    \n"
+"gid                            0000-0000-0000-00d2\n"
+"id                             210\n"
+"label                          Filtration Flow\n"
+"lat                            None\n"
+"lon                            None\n"
+"org                            test_org\n"
+"project                        1c07fdd0-3fad-4549-bd56-5af2aca18d5b\n"
 "sg                             water-meter-v1-1-0\n"
 "slug                           d--0000-0000-0000-00d2\n"
-"claimed_on                     None\n")
+"template                       1d1p2bt101es-v2-0-0\n"
+)
 
 
 def test_info_report_archive_stdout(shipping, capsys):
@@ -120,7 +121,7 @@ def test_info_report_to_file(water_meter, tmpdir):
 
 
 def test_user_pass_handling(water_meter, capsys):
-    """Make sure we can render info to stdout from a device."""
+    """Make sure we can pass username and password on the cmdline."""
 
     domain, _cloud = water_meter
     slug = 'd--0000-0000-0000-00d2'
