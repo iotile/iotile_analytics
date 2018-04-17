@@ -103,7 +103,7 @@ class AnalysisGroupChannel(object):
 
         raise NotImplementedError()
 
-    def fetch_datapoints(self, slug):
+    def fetch_datapoints(self, slug, direct=False):
         """Fetch all data points for this stream.
 
         These are time, value data pairs stored in the stream.
@@ -111,6 +111,8 @@ class AnalysisGroupChannel(object):
         Args:
             slug (str): The slug of the stream that we should fetch
                 raw events for.
+            direct (bool): Access the data directly without needing a
+                stream object to perform unit conversion.
 
         Returns:
             StreamSeries: A data fame with internal value as floating

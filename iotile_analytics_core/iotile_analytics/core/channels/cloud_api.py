@@ -11,6 +11,7 @@ from iotile_cloud.api.exceptions import RestHttpBaseException
 from typedargs.exceptions import ArgumentError
 from .channel import AnalysisGroupChannel
 from ..session import CloudSession
+from ..interaction import ProgressBar
 from ..stream_series import StreamSeries
 from ..exceptions import CloudError
 
@@ -217,11 +218,16 @@ class IOTileCloudChannel(AnalysisGroupChannel):
                 point data.
         """
 
-        resource = self._api.stream(slug).data
-        raw_data = self._session.fetch_all(resource, page_size=1000, message="Downloading Stream Data")
+        with ProgressBar(1, "Fetching %s" % slug, leave=False) as prog:
+            raw_data = self._api.df.get(filter=slug, format='csv')
 
-        dt_index = pd.to_datetime([x['timestamp'] for x in raw_data])
-        return StreamSeries([x['value'] for x in raw_data], index=dt_index)
+            rows = raw_data.splitlines()
+            data = [x.split(',') for x in rows]
+            data = data[1:]  # There is a single header line
+            dt_index = pd.to_datetime([x[0] for x in data])
+            prog.update(1)
+
+        return StreamSeries([float(x[1]) for x in data], index=dt_index)
 
     def _find_device_streams(self, device_slug):
         """Find all streams for a device by its slug."""
