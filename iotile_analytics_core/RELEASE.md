@@ -4,6 +4,7 @@
 
 - Switch source_info to store properties separately so we can productively 
   iterate over properties in a template and show them all to the user.
+- Move to using faster df api for stream data download.
 
 ## 0.3.2
 
