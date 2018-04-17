@@ -1,5 +1,13 @@
 # Release Notes
 
+## HEAD
+
+- Improve saving of hdf5 files when overwriting old files or reading from
+  nonexistent ones.  UsageError is now properly raised
+- Fix storage of properties to properly handle nulls and add test coverage.
+- Store properties separate from source info so that there is no ambiguity
+  what a property is.
+
 ## 0.1.0
 
 - Initial public release

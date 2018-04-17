@@ -95,7 +95,7 @@ class OfflineDatabase(object):
         self._populate_db_info()
 
     def _populate_db_info(self):
-        info_table = self._file.root.meta.info
+        table = self._file.root.meta.info
 
         entry = table.row
         entry['major_version'] = 1

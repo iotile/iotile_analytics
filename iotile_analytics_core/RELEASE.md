@@ -1,5 +1,10 @@
 # Release Notes
 
+## HEAD
+
+- Switch source_info to store properties separately so we can productively 
+  iterate over properties in a template and show them all to the user.
+
 ## 0.3.2
 
 - Increase compatibility with iotile-analytics-offline.
