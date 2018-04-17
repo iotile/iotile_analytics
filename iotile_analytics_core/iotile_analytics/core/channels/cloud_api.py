@@ -221,7 +221,8 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         with ProgressBar(1, "Fetching %s" % slug, leave=False) as prog:
             raw_data = self._api.df.get(filter=slug, format='csv')
 
-            rows = raw_data.splitlines()
+            str_data = raw_data.decode('utf-8')
+            rows = str_data.splitlines()
             data = [x.split(',') for x in rows]
             data = data[1:]  # There is a single header line
             dt_index = pd.to_datetime([x[0] for x in data])
