@@ -1,6 +1,6 @@
 # Release Notes
 
-## HEAD
+## 0.3.3
 
 - Switch source_info to store properties separately so we can productively 
   iterate over properties in a template and show them all to the user.

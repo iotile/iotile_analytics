@@ -1,6 +1,6 @@
 # Release Notes
 
-## HEAD
+## 0.2.0
 
 - Improve saving of hdf5 files when overwriting old files or reading from
   nonexistent ones.  UsageError is now properly raised
