@@ -6,6 +6,7 @@ import sys
 import os
 from io import open
 import zipfile
+from future.utils import viewitems
 from iotile_analytics.core.exceptions import UsageError
 from .report import LiveReport
 
@@ -13,15 +14,19 @@ from .report import LiveReport
 class SourceInfoReport(object):
     """A basic LiveReport that just prints source information.
 
+    If you pass the argument streams as True, the report will also
+    include a list of all data streams in the analysis group.
+
     Args:
         group (AnalysisGroup): The group that we wish to analyze.
+        streams (bool): Include stream summary information as well
+            in the report.  This defaults to False if not passed.
     """
 
-    DESCRIPTION = "Display streams, properties and record counts about the source."
-
-    def __init__(self, group):
+    def __init__(self, group, streams=False):
         self._group = group
         self.standalone = True
+        self.include_streams = streams
 
     def render(self, output_path, bundle=False):
         """Render this report to output_path.
@@ -75,6 +80,18 @@ class SourceInfoReport(object):
                 else:
                     val = str(val)
                 output_file.write('{0:30s} {1}\n'.format(key, val.replace('\n', new_line)))
+
+            if self.include_streams:
+                output_file.write("\nStream Summaries\n")
+                output_file.write("----------------\n")
+
+                for slug, stream in viewitems(self._group.streams):
+                    name = self._group.get_stream_name(stream)
+
+                    if len(name) > 37:
+                        name = name[:37] + '...'
+
+                    output_file.write('{:40s} {:s}\n'.format(name, slug))
         finally:
             if output_path is not None:
                 output_file.close()

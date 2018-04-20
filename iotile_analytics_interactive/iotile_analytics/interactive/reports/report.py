@@ -3,12 +3,23 @@ import json
 import zipfile
 import shutil
 from datetime import datetime
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, PackageLoader, contextfunction, Markup
 from iotile_analytics.core.exceptions import UsageError
 from future.utils import viewitems
 from bokeh.embed import file_html
 from bokeh.resources import Resources
 from ..app import AnalyticsObject
+
+
+@contextfunction
+def include_file(ctx, name):
+    """Jinja2 function to allow including literal files into a template.
+
+    This is used for emdedding jquery into our unhosted reports.
+    """
+
+    env = ctx.environment
+    return Markup(env.loader.get_source(env, name)[0])
 
 
 class LiveReport(AnalyticsObject):
@@ -20,7 +31,7 @@ class LiveReport(AnalyticsObject):
     able to properly export the files in a way that allows them to be loaded
     outside of the context of a bokeh application or notebook.
 
-    Structing a Bokeh documentat so that we can export it is the primary job
+    Structuring a Bokeh documentat so that we can export it is the primary job
     of the LiveReport class.  The primary difference between a LiveReport and
     a standard embedded Bokeh document is the method by which a LiveReport is
     able to reference a tree of local files and load them into
@@ -43,7 +54,16 @@ class LiveReport(AnalyticsObject):
         self.target = target
         self._relative_dir = "data"
 
-        self._extra_scripts = []
+        # Internal template variables that subclasses can override to insert details into the
+        # template.
+
+        self.header = None
+        self.before_content = None
+        self.after_content = None
+        self.footer = None
+
+        self.extra_scripts = []
+        self.extra_css = []
 
     @property
     def standalone(self):
@@ -105,6 +125,28 @@ class LiveReport(AnalyticsObject):
             write_data = "{}({});".format(info['func'], json_data)
             outfile.write(write_data.encode('utf-8'))
 
+    @classmethod
+    def find_template(cls, package, folder, name):
+        """Find a template inside package data.
+
+        This helper function will find a jinja2 template for you by looking
+        inside a data inside an installed package.
+
+        Args:
+            package (str): A dotted package name for the subpackage that
+                contains folder, which should not have an __init__.py file
+            folder (str): The name of the folder that contains the templates
+                and is located in the installed subpackage specified by package.
+            name (str): The name of the template that we wish to load.
+
+        Returns:
+            jinja2.Template: The loaded template.
+        """
+
+        env = Environment(loader=PackageLoader(package, folder))
+        template = env.get_template(name)
+        return template
+
     def render(self, output_path, bundle=False):
         """Render this report to output_path.
 
@@ -145,6 +187,7 @@ class LiveReport(AnalyticsObject):
             bundle_path = output_path + ".zip"
 
         env = Environment(loader=PackageLoader('iotile_analytics.interactive.reports', 'templates'))
+        env.globals['include_file'] = include_file
 
         if self.target == self.UNHOSTED:
             template = env.get_template('unhosted_file.html')
@@ -153,7 +196,12 @@ class LiveReport(AnalyticsObject):
 
         template_vars = {
             'loadable_models': self.loadable_models,
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.utcnow().isoformat(),
+            'header': self.header,
+            'before_content': self.before_content,
+            'after_content': self.after_content,
+            'footer': self.footer,
+            'extra_scripts': self.extra_scripts
         }
 
         rendered_html = file_html(self.models, Resources('inline'), self.title, template, template_vars)
