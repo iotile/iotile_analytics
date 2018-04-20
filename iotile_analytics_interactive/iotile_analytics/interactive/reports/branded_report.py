@@ -16,7 +16,7 @@ class BrandedReport(LiveReport):
             information.
         link_url (str): An optional direct link to the object that we are showing
             a report about in app.iotile.cloud.  If not passed it defaults to
-            the generic start page of app.iotile.cloud
+            the generic start page of app.iotile.cloud.
     """
 
     def __init__(self, target, source_info, link_url=APP_IOTILE_CLOUD):
@@ -26,6 +26,14 @@ class BrandedReport(LiveReport):
 
     def _render_branding(self, template_name, source_info, link_url):
         template = self.find_template('iotile_analytics.interactive.reports', 'templates', template_name)
+
+        # Handling labeling for archives and devices
+        label = source_info.get('title')
+        if label is None:
+            label = source_info.get('label')
+
+        if label is None:
+            label = "unknown"
 
         args = {
             "org_slug": source_info.get('org', "unknown"),

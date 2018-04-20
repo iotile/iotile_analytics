@@ -48,7 +48,7 @@ def test_info_report_archive_stdout(shipping, capsys):
     slug = 'b--0001-0000-0000-04e7'
 
     CloudSession(user='test@arch-iot.com', password='test', domain=domain, verify=False)
-    retval = main(['-t', 'basic_info', slug, '-d', domain, '--no-verify'])
+    retval = main(['-t', 'basic_info', slug, '-d', domain, '--no-verify', '-c'])
     assert retval == 0
 
     out, err = capsys.readouterr()
@@ -63,7 +63,7 @@ def test_info_report_device_stdout(water_meter, capsys):
     slug = 'd--0000-0000-0000-00d2'
 
     CloudSession(user='test@arch-iot.com', password='test', domain=domain, verify=False)
-    retval = main(['-t', 'basic_info', slug, '-d', domain, '--no-verify'])
+    retval = main(['-t', 'basic_info', slug, '-d', domain, '--no-verify', '-c'])
     assert retval == 0
 
     out, err = capsys.readouterr()
@@ -80,7 +80,7 @@ def test_info_report_to_file(water_meter, tmpdir):
     slug = 'd--0000-0000-0000-00d2'
 
     CloudSession(user='test@arch-iot.com', password='test', domain=domain, verify=False)
-    retval = main(['-t', 'basic_info', slug, '-d', domain, '--no-verify', '-o', file])
+    retval = main(['-t', 'basic_info', slug, '-d', domain, '--no-verify', '-o', file, '-c'])
     assert retval == 0
 
     with open(file + '.txt', 'r') as infile:
@@ -89,7 +89,7 @@ def test_info_report_to_file(water_meter, tmpdir):
     assert out == DEVICE_DATA
 
     # Make sure .txt is properly stripped
-    retval = main(['-t', 'basic_info', slug, '-d', domain, '--no-verify', '-o', file + '.txt'])
+    retval = main(['-t', 'basic_info', slug, '-d', domain, '--no-verify', '-o', file + '.txt', '-c'])
     assert retval == 0
 
     with open(file + '.txt', 'r') as infile:
@@ -107,7 +107,7 @@ def test_info_report_to_file(water_meter, tmpdir):
     slug = 'd--0000-0000-0000-00d2'
 
     CloudSession(user='test@arch-iot.com', password='test', domain=domain, verify=False)
-    retval = main(['-t', 'basic_info', slug, '-d', domain, '--no-verify', '-o', file, '-b'])
+    retval = main(['-t', 'basic_info', slug, '-d', domain, '--no-verify', '-o', file, '-b', '-c'])
     assert retval == 0
 
     zip_obj = zipfile.ZipFile(file + '.zip', 'r')
@@ -126,9 +126,9 @@ def test_user_pass_handling(water_meter, capsys):
     domain, _cloud = water_meter
     slug = 'd--0000-0000-0000-00d2'
 
-    retval = main(['-t', 'basic_info', '-u', 'test@arch-iot.com', '-p', 'test', slug, '-d', domain, '--no-verify'])
+    retval = main(['-t', 'basic_info', '-u', 'test@arch-iot.com', '-p', 'test', slug, '-d', domain, '--no-verify', '-c'])
     assert retval == 0
 
-    out, err = capsys.readouterr()
+    out, _err = capsys.readouterr()
 
     assert out == DEVICE_DATA
