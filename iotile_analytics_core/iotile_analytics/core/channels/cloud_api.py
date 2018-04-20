@@ -11,6 +11,7 @@ from iotile_cloud.api.exceptions import RestHttpBaseException
 from typedargs.exceptions import ArgumentError
 from .channel import AnalysisGroupChannel
 from ..session import CloudSession
+from ..interaction import ProgressBar
 from ..stream_series import StreamSeries
 from ..exceptions import CloudError
 
@@ -59,17 +60,18 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
         return self._stream_finder(self._cloud_id)
 
-    def fetch_source_info(self, with_properties=False):
+    def fetch_source_info(self):
         """Fetch the record associated to the channel object (project, device or datablock)
 
-        This is the object dictionary for the project, device or datablock this channel is based on
+        This is the object dictionary for the project, device or datablock
+        this channel is based on
 
         Args:
-            with_properties: If True, will also fetch object properties and add them as dictionary entries
+            with_properties: If True, will also fetch object properties and
+                add them as dictionary entries
 
         Returns:
-            dict(<name>: <value>): A dict mapping object attribute names and values (including properties
-            if with_properties=True)
+            dict: The raw source object that our analytics group was generated from.
         """
 
         resource = getattr(self._api, self._source_type)
@@ -78,15 +80,25 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         except RestHttpBaseException as exc:
             raise CloudError("Error calling method on iotile.cloud", exception=exc, response=exc.response.status_code)
 
-        if with_properties:
-            try:
-                property_data = self._api.property.get(target=self._cloud_id)
-                if 'count' in property_data and property_data['count']:
-                    for item in property_data['results']:
-                        data[item['name']] = item['value']
-            except RestHttpBaseException as exc:
-                raise CloudError("Error calling method on iotile.cloud", exception=exc,
-                                 response=exc.response.status_code)
+        return data
+
+    def fetch_properties(self):
+        """Fetch all properties for a given object (project, device or datablock).
+
+        Returns:
+            dict: A dict of property names and values.
+        """
+
+        data = {}
+
+        try:
+            property_data = self._api.property.get(target=self._cloud_id)
+            if 'count' in property_data and property_data['count']:
+                for item in property_data['results']:
+                    data[item['name']] = item['value']
+        except RestHttpBaseException as exc:
+            raise CloudError("Error calling method on iotile.cloud", exception=exc,
+                             response=exc.response.status_code)
 
         return data
 
@@ -206,11 +218,17 @@ class IOTileCloudChannel(AnalysisGroupChannel):
                 point data.
         """
 
-        resource = self._api.stream(slug).data
-        raw_data = self._session.fetch_all(resource, page_size=1000, message="Downloading Stream Data")
+        with ProgressBar(1, "Fetching %s" % slug, leave=False) as prog:
+            raw_data = self._api.df.get(filter=slug, format='csv')
 
-        dt_index = pd.to_datetime([x['timestamp'] for x in raw_data])
-        return StreamSeries([x['value'] for x in raw_data], index=dt_index)
+            str_data = raw_data.decode('utf-8')
+            rows = str_data.splitlines()
+            data = [x.split(',') for x in rows]
+            data = data[1:]  # There is a single header line
+            dt_index = pd.to_datetime([x[0] for x in data])
+            prog.update(1)
+
+        return StreamSeries([float(x[1]) for x in data], index=dt_index)
 
     def _find_device_streams(self, device_slug):
         """Find all streams for a device by its slug."""

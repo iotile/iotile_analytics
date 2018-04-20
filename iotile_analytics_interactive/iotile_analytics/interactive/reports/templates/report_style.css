@@ -1,40 +1,169 @@
-div.outercontainer
-{
-    -webkit-box-shadow: 6px 6px 4px #aaaaaa;
-    -moz-box-shadow: 6px 6px 4px #aaaaaa;
-    box-shadow: 6px 6px 4px #aaaaaa;
-    margin-right: auto;
-    margin-left: auto;
-    margin-top: 50px;
-    margin-bottom: 20px;
-    padding: 20px 20px 0.5em 20px;
-
-    background-color: #FFFFFF;
-
-    border-style: solid;
-    border-color: rgba(0,0,0, 0.5);
-    border-width: 1px;
-
-    width: 1000px;
+body {
+  background-color: #ecf0f5;
 }
 
-div.footer
-{
-    font-size: 12px;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a {
+  font-family: Source Sans Pro, sans-serif;
+  font-weight: 500;
 }
 
-body
-{
-    background-color: #ecf0f5;
+.arch-blue {
+  color: #0159a4;
 }
 
-hr.header-divider 
-{ 
-    display: block;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-    margin-left: auto;
-    margin-right: auto;
-    border-style: inset;
-    border-width: 1px;
+.arch-logo {
+  width: 9em;
+  height: auto;
+}
+
+.outercontainer {
+  -webkit-box-shadow: 0px 0px 10px 3px lightgrey;
+  -moz-box-shadow: 0px 0px 10px 3px lightgrey;
+  box-shadow: 0px 0px 10px 3px lightgrey;
+  margin: 50px auto 10px auto;
+  padding: 0;
+  background-color: #FFFFFF;
+  border-width: 0;
+  width: 1000px;
+}
+
+/* Header */
+
+.outercontainer .header {
+  background: #fff;
+  color: #000;
+  border-bottom: #0159a4 2px solid;
+  padding: 20px 30px 10px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.nav-info {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.nav-info p {
+  padding: 5px;
+  color: #0159a4;
+  bottom: 0;
+  margin-bottom: 0;
+}
+
+/* Main Content */
+
+.content {
+  padding: 15px 20px 0 20px;
+  margin: auto auto;
+}
+
+.content-chart {
+  display: flex;
+}
+
+.demo-chart {
+  width: 150px;
+  padding: 10px;
+  text-align: center;
+  display: block;
+}
+
+.page-info {
+  padding-top: 10px;
+  display: flex;
+  color: #0159a4;
+}
+
+.page-info p {
+  padding: 10px 5px 0 5px;
+  font-size: 14px;
+}
+
+/* Footer */
+
+.outercontainer .footer {
+  border-top: #0159a4 2px solid;
+  padding: 5px 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.outercontainer .footer p,
+.outercontainer .footer svg {
+  display: inline-block;
+  letter-spacing: 0.5px;
+  color: #0159a4;
+}
+
+.outercontainer .footer a {
+  color: #0159a4;
+  text-decoration: none;
+}
+
+.arch-systems {
+  display: inline-block;
+}
+
+.arch-systems svg {
+  width: auto;
+  height: 25px;
+  padding: 0 5px;
+}
+
+.globe,
+.mail,
+.phone,
+.view-data {
+  padding: 20px 0 15px 0;
+  margin: 0;
+}
+
+.contact-info {
+  text-align: right;
+  display: inline-block;
+}
+
+.globe svg,
+.mail svg,
+.phone svg,
+.view-data svg {
+  width: 20px;
+  height: 20px;
+  padding-right: 3px;
+  padding-left: 3px;
+}
+
+.globe span,
+.mail span,
+.phone span,
+.view-data span {
+  width: 23px;
+  height: 23px;
+  position: relative;
+  bottom: 4px;
+  padding-right: 15px;
+}
+
+/* Print */
+
+@media print {
+  .outercontainer {
+    -webkit-box-shadow: 0 0 0 0 #fff;
+    -moz-box-shadow: 0 0 0 0 #fff;
+    box-shadow: 0 0 0 0 #fff;
+  }
+
+  .outercontainer .footer {
+    position: absolute;
+    bottom: 0;
+  }
 }

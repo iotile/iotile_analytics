@@ -83,22 +83,27 @@ class AnalysisGroupChannel(object):
 
         raise NotImplementedError()
 
-    def fetch_source_info(self, with_properties=False):
+    def fetch_source_info(self):
         """Fetch the record associated to the channel object (project, device or datablock)
 
         This is the object dictionary for the project, device or datablock this channel is based on
 
-        Args:
-            with_properties: If True, will also fetch object properties and add them as dictionary entries
-
         Returns:
-            dict(<name>: <value>): A dict mapping object attribute names and values (including properties
-            if with_properties=True)
+            dict(<name>: <value>): A dict mapping object attribute names and values.
         """
 
         raise NotImplementedError()
 
-    def fetch_datapoints(self, slug):
+    def fetch_properties(self):
+        """Fetch all properties for a given object (project, device or datablock).
+
+        Returns:
+            dict: A dict of property names and values.
+        """
+
+        raise NotImplementedError()
+
+    def fetch_datapoints(self, slug, direct=False):
         """Fetch all data points for this stream.
 
         These are time, value data pairs stored in the stream.
@@ -106,6 +111,8 @@ class AnalysisGroupChannel(object):
         Args:
             slug (str): The slug of the stream that we should fetch
                 raw events for.
+            direct (bool): Access the data directly without needing a
+                stream object to perform unit conversion.
 
         Returns:
             StreamSeries: A data fame with internal value as floating

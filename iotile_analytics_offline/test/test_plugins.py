@@ -44,3 +44,6 @@ def test_save_and_load(group, tmpdir):
 
     assert len(events5002) == 0
     assert len(grp5002) == 0
+
+    assert loaded.source_info == group.source_info
+    assert loaded.properties == group.properties

@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 from iotile_analytics.core.stream_series import StreamSeries
 from typedargs.exceptions import ArgumentError
-from .table_descriptions import Stream, EventIndex, PropertyTable
+from .table_descriptions import Stream, EventIndex, PropertyTable, DatabaseInfoTable, PropertyTypes
 
 try:
     import cPickle as pickle
@@ -89,6 +89,19 @@ class OfflineDatabase(object):
         self._file.create_vlarray(meta, 'device_definitions', CompatibleObjectAtom())
         self._file.create_vlarray(meta, 'vartype_definitions', CompatibleObjectAtom())
         self._file.create_table(meta, 'source_info', PropertyTable)
+        self._file.create_table(meta, 'properties', PropertyTable)
+        self._file.create_table(meta, 'info', DatabaseInfoTable)
+
+        self._populate_db_info()
+
+    def _populate_db_info(self):
+        table = self._file.root.meta.info
+
+        entry = table.row
+        entry['major_version'] = 1
+        entry['minor_version'] = 0
+        entry['patch_version'] = 0
+        entry.append()
 
     def save_stream(self, slug, definition, data=None, events=None, raw_events=None):
         """Save a stream with timeseries and event data.
@@ -170,67 +183,83 @@ class OfflineDatabase(object):
         table = self._file.root.meta.vartype_definitions
         table.append(vartype)
 
-    def save_source_info(self, info):
+    def save_source_info(self, info, properties):
         """Save analysis group source metadata including properties if set.
 
         Args:
             info (dict): A dict of string -> string with the properties and data
+                about the analysis group source.
+            properties (dict): A dict of string -> string with the properties and data
                 about the analysis group source.
         """
 
         if self.read_only:
             raise ArgumentError("Attempted to save source info in read only file")
 
-        table = self._file.root.meta.source_info
+        self._encode_dict_in_table(info, self._file.root.meta.source_info)
+        self._encode_dict_in_table(properties, self._file.root.meta.properties)
 
+    @classmethod
+    def _encode_dict_in_table(cls, info, table):
         for key, value in viewitems(info):
             entry = table.row
             entry['key'] = key.encode('utf-8')
 
             if isinstance(value, basestring):
+                entry['value_type'] = PropertyTypes.STRING
                 entry['str_value'] = value.encode('utf-8')
             elif isinstance(value, int):
+                entry['value_type'] = PropertyTypes.INT
                 entry['int_value'] = value
             elif isinstance(value, bool):
+                entry['value_type'] = PropertyTypes.BOOL
                 entry['bool_value'] = value
             elif value is None:
+                entry['value_type'] = PropertyTypes.NONE
                 pass # Store a None as nothing
             else:
-                raise ArgumentError("Unsupported data type in source_info", key=key, value=value, type=type(value))
+                raise ArgumentError("Unsupported data type in dictionary", key=key, value=value, type=type(value))
 
             entry.append()
 
-    def fetch_source_info(self, with_properties=False):
-        """Fetch presaved source info.
-
-        Args:
-            with_properties (bool): Include properties attached to
-                the object or not.  Support for this is currently
-                not implemented since there is no distinction between
-                property and non-property info.
-
-        Returns:
-            dict: A string -> string key-value store of source information.
-        """
-
-        table = self._file.root.meta.source_info
-
+    @classmethod
+    def _decode_dict_in_table(cls, table):
         out_data = {}
         for row in table.iterrows():
             key = row['key'].decode('utf-8')
-
-            if row['str_value'] is not None:
+            value_type = row['value_type']
+            if value_type == PropertyTypes.STRING:
                 value = row['str_value'].decode('utf-8')
-            elif row['int_value'] is not None:
+            elif value_type == PropertyTypes.INT:
                 value = int(row['int_value'])
-            elif row['bool_value'] is not None:
+            elif value_type == PropertyTypes.BOOL:
                 value = bool(row['bool_value'])
-            else:
+            elif value_type == PropertyTypes.NONE:
                 value = None
+            else:
+                raise ArgumentError("Unsupported value type in database property", value_type=value_type)
 
             out_data[key] = value
 
         return out_data
+
+    def fetch_source_info(self):
+        """Fetch presaved source info.
+
+        Returns:
+            dict: The decoded source information.
+        """
+
+        return self._decode_dict_in_table(self._file.root.meta.source_info)
+
+    def fetch_properties(self):
+        """Fetch saved properties.
+
+        Returns:
+            dict: The saved properties.
+        """
+
+        return self._decode_dict_in_table(self._file.root.meta.properties)
 
     @classmethod
     def _to_timecol(cls, value):

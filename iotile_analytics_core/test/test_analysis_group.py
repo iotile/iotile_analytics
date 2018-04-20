@@ -122,22 +122,7 @@ def test_channel_info(filter_group):
     assert device['slug'] == 'd--0000-0000-0000-00d2'
     assert device['label'] == 'Filtration Flow'
     assert device['org'] == 'test_org'
-    assert device['CargoDescription'] == 'SO# 83469'
-    assert device['Country'] == 'KOREA'
 
-    # Test Channel API (without properties)
-    channel = filter_group._channel
-
-    device = channel.fetch_source_info()
-    assert device['slug'] == 'd--0000-0000-0000-00d2'
-    assert device['label'] == 'Filtration Flow'
-    assert device['org'] == 'test_org'
-    assert 'CargoDescription' not in device
-    assert 'Country' not in device
-
-    device = channel.fetch_source_info(with_properties=True)
-    assert device['slug'] == 'd--0000-0000-0000-00d2'
-    assert device['label'] == 'Filtration Flow'
-    assert device['org'] == 'test_org'
-    assert device['CargoDescription'] == 'SO# 83469'
-    assert device['Country'] == 'KOREA'
+    props = filter_group.properties
+    assert props['CargoDescription'] == 'SO# 83469'
+    assert props['Country'] == 'KOREA'

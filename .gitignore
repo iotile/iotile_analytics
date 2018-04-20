@@ -64,3 +64,5 @@ target/
 #PyCharm
 .idea
 .sublimelinterrc
+
+built_docs

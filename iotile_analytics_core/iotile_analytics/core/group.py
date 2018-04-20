@@ -49,14 +49,15 @@ class AnalysisGroup(object):
         self._channel = channel
 
         stream_list = channel.list_streams()
-        self.source_info = channel.fetch_source_info(with_properties=True)
+        self.source_info = channel.fetch_source_info()
+        self.properties = channel.fetch_properties()
         self.streams = self._parse_stream_list(stream_list)
         self.stream_counts = channel.count_streams([x['slug'] for x in stream_list])
 
         var_type_slugs = set([x['var_type'] for x in viewvalues(self.streams) if x['var_type'] is not None])
 
         self.variable_types = channel.fetch_variable_types(var_type_slugs)
-        self._stream_table = [(slug.lower(), self._get_stream_name(stream).lower()) for slug, stream in viewitems(self.streams)]
+        self._stream_table = [(slug.lower(), self.get_stream_name(stream).lower()) for slug, stream in viewitems(self.streams)]
 
     def stream_empty(self, slug):
         """Check if a stream is empty.
@@ -109,7 +110,7 @@ class AnalysisGroup(object):
             if self.stream_empty(slug) and not include_empty:
                 continue
 
-            name = self._get_stream_name(stream)
+            name = self.get_stream_name(stream)
 
             if len(name) > 37:
                 name = name[:37] + '...'
@@ -117,7 +118,15 @@ class AnalysisGroup(object):
             print('{:40s} {:s}'.format(name, slug))
 
     @classmethod
-    def _get_stream_name(cls, stream):
+    def get_stream_name(cls, stream):
+        """Extract a user-friendly name from a stream.
+
+        Args:
+            stream (dict): A dictionary of metadata about the stream.
+        Returns:
+            str: The name of the stream
+        """
+
         name = stream.get('data_label', '')
 
         if name == '':
@@ -381,7 +390,7 @@ class AnalysisGroup(object):
             for slug, vartype in viewitems(self.variable_types):
                 saver.save_vartype(slug, vartype)
 
-            saver.save_source_info(self.source_info)
+            saver.save_source_info(self.source_info, self.properties)
 
     @classmethod
     def _find_save_format(cls, format_name):
