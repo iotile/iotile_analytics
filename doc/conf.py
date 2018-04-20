@@ -19,6 +19,18 @@ import shlex
 # Set environment variables so bokeh plot plugin will work
 os.environ['BOKEH_DOCS_MISSING_API_KEY_OK'] = "1"
 
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
+if on_rtd:
+    from unittest.mock import MagicMock
+
+    class _Mock(MagicMock):
+        @classmethod
+        def __getattr__(cls, name):
+            return MagicMock()
+
+    MOCK_MODULES = ['scipy', 'numpy', 'pandas']
+    sys.modules.update((mod_name, _Mock()) for mod_name in MOCK_MODULES)
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
