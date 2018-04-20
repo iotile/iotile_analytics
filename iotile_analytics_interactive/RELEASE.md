@@ -13,6 +13,8 @@
 - Add `analytics-host` command line program that allows you to pick a report
   that you would like to run against an AnalysisGroup and saves the output to
   a file on your computer.
+- Add default arch branded report that can be used `BrandedReport` and populates
+  the LiveReport template with a pretty header and footer.
 
 ## 0.1.1
 
