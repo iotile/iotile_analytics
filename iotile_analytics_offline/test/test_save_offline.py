@@ -28,7 +28,7 @@ def test_livereport_saving(shipping, shipping_group, tmpdir):
     slug = 'b--0001-0000-0000-04e7'
 
     CloudSession(user='test@arch-iot.com', password='test', domain=domain, verify=False)
-    retval = main(['-t', 'save_hdf5', slug, '-d', domain, '-o', outfile, '--no-verify'])
+    retval = main(['-t', 'save_hdf5', slug, '-d', domain, '-o', outfile, '--no-verify', '-c'])
     assert retval == 0
 
     assert os.path.isfile(outfile)
