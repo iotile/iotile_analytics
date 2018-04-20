@@ -28,7 +28,7 @@ if on_rtd:
         def __getattr__(cls, name):
             return MagicMock()
 
-    MOCK_MODULES = ['pandas', 'tables']
+    MOCK_MODULES = ['tables']
     sys.modules.update((mod_name, _Mock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,

@@ -4,3 +4,6 @@ better-apidoc
 future
 iotile_cloud
 typedargs
+pandas
+scipy
+numpy
