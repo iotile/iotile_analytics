@@ -17,7 +17,7 @@ import os
 import shlex
 
 # Set environment variables so bokeh plot plugin will work
-os.environ['BOKEH_DOCS_MISSING_API_KEY_OK'] = 1
+os.environ['BOKEH_DOCS_MISSING_API_KEY_OK'] = "1"
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
