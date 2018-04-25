@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 import json
+import os
 import zipfile
 from iotile_analytics.interactive.scripts.analytics_host import main
 from iotile_analytics.core import CloudSession
@@ -91,6 +92,9 @@ def test_info_report_to_file(water_meter, tmpdir):
 
     assert out == DEVICE_DATA
 
+    # Prepare for the next test
+    os.remove(file + '.txt')
+
     # Make sure .txt is properly stripped
     retval = main(['-t', 'basic_info', slug, '-d', domain, '--no-verify', '-o', file + '.txt', '-c'])
     assert retval == 0
@@ -133,5 +137,27 @@ def test_user_pass_handling(water_meter, capsys):
     assert retval == 0
 
     out, _err = capsys.readouterr()
+
+    assert out == DEVICE_DATA
+
+
+def test_local_files(water_meter, tmpdir):
+    """Make sure we can run a report from a local file."""
+
+    domain, _cloud = water_meter
+    slug = 'd--0000-0000-0000-00d2'
+
+    saved_file = str(tmpdir.join('saved_file.hdf5'))
+    file = str(tmpdir.join('temp_file.txt'))
+
+    retval = main(['-t', 'save_hdf5', slug, '-d', domain, '--no-verify', '-o', saved_file, '-c'])
+    assert retval == 0
+    assert os.path.isfile(saved_file)
+
+    retval = main(['-t', 'basic_info', saved_file, '-o', file, '-c'])
+    assert retval == 0
+
+    with open(file, 'r') as infile:
+        out = infile.read()
 
     assert out == DEVICE_DATA

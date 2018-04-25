@@ -210,12 +210,12 @@ class OfflineDatabase(object):
             if isinstance(value, basestring):
                 entry['value_type'] = PropertyTypes.STRING
                 entry['str_value'] = value.encode('utf-8')
+            elif isinstance(value, bool):  # Important that this check comes first because isinstance(True, int) is True
+                entry['value_type'] = PropertyTypes.BOOL
+                entry['bool_value'] = value
             elif isinstance(value, int):
                 entry['value_type'] = PropertyTypes.INT
                 entry['int_value'] = value
-            elif isinstance(value, bool):
-                entry['value_type'] = PropertyTypes.BOOL
-                entry['bool_value'] = value
             elif value is None:
                 entry['value_type'] = PropertyTypes.NONE
                 pass # Store a None as nothing

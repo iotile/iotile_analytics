@@ -58,7 +58,7 @@ class SourceInfoReport(object):
         output_file = sys.stdout
         if output_path is not None:
             if output_path.endswith('.txt'):
-                output_path = output_path[:-3]
+                output_path = output_path[:-4]
 
             bundle_path = output_path + ".zip"
             output_path = output_path + ".txt"

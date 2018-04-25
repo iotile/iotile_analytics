@@ -23,7 +23,7 @@ on Python 2 or Python 3.
 
 
 Generating Live Reports
-------------------------
+-----------------------
 
 Live Reports are a key part of IOTile Analytics.  They are static HTML documents
 that either embed data and plots or reference local data files that can be
