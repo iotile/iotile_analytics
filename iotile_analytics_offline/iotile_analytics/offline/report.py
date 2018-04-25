@@ -1,7 +1,7 @@
 """A LiveReport plugin to enable quickly saving data from iotile.cloud offline."""
 
 class SaveOfflineReport(object):
-    DESCRIPTION = "Save all data locally as an HDF5 database file."
+    """Save all data locally as an HDF5 database file."""
 
     def __init__(self, group):
         self._group = group

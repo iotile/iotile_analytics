@@ -33,6 +33,7 @@ def build_args():
     parser.add_argument('-p', '--password', default=None, type=str, help="Your iotile.cloud password.  If not specified it will be prompted when needed.")
     parser.add_argument('-o', '--output', type=str, default=None, help="The output path that you wish to save the report at.")
     parser.add_argument('-t', '--report', type=str, help="The name of the report to generate")
+    parser.add_argument('-s', '--include-system', action="store_true", help="Also include hidden system streams.  This only affects reports created from device objects, not projects or datablocks/archives")
     parser.add_argument('-a', '--arg', action="append", default=[], help="Pass an argument to the livereport you are generating, should be in the form name=value")
     parser.add_argument('-c', '--no-confirm', action="store_true", help="Do not confirm the report that you are about to generate and prompt for parameters")
     parser.add_argument('-l', '--list', action="store_true", help="List all known report types without running one")
@@ -135,7 +136,7 @@ def find_analysis_group(args):
 
     if group.startswith('d--'):
         is_cloud = True
-        generator = lambda x: AnalysisGroup.FromDevice(x, domain=args.domain)
+        generator = lambda x: AnalysisGroup.FromDevice(x, domain=args.domain, include_system=args.include_system)
     elif group.startswith('b--'):
         is_cloud = True
         generator = lambda x: AnalysisGroup.FromArchive(x, domain=args.domain)
@@ -145,6 +146,8 @@ def find_analysis_group(args):
             raise ValueError("Only hdf5 formatted local analysis group files are supported")
 
         generator = lambda x: AnalysisGroup.FromSaved(x, 'hdf5')
+    else:
+        raise ValueError("Could not find object specified for report source: %s" % group)
 
     if not args.no_confirm:
         if is_cloud:
@@ -224,7 +227,6 @@ def render_report(report_class, group, output_path=None, args=None, bundle=False
 
     if args is None:
         args = {}
-
 
     metadata = AnnotatedMetadata(report_class)
     metadata.load_from_doc = True

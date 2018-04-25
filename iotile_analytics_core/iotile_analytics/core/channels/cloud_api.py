@@ -23,12 +23,13 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         domain (str): The domain of the iotile.cloud instance that
             you want to fetch data from.
         cloud_id (str): The slug or id of the object to be enumerated to
-            create this cloud channel.
-        source_type (str): The type of object that we are enumerating.
-            This must be one of project, device or archive.
+            create this cloud channel.  If you do not want to enumerate
+            any object, you can pass None here.
+        include_system (bool): Include hidden system streams when query device
+            objects.  This defaults to False.
     """
 
-    def __init__(self, cloud_id, source_type, domain):
+    def __init__(self, cloud_id, domain, include_system=False):
         super(IOTileCloudChannel, self).__init__()
 
         stream_finders = {
@@ -37,15 +38,38 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             'datablock': self._find_archive_streams
         }
 
-        stream_finder = stream_finders.get(source_type, None)
-        if stream_finder is None:
-            raise ArgumentError("Invalid source type", source_type=source_type, supported_sources=stream_finders.keys(), suggestion="Try using one of the convenience functions for creating an AnalysisGroup like FromDevice or FromProject")
+        stream_counters = {
+            'device': self._count_device_streams
+        }
+
+        stream_finder = None
+        source_type = None
+        if cloud_id is not None:
+            source_type = self._classify_object(cloud_id)
+            stream_finder = stream_finders.get(source_type, None)
+
 
         self._session = CloudSession(domain=domain)
         self._api = self._session.get_api()
         self._cloud_id = cloud_id
+        self._include_system = include_system
         self._source_type = source_type
         self._stream_finder = stream_finder
+        self._stream_counter = stream_counters.get(source_type, self._count_generic_streams)
+
+    @classmethod
+    def _classify_object(cls, cloud_id):
+        if cloud_id.startswith('p--'):
+            return 'project'
+
+        if cloud_id.startswith('d--'):
+            return 'device'
+
+        if cloud_id.startswith('b--'):
+            return 'datablock'
+
+        raise ArgumentError("Invalid source type", cloud_id=cloud_id, supported_sources=('project', 'device', 'datablock'),
+                            suggestion="Try using one of the convenience functions for creating an AnalysisGroup like FromDevice or FromProject")
 
     def list_streams(self):
         """Return a list of all streams.
@@ -53,10 +77,20 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         This is equivalent to the IOTile.cloud API method
         /api/v1/stream/
 
+        for datablocks and projects.  For devices, this calls the
+        api:
+        /api/v1/device/<cloud_id>/extra/
+
+        to also get information on system streams that do not show
+        up in the normal stream API.
+
         Returns:
             list(dict): A list of dictionaries, one for each
                 stream that should be part of this analysis group.
         """
+
+        if self._cloud_id is None:
+            return []
 
         return self._stream_finder(self._cloud_id)
 
@@ -74,6 +108,9 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             dict: The raw source object that our analytics group was generated from.
         """
 
+        if self._cloud_id is None:
+            return {}
+
         resource = getattr(self._api, self._source_type)
         try:
             data = resource(self._cloud_id).get()
@@ -90,6 +127,9 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         """
 
         data = {}
+
+        if self._cloud_id is None:
+            return {}
 
         try:
             property_data = self._api.property.get(target=self._cloud_id)
@@ -114,6 +154,31 @@ class IOTileCloudChannel(AnalysisGroupChannel):
                 data points in this stream.
         """
 
+        return self._stream_counter(slugs)
+
+    def _count_device_streams(self, slugs):
+        info = self._api.device(self._cloud_id).extra.get()
+
+        stream_table = info.get('stream_counts', {})
+
+        # Note the specific logic here of is not False.  We explictly want to exclude has_streamid is True and is None
+        # since those corresponds with normal streams like app only streams.
+        normal_streams = [slug for slug in slugs if stream_table.get(slug, {}).get('has_streamid') is not False]
+
+        normal_counts = self._count_generic_streams(normal_streams)
+
+        results = {}
+        for slug in slugs:
+            if slug in normal_counts:
+                results[slug] = normal_counts[slug]
+            elif slug in stream_table:
+                results[slug] = {'points': stream_table[slug].get('data_cnt', 0), 'events': 0}
+            else:
+                raise CloudError("Could not find stream to perform a count", slug=slug)
+
+        return results
+
+    def _count_generic_streams(self, slugs):
         resources = [self._api.stream(x).data for x in slugs]
         ts_results = self._session.fetch_multiple(resources, message='Counting Events in Streams', page_size=1)
 
@@ -121,7 +186,6 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         event_args = [{"filter": x} for x in slugs]
 
         event_results = self._session.fetch_multiple(event_resources, event_args, message='Counting Data in Streams', page_size=1)
-
         return {slug: {'points': ts['count'], 'events': event['count']} for slug, ts, event in zip(slugs, ts_results, event_results)}
 
     def fetch_variable_types(self, slugs):
@@ -218,6 +282,8 @@ class IOTileCloudChannel(AnalysisGroupChannel):
                 point data.
         """
 
+        use_data_api = False
+
         with ProgressBar(1, "Fetching %s" % slug, leave=False) as prog:
             raw_data = self._api.df.get(filter=slug, format='csv')
 
@@ -225,17 +291,40 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             rows = str_data.splitlines()
             data = [x.split(',') for x in rows]
             data = data[1:]  # There is a single header line
-            dt_index = pd.to_datetime([x[0] for x in data])
+
+            # FIXME: Hack to work around issue returning int_value for these objects
+            if len(data) > 0 and data[0][1] == '':
+                use_data_api = True
+            else:
+                dt_index = pd.to_datetime([x[0] for x in data])
+
             prog.update(1)
 
-        return StreamSeries([float(x[1]) for x in data], index=dt_index)
+        if not use_data_api:
+            return StreamSeries([float(x[1]) for x in data], index=dt_index)
+
+        resource = self._api.data
+        raw_json = self._session.fetch_all(resource, page_size=10000, message="Downloading Data", filter=slug)
+
+        dt_index =pd.to_datetime([x['timestamp'] for x in raw_json])
+        data = [x['int_value'] for x in raw_json]
+
+        return StreamSeries(data, index=dt_index)
 
     def _find_device_streams(self, device_slug):
         """Find all streams for a device by its slug."""
 
         try:
             results = self._api.stream.get(device=device_slug)
-            return results['results']
+            streams = results['results']
+
+            if self._include_system:
+                hidden_results = self._api.device(device_slug).extra.get()
+                hidden_streams = [slug for slug, data in viewitems(hidden_results.get('stream_counts', {})) if data.get('has_streamid') is False]
+
+                streams += hidden_streams
+
+            return streams
         except RestHttpBaseException as exc:
             raise CloudError("Error calling method on iotile.cloud", exception=exc, response=exc.response.status_code)
 

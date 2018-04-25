@@ -2,14 +2,14 @@
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
-from future.utils import viewitems
-from builtins import int
-from past.builtins import basestring
 import uuid
+from builtins import int
 import os.path
+from past.builtins import basestring
 import tables
 import pandas as pd
 import numpy as np
+from future.utils import viewitems
 from iotile_analytics.core.stream_series import StreamSeries
 from typedargs.exceptions import ArgumentError
 from .table_descriptions import Stream, EventIndex, PropertyTable, DatabaseInfoTable, PropertyTypes
@@ -110,6 +110,8 @@ class OfflineDatabase(object):
             slug (str): The stream slug to save
             definition (dict): The stream metadata dictionary that comes
                 from the /api/v1/stream/<slug>/ API
+                This may be None if there is no stream metadata for this stream
+                which can happen if the stream is a hidden system stream.
             data (StreamData): The raw stream timeseries data to save.
             events (pandas.DataFrame): Any event summary data to save.
             raw_events (pandas.DataFrame): The raw event data to save.
@@ -276,7 +278,18 @@ class OfflineDatabase(object):
                 stream that should be part of this analysis group.
         """
 
-        return [x.definition[0] for x in self._file.root.streams._f_iter_nodes()]
+        streams = []
+
+        for node in self._file.root.streams._f_iter_nodes():
+            slug = node._v_name.replace('_', '-')
+            info_obj = node.definition[0]
+
+            if info_obj is None:
+                streams.append(slug)
+            else:
+                streams.append(info_obj)
+
+        return streams
 
     def close(self):
         self._file.close()

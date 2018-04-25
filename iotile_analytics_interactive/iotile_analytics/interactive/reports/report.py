@@ -31,7 +31,7 @@ class LiveReport(AnalyticsObject):
     able to properly export the files in a way that allows them to be loaded
     outside of the context of a bokeh application or notebook.
 
-    Structuring a Bokeh documentat so that we can export it is the primary job
+    Structuring a Bokeh document so that we can export it is the primary job
     of the LiveReport class.  The primary difference between a LiveReport and
     a standard embedded Bokeh document is the method by which a LiveReport is
     able to reference a tree of local files and load them into
@@ -146,6 +146,22 @@ class LiveReport(AnalyticsObject):
         env = Environment(loader=PackageLoader(package, folder))
         template = env.get_template(name)
         return template
+
+    @classmethod
+    def render_string_template(cls, template_str, variables):
+        """Render a string jinja2 template as a string.
+
+        Args:
+            template_str (str): The template that we wish to render.
+            variables (dict): The variables that we wish to substitute
+                into the template.
+        Returns:
+            str: The rendered string template.
+        """
+
+        env = Environment()
+        template = env.from_string(template_str)
+        return template.render(variables)
 
     def render(self, output_path, bundle=False):
         """Render this report to output_path.

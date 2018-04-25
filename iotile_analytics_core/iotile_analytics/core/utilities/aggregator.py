@@ -104,7 +104,8 @@ class TimeseriesSelector(object):
         The subdivision will be performed down to second precision by default.
 
         Args:
-            period (pd.Period): The period that we wish to subdivid
+            period (pd.Period): The period that we wish to subdivide.  If this is None
+                we default to subdividing the entire domain of this object.
             freq (str): A Pandas frequency string to use to determine how big the
                 chunks are that we are going to subdivid period into.
 
@@ -112,8 +113,15 @@ class TimeseriesSelector(object):
             pd.DatetimeIndex: The subdivided period.
         """
 
-        start = period.to_timestamp('S', 'S')
-        end = period.to_timestamp('S', 'E')
+        if self.oldest_point is None or self.newest_point is None:
+            raise UsageError("You must add at least one dataset to the selector first before trying to generate an index.")
+
+        if period is not None:
+            start = period.to_timestamp(freq, 'S')
+            end = period.to_timestamp(freq, 'E')
+        else:
+            start = self.oldest_point.to_period(freq).to_timestamp(freq, 'S')
+            end = self.newest_point.to_period(freq).to_timestamp(freq, 'E')
 
         return pd.DatetimeIndex(start=start, end=end, freq=freq, tz=self._timezone)
 

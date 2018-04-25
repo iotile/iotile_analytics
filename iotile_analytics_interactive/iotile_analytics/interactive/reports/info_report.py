@@ -66,11 +66,24 @@ class SourceInfoReport(object):
             output_file = open(output_path, 'w', encoding='utf-8')
 
         try:
-            output_file.write("Source Properties\n")
-            output_file.write("-----------------\n")
+            output_file.write("Source Info\n")
+            output_file.write("-----------\n")
 
             new_line = '\n' + ' ' * 31
             for key in sorted(self._group.source_info):
+                if len(key) > 27:
+                    key = key[:27] + '...'
+
+                val = self._group.source_info[key]
+                if isinstance(val, basestring):
+                    val = val.encode('utf-8').decode('utf-8')
+                else:
+                    val = str(val)
+                output_file.write('{0:30s} {1}\n'.format(key, val.replace('\n', new_line)))
+
+            output_file.write("\nProperties\n")
+            output_file.write("----------\n")
+            for key in sorted(self._group.properties):
                 if len(key) > 27:
                     key = key[:27] + '...'
 
@@ -85,13 +98,27 @@ class SourceInfoReport(object):
                 output_file.write("\nStream Summaries\n")
                 output_file.write("----------------\n")
 
-                for slug, stream in viewitems(self._group.streams):
-                    name = self._group.get_stream_name(stream)
+                for slug in sorted(self._group.streams):
+                    if self._group.stream_empty(slug):
+                        continue
+
+                    name = self._group.get_stream_name(slug)
 
                     if len(name) > 37:
                         name = name[:37] + '...'
 
                     output_file.write('{:40s} {:s}\n'.format(name, slug))
+
+                output_file.write("\nStream Counts\n")
+                output_file.write("-------------\n")
+
+                for slug in sorted(self._group.streams):
+                    if self._group.stream_empty(slug):
+                        continue
+
+                    counts = self._group.stream_counts[slug]
+
+                    output_file.write('{:s}              {: 6d} points {: 6d} events\n'.format(slug, counts.get('points'), counts.get('events')))
         finally:
             if output_path is not None:
                 output_file.close()

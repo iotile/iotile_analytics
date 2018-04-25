@@ -9,7 +9,10 @@ h4,
 h5,
 h6,
 p,
-a {
+a,
+.note,
+ul,
+li {
   font-family: Source Sans Pro, sans-serif;
   font-weight: 500;
 }
@@ -66,19 +69,48 @@ a {
   margin: auto auto;
 }
 
-.content-chart {
-  display: flex;
+.before-content {
+  padding: 0 15px;
 }
 
-.demo-chart {
-  width: 150px;
-  padding: 10px;
-  text-align: center;
-  display: block;
+.before-content .title,
+.before-content a {
+  color: #0159a4;
+}
+
+.before-content p,
+.before-content .date-and-range li {
+  font-size: 15px;
+}
+
+.before-content .title {
+  margin-top: 0;
+  margin-bottom: 0
+}
+
+.before-content p {
+  line-height: 1.5;
+  margin: 5px 0;
+}
+
+.before-content .date-and-range li {
+  margin: 8px;
+}
+
+.before-content .arrow-right {
+  width: 15px;
+  margin-left: 5px;
+  margin-right: 5px;
+  position: relative;
+  top: 3px;
+}
+
+.content-chart {
+  padding: 0 10px;
 }
 
 .page-info {
-  padding-top: 10px;
+  padding-top: 5px;
   display: flex;
   color: #0159a4;
 }
