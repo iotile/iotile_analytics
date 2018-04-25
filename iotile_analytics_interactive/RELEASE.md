@@ -1,6 +1,14 @@
 # Release Notes
 
-## HEAD
+## 0.3.0
+
+- Add support for stream_overview report that shows detailed information about
+  a specific data stream.
+- Add TimeSelectViewer that shows how many data points you have as a function
+  of time in a given stream.  This is just an initial implementation.  The 
+  long term goal is for it to be a kind of mini-map for stream data showing you
+  where in time you have data and letting you quickly select the region you
+  want to focus in. 
 
 ## 0.2.0
 

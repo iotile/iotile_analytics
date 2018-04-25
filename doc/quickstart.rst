@@ -173,8 +173,8 @@ should look something like this:
 	period.  
 
 
-Getting Help with Live Reports
-------------------------------
+Seeing Report Usage
+-------------------
 
 Each LiveReport that you can generate comes with built in documentation showing how you can use it and
 what, if any arguments it accepts.  You can view the help documentation using `analytics-host -l -t <report_name>`
@@ -232,7 +232,8 @@ You would pass that on the command line as a string such as ``-a mdo=[1.0,2.0,3.
 include a space in the parameter value, make sure to quote it so that the shell does not misinterpret
 the value as another argument to the program.
 
-Downloading Data for Offline Use
+Saving Data Offline
+-------------------
 
 Any LiveReport can be generated either directly from iotile.cloud by passing the ``slug`` of the device
 or archive that you want to use.  A slug is an alphanumeric identifier that starts with ``d--`` for 
@@ -240,6 +241,13 @@ a device and ``b--`` for an archive.
 
 If you have data that you wish to download and save, you can use the ``save_hdf5`` report to cache all
 data offline.
+
+.. note::
+
+	You will need to login with your iotile.cloud email address and password in order to download data
+	from iotile.cloud and you can only access data that belongs to devices or archives that you have 
+	access to.
+
 
 For example, let's say you want to download data from device ``d--abcd-0000-5678-1234`` and save it to
 a file named ``my-device.hdf5``  You would do:
@@ -253,10 +261,3 @@ a file named ``my-device.hdf5``  You would do:
 
 See how the final line says ``Rendered report to: my-device.hdf5``.  That is the offline file that you
 can use for any live report generation without needing internet access.
-
-.. note::
-
-	You will need to login with your iotile.cloud email address and password in order to download data
-	from iotile.cloud and you can only access data that belongs to devices or archives that you have 
-	access to.
-
