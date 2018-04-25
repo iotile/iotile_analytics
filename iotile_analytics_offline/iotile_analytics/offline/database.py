@@ -218,7 +218,6 @@ class OfflineDatabase(object):
                 entry['int_value'] = value
             elif value is None:
                 entry['value_type'] = PropertyTypes.NONE
-                pass # Store a None as nothing
             else:
                 raise ArgumentError("Unsupported data type in dictionary", key=key, value=value, type=type(value))
 
