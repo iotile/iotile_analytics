@@ -18,6 +18,9 @@ examples below:
 	example so that you can quickly get up to speed with no external
 	dependencies.
 
+``iotile-analytics`` works on Python 2.7+ and Python 3.5+.  There is no usage difference
+on Python 2 or Python 3.
+
 
 Generating Live Reports
 ------------------------
