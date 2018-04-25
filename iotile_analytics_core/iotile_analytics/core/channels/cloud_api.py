@@ -271,11 +271,14 @@ class IOTileCloudChannel(AnalysisGroupChannel):
     def fetch_datapoints(self, slug):
         """Fetch all data points for this stream.
 
-        These are time, value data pairs stored in the stream.
+        These are time, value data pairs stored in the stream. Internal
+        metadata about those data points is not returned. The result is a norm
+        pandas Series subclass with additional functionality to support unit
+        conversion.
 
         Args:
             slug (str): The slug of the stream that we should fetch
-                raw events for.
+                raw data points for.
 
         Returns:
             StreamSeries: A data fame with internal value as floating
@@ -306,7 +309,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         resource = self._api.data
         raw_json = self._session.fetch_all(resource, page_size=10000, message="Downloading Data", filter=slug)
 
-        dt_index =pd.to_datetime([x['timestamp'] for x in raw_json])
+        dt_index = pd.to_datetime([x['timestamp'] for x in raw_json])
         data = [x['int_value'] for x in raw_json]
 
         return StreamSeries(data, index=dt_index)

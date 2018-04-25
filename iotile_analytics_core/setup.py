@@ -16,7 +16,7 @@ setup(
         "pandas>=0.20.3",
         "scipy>=1.0.0",
         "typedargs>=0.10.0",
-        "iotile_cloud>=0.8.3",
+        "iotile_cloud>=0.9.2",
         "tqdm>=4.19.4"
     ],
     description="A data science bridge for iotile.cloud",
@@ -53,7 +53,7 @@ your use cases.
 Installation:
 
 ```
-pip install iotile_analytics
+pip install -U iotile_analytics-core
 ```
 """
 )

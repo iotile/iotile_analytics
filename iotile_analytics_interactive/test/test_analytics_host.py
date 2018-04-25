@@ -7,8 +7,8 @@ from iotile_analytics.interactive.scripts.analytics_host import main
 from iotile_analytics.core import CloudSession
 
 ARCHIVE_DATA = (
-"Source Properties\n"
-"-----------------\n"
+"Source Info\n"
+"-----------\n"
 "block                          1\n"
 "created_by                     tim\n"
 "created_on                     2017-10-27T21:23:36Z\n"
@@ -18,11 +18,13 @@ ARCHIVE_DATA = (
 "pid                            \n"
 "sg                             saver-v1-0-0\n"
 "slug                           b--0001-0000-0000-04e7\n"
-"title                          Archive: Test Saver Device (04e7)\n")
+"title                          Archive: Test Saver Device (04e7)\n"
+"\nProperties\n"
+"----------\n")
 
 DEVICE_DATA = (
-"Source Properties\n"
-"-----------------\n"
+"Source Info\n"
+"-----------\n"
 "active                         True\n"
 "claimed_by                     test\n"
 "claimed_on                     None\n"
@@ -38,7 +40,8 @@ DEVICE_DATA = (
 "sg                             water-meter-v1-1-0\n"
 "slug                           d--0000-0000-0000-00d2\n"
 "template                       1d1p2bt101es-v2-0-0\n"
-)
+"\nProperties\n"
+"----------\n")
 
 
 def test_info_report_archive_stdout(shipping, capsys):
@@ -98,7 +101,7 @@ def test_info_report_to_file(water_meter, tmpdir):
     assert out == DEVICE_DATA
 
 
-def test_info_report_to_file(water_meter, tmpdir):
+def test_info_report_to_zip(water_meter, tmpdir):
     """Make sure we can bundle into a zip."""
 
     file = str(tmpdir.join('temp_file'))
