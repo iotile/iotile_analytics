@@ -10,7 +10,6 @@ install:
 - pip install --upgrade tox-travis -r requirements_build.txt -r requirements_doc.txt
 script:
 - tox
-- sphinx-build -b html ./doc built_docs -E -W
 deploy:
   - provider: script
     skip_cleanup: true
