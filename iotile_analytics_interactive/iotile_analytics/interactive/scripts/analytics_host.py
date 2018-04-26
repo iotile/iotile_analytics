@@ -7,9 +7,9 @@ from builtins import input, str
 import argparse
 import logging
 import inspect
-import pkg_resources
 import zipfile
 import shutil
+import pkg_resources
 from future.utils import viewitems
 from iotile_analytics.core.exceptions import UsageError, AuthenticationError
 from iotile_analytics.core import CloudSession, AnalysisGroup, Environment
@@ -128,7 +128,7 @@ def find_live_reports():
         obj = entry.load()
 
         if name in reports:
-            print("WARNING: LiveReport added twice with the same name %s, replacing older version" % name)
+            print("WARNING: AnalysisTemplate added twice with the same name %s, replacing older version" % name)
 
         reports[name] = obj
 
@@ -394,7 +394,8 @@ def cmdline_main(argv=None):
         print('\nERROR: Could not log in to iotile cloud server using provided username and password.')
         retval = 1
     except UsageError as exc:
-        print("\nUSAGE ERROR: %s" % exc.message)
+        raise
+        print("\nUSAGE ERROR: %s" % exc.msg)
         for key, val in viewitems(exc.params):
             print("- %s: %s" % (key, str(val)))
 

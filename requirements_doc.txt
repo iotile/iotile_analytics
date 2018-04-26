@@ -7,3 +7,4 @@ typedargs
 pandas
 scipy
 numpy
+sphinxcontrib-programoutput

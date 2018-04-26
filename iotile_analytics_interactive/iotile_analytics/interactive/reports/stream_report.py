@@ -80,8 +80,7 @@ class StreamOverviewReport(LiveReport):
                                 tools=[BoxZoomTool(), PanTool(dimensions='width'), WheelZoomTool(dimensions="width"), ResetTool()])
         self._data.add_series(self.stream_data)
 
-        self.root = layout([self._selector.figure], [self._data.figure])
-        self.models = [self.root]
+        self.models = [self._selector.figure, self._data.figure]
 
     def _unit_name(self):
         if self.units is not None:

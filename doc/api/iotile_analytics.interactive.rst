@@ -16,6 +16,9 @@ iotile_analytics.interactive package
        iotile_analytics.interactive.app
        iotile_analytics.interactive.viewer_base
        iotile_analytics.interactive.viewer_loglog
+       iotile_analytics.interactive.viewer_timeselect
+
+
     Subpackages:
 
     .. toctree::
@@ -27,6 +30,6 @@ iotile_analytics.interactive package
 
 
 
-    ``__all__``: :class:`AnalyticsApplication <iotile_analytics.interactive.app.AnalyticsApplication>`, :class:`AnalyticsObject <iotile_analytics.interactive.app.AnalyticsObject>`, :class:`BaseViewer <iotile_analytics.interactive.viewer_base.BaseViewer>`, :class:`LogLogViewer <iotile_analytics.interactive.viewer_loglog.LogLogViewer>`, :func:`show <iotile_analytics.interactive.app.show>`
+    ``__all__``: :class:`AnalyticsApplication <iotile_analytics.interactive.app.AnalyticsApplication>`, :class:`AnalyticsObject <iotile_analytics.interactive.app.AnalyticsObject>`, :class:`BaseViewer <iotile_analytics.interactive.viewer_base.BaseViewer>`, :class:`LogLogViewer <iotile_analytics.interactive.viewer_loglog.LogLogViewer>`, :class:`TimeSelectViewer <iotile_analytics.interactive.viewer_timeselect.TimeSelectViewer>`, :func:`show <iotile_analytics.interactive.app.show>`
 
 

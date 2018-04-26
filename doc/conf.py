@@ -56,7 +56,8 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
-    'bokeh.sphinxext.bokeh_plot'
+    'bokeh.sphinxext.bokeh_plot',
+    'sphinxcontrib.programoutput'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

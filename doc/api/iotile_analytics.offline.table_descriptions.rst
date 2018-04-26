@@ -21,6 +21,8 @@ iotile_analytics.offline.table_descriptions package
 
 
 
+
+
     ``__all__``: :class:`DatabaseInfoTable <tables.description.DatabaseInfoTable>`, :class:`EventIndex <tables.description.EventIndex>`, :class:`PropertyTable <tables.description.PropertyTable>`, :class:`PropertyTypes <iotile_analytics.offline.table_descriptions.properties.PropertyTypes>`, :class:`Stream <tables.description.Stream>`
 
 
