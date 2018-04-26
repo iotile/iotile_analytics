@@ -2,6 +2,7 @@ import os
 import json
 import zipfile
 import shutil
+from io import open
 from datetime import datetime
 from jinja2 import Environment, PackageLoader, contextfunction, Markup
 from iotile_analytics.core.exceptions import UsageError
@@ -136,9 +137,9 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
 
         json_data = json.dumps(info['data'])
 
-        with open(path, "wb") as outfile:
+        with open(path, "w", encoding='utf-8') as outfile:
             write_data = "{}({});".format(info['func'], json_data)
-            outfile.write(write_data.encode('utf-8'))
+            outfile.write(write_data)
 
     @classmethod
     def find_template(cls, package, folder, name):
@@ -239,7 +240,7 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
 
         rendered_html = file_html(self.models, Resources('inline'), self.title, template, template_vars)
 
-        with open(html_path, "wb") as outfile:
+        with open(html_path, "w", encoding='utf-8') as outfile:
             outfile.write(rendered_html)
 
         if not self.standalone:

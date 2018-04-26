@@ -12,13 +12,22 @@ script:
 - tox
 - sphinx-build -b html ./doc built_docs -E -W
 deploy:
-  skip_cleanup: true
-  provider: script
-  script: python scripts/release.py $TRAVIS_TAG
-  on:
-    branch: master
-    tags: true
-    condition: $TRAVIS_PYTHON_VERSION = "2.7"
+  - provider: script
+    skip_cleanup: true
+    script: python scripts/release.py $TRAVIS_TAG
+    on:
+      branch: master
+      tags: true
+      condition: $TRAVIS_PYTHON_VERSION = "2.7"
+  - provider: pages
+    skip-cleanup: true
+    github-token: $GITHUB_TOKEN
+    keep-history: true
+    local-dir: built_docs
+    on:
+      branch: master
+      condition: $TRAVIS_PYTHON_VERSION = "3.6"
+
 notifications:
   on_success: always
   on_failure: always

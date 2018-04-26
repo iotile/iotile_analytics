@@ -19,6 +19,7 @@ setup(
         'iotile_analytics.live_report': ['basic_info = iotile_analytics.interactive.reports.info_report:SourceInfoReport',
                                          'stream_overview = iotile_analytics.interactive.reports.stream_report:StreamOverviewReport']
     },
+    include_package_data=True,
     description="A data science bridge for iotile.cloud",
     author="Arch",
     author_email="info@arch-iot.com",
