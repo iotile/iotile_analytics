@@ -164,7 +164,7 @@ def test_local_files(water_meter, tmpdir):
 
 
 def test_stream_overview_desc():
-    """Make sure we can run a report from a local file."""
+    """Make sure we can print help info for an AnalysisTemplate."""
 
     retval = main(['-t', 'stream_overview', '-l'])
     assert retval == 0

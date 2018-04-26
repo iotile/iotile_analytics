@@ -16,6 +16,7 @@ from iotile_analytics.core import CloudSession, AnalysisGroup, Environment
 from typedargs.doc_parser import ParsedDocstring
 from typedargs.exceptions import ValidationError, ArgumentError
 from typedargs.metadata import AnnotatedMetadata
+from typedargs.terminal import get_terminal_size
 from iotile_cloud.api.connection import DOMAIN_NAME
 
 
@@ -193,7 +194,14 @@ def print_report_details(report):
     try:
         if docstring is not None:
             doc = ParsedDocstring(docstring)
-            print(doc.wrap_and_format(include_params=True, include_return=False, excluded_params=['group']))
+            width, _height = get_terminal_size()
+
+            # Workaround terminals that do not support getting their width
+            # such as Travis CI's build server
+            if width is None or width <= 0:
+                width = 80
+
+            print(doc.wrap_and_format(include_params=True, width=width, include_return=False, excluded_params=['group']))
         else:
             print("Report has no usage information.")
     except ValidationError:
