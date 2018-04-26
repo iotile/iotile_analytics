@@ -172,7 +172,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             if slug in normal_counts:
                 results[slug] = normal_counts[slug]
             elif slug in stream_table:
-                results[slug] = {'points': stream_table[slug].get('data_cnt', 0), 'events': 0}
+                results[slug] = {'points': stream_table[slug].get('data_cnt', 0), 'events': stream_table[slug].get('event_cnt', 0)}
             else:
                 raise CloudError("Could not find stream to perform a count", slug=slug)
 
