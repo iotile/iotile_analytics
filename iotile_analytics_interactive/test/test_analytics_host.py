@@ -161,3 +161,10 @@ def test_local_files(water_meter, tmpdir):
         out = infile.read()
 
     assert out == DEVICE_DATA
+
+
+def test_stream_overview_desc():
+    """Make sure we can run a report from a local file."""
+
+    retval = main(['-t', 'stream_overview', '-l'])
+    assert retval == 0

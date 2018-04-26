@@ -394,7 +394,6 @@ def cmdline_main(argv=None):
         print('\nERROR: Could not log in to iotile cloud server using provided username and password.')
         retval = 1
     except UsageError as exc:
-        raise
         print("\nUSAGE ERROR: %s" % exc.msg)
         for key, val in viewitems(exc.params):
             print("- %s: %s" % (key, str(val)))
