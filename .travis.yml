@@ -6,10 +6,16 @@ python:
 - '2.7'
 - '3.6'
 - '3.5'
+matrix:
+  include:
+  - python: 3.6
+    env: BUILD_DOCS=1
 install:
 - pip install --upgrade tox-travis -r requirements_build.txt -r requirements_doc.txt
 script:
-- tox
+- if [[ "$BUILD_DOCS]" != "1" ]]; then tox; fi
+- if [[ "$BUILD_DOCS" == "1" ]]; then tox -e docs; fi
+
 deploy:
   - provider: script
     skip_cleanup: true
@@ -25,7 +31,7 @@ deploy:
     local-dir: built_docs
     on:
       branch: master
-      condition: $TRAVIS_PYTHON_VERSION = "3.6"
+      condition: $BUILD_DOC = "1"
 
 notifications:
   on_success: always
