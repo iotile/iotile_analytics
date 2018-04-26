@@ -7,7 +7,7 @@ iotile_analytics.interactive.reports.report module
 .. currentmodule:: iotile_analytics.interactive.reports.report
 
 .. automodule:: iotile_analytics.interactive.reports.report
-    :members: LiveReport
+    :members: LiveReport, include_file
     :undoc-members:
     :show-inheritance:
     :member-order: bysource
@@ -21,6 +21,13 @@ iotile_analytics.interactive.reports.report module
         :nosignatures:
 
         LiveReport
+
+    Functions:
+
+    .. autosummary::
+        :nosignatures:
+
+        include_file
 
 
 

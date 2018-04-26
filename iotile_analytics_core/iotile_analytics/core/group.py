@@ -9,7 +9,7 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from builtins import *
 from future.utils import viewitems, viewvalues
-
+from past.builtins import basestring
 import pkg_resources
 import pandas as pd
 from iotile_cloud.api.connection import DOMAIN_NAME
@@ -52,12 +52,12 @@ class AnalysisGroup(object):
         self.source_info = channel.fetch_source_info()
         self.properties = channel.fetch_properties()
         self.streams = self._parse_stream_list(stream_list)
-        self.stream_counts = channel.count_streams([x['slug'] for x in stream_list])
+        self.stream_counts = channel.count_streams([x for x in self.streams])
 
-        var_type_slugs = set([x['var_type'] for x in viewvalues(self.streams) if x['var_type'] is not None])
+        var_type_slugs = set([x['var_type'] for x in viewvalues(self.streams) if x is not None and x.get('var_type') is not None])
 
         self.variable_types = channel.fetch_variable_types(var_type_slugs)
-        self._stream_table = [(slug.lower(), self.get_stream_name(stream).lower()) for slug, stream in viewitems(self.streams)]
+        self._stream_table = [(slug.lower(), self.get_stream_name(slug).lower()) for slug in self.streams]
 
     def stream_empty(self, slug):
         """Check if a stream is empty.
@@ -106,26 +106,29 @@ class AnalysisGroup(object):
         print("{:40s} {:s}".format("Name", "Slug"))
         print("{:40s} {:s}".format("----", "----"))
 
-        for slug, stream in self.streams.items():
+        for slug in self.streams:
             if self.stream_empty(slug) and not include_empty:
                 continue
 
-            name = self.get_stream_name(stream)
+            name = self.get_stream_name(slug)
 
             if len(name) > 37:
                 name = name[:37] + '...'
 
             print('{:40s} {:s}'.format(name, slug))
 
-    @classmethod
-    def get_stream_name(cls, stream):
+    def get_stream_name(self, slug):
         """Extract a user-friendly name from a stream.
 
         Args:
-            stream (dict): A dictionary of metadata about the stream.
+            slug (str): The slug that we wish to get the name of.
         Returns:
             str: The name of the stream
         """
+
+        stream = self.streams.get(slug)
+        if stream is None:
+            return "System Data %s" % (slug[-4:].upper())
 
         name = stream.get('data_label', '')
 
@@ -209,13 +212,15 @@ class AnalysisGroup(object):
         slug = self.find_stream(slug_or_name)
         stream = self.streams[slug]
         raw = self._channel.fetch_datapoints(slug)
-        raw.set_stream(self.streams[slug])
 
-        vartype_slug = stream['var_type']
+        if stream is not None:
+            raw.set_stream(stream)
 
-        if vartype_slug is not None:
-            vartype = self.variable_types[stream['var_type']]
-            raw.set_vartype(vartype)
+            vartype_slug = stream['var_type']
+
+            if vartype_slug is not None:
+                vartype = self.variable_types[stream['var_type']]
+                raw.set_vartype(vartype)
 
         return raw
 
@@ -279,10 +284,18 @@ class AnalysisGroup(object):
 
     @classmethod
     def _parse_stream_list(cls, stream_list):
-        return {stream['slug']: stream for stream in stream_list}
+        out_streams = {}
+
+        for obj in stream_list:
+            if isinstance(obj, basestring):
+                out_streams[obj] = None
+            else:
+                out_streams[obj['slug']] = obj
+
+        return out_streams
 
     @classmethod
-    def FromDevice(cls, slug=None, external_id=None, domain=DOMAIN_NAME):
+    def FromDevice(cls, slug=None, external_id=None, domain=DOMAIN_NAME, include_system=False):
         """Create a new AnalysisGroup from a single device.
 
         The device can be found either by passing its slug or numeric
@@ -303,12 +316,15 @@ class AnalysisGroup(object):
                 so that it matches a single device.
             domain (str): Optional iotile.cloud domain to connect to (defaults to
                 https://iotile.cloud).
+            include_system (bool): Also include hidden system streams when fetching data
+                for this device.  System streams are not generally useful so this defaults
+                to False.
         """
 
         session = CloudSession(domain=domain)
         device = session.find_device(slug=slug, external_id=external_id)
 
-        channel = IOTileCloudChannel(device['slug'], source_type="device", domain=domain)
+        channel = IOTileCloudChannel(device['slug'], domain=domain, include_system=include_system)
         return AnalysisGroup(channel)
 
     @classmethod
@@ -326,7 +342,7 @@ class AnalysisGroup(object):
                 https://iotile.cloud).
         """
 
-        channel = IOTileCloudChannel(slug, source_type="datablock", domain=domain)
+        channel = IOTileCloudChannel(slug, domain=domain)
         return AnalysisGroup(channel)
 
     @classmethod
@@ -380,6 +396,7 @@ class AnalysisGroup(object):
                 data = None
                 events = None
                 raw_events = None
+
                 if not self.stream_empty(slug):
                     data = self.fetch_stream(slug)
                     events = self.fetch_events(slug)

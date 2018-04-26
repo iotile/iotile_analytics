@@ -27,9 +27,20 @@ def water_meter(mock_cloud):
 def filter_group(water_meter):
     """An AnalysisGroup from a single water meter device."""
 
-    domain, cloud = water_meter
+    domain, _cloud = water_meter
 
     CloudSession('test@arch-iot.com', 'test', domain=domain, verify=False)
 
     group = AnalysisGroup.FromDevice('d--0000-0000-0000-00d2', domain=domain)
+    return group
+
+@pytest.fixture(scope="function")
+def with_system(water_meter):
+    """An AnalysisGroup from a single water meter device."""
+
+    domain, _cloud = water_meter
+
+    CloudSession('test@arch-iot.com', 'test', domain=domain, verify=False)
+
+    group = AnalysisGroup.FromDevice('d--0000-0000-0000-00d2', domain=domain, include_system=True)
     return group

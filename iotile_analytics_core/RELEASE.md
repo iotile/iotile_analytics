@@ -1,5 +1,11 @@
 # Release Notes
 
+## 0.4.0
+
+- Allow downloading system data as well as user data.
+- Refactor data fetching and handling to accommodate data streams that do not
+  have metadata information.
+
 ## 0.3.3
 
 - Switch source_info to store properties separately so we can productively 

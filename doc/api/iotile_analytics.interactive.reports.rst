@@ -13,12 +13,17 @@ iotile_analytics.interactive.reports package
     .. toctree::
        :maxdepth: 1
 
+       iotile_analytics.interactive.reports.analysis_template
+       iotile_analytics.interactive.reports.branded_report
        iotile_analytics.interactive.reports.info_report
        iotile_analytics.interactive.reports.report
+       iotile_analytics.interactive.reports.stream_report
 
 
 
 
-    ``__all__``: :class:`LiveReport <iotile_analytics.interactive.reports.report.LiveReport>`
+
+
+    ``__all__``: :class:`BrandedReport <iotile_analytics.interactive.reports.branded_report.BrandedReport>`, :class:`LiveReport <iotile_analytics.interactive.reports.report.LiveReport>`
 
 

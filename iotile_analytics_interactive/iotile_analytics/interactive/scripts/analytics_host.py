@@ -1,25 +1,100 @@
-"""A cmdline host for running LiveReports on data from iotile.cloud."""
+"""A cmdline host for running AnalysisTemplates on data from iotile.cloud."""
 
 from __future__ import absolute_import, unicode_literals, print_function
 import sys
 import os
-from future.utils import viewitems
-from builtins import input
+from builtins import input, str
 import argparse
 import logging
 import inspect
+import zipfile
+import shutil
+import pkg_resources
+from future.utils import viewitems
+from iotile_analytics.core.exceptions import UsageError, AuthenticationError
+from iotile_analytics.core import CloudSession, AnalysisGroup, Environment
 from typedargs.doc_parser import ParsedDocstring
 from typedargs.exceptions import ValidationError, ArgumentError
 from typedargs.metadata import AnnotatedMetadata
+from typedargs.terminal import get_terminal_size
 from iotile_cloud.api.connection import DOMAIN_NAME
-import pkg_resources
-from builtins import str
-from iotile_analytics.core import CloudSession, AnalysisGroup, Environment
 
 
 DESCRIPTION = \
-"""Generate a LiveReport from data stored locally or in iotile.cloud.
+"""Run precreated analysis templates against devices or archives stored locally or in iotile.cloud.
 
+analytics-host is designed to let people quickly run precreated analysis
+operatation on their data. An example would be creating a summary report that
+shows high level information about all data received from a given device or
+inside of a particular archive.
+
+You do not need to have an internet connection to use analytics-host.  While
+it can automatically pull your information from iotile.cloud using your login
+credentials, it can also run most analyses locally using predownloaded data
+that you have on your computer.
+
+The most up-to-date reference information is always available online at:
+http://iotile-analytics.readthedocs.io/en/latest/
+
+Most of the analysis templates included with analytics-host create interactive
+html web pages that embed graphs, controls and tables showing the results of
+the analysis performed.  These html files are designed to be opened in any
+modern web browser and typically do not need an internet connection.
+
+basic usage:
+
+- analytics-host will ask you to confirm everything before you do it unless
+  you pass the -c flag indicating that you don't want this behavior.
+
+- you typically need to specify an output path for where the results of your
+  analysis should be saved.  You do this using the -o,--output <path> flag.
+  Some simple analysis templates can just print their output to the screen
+  but most require a file.  Some analysis template generate many files so the
+  path you pass here will be interpreted as a directory where all of the files
+  should be saved.
+
+- you need to identify the data you are looking for in the cloud by its *slug*
+  which is an alphanumeric identifier that starts with d-- for a device or
+  b-- for an archive.
+
+  For example, "d--0000-0000-0000-0123" or "b--0001-0000-0000-0100".
+
+- if your analysis generates multiple files you can have analytics-host bundle
+  them into a zip file for you by using the `-b` flag.
+
+examples:
+
+To see what types of analysis you have installed run:
+$ analytics-host -l
+
+To see help information about a specific AnalysisTemplate, pass it by name
+using -t along with -l:
+$ analytics-host -l -t basic_info
+
+To see this help information do:
+$ analytics-host -h
+
+If you have the package iotile-analytics-offline installed, you can download
+all data from a specific device for offline access using:
+$ analytics-host -t save_hdf5 <device slug> -o <output_path> -c
+
+advanced usage:
+
+Some analysis templates are configurable and require that you pass them
+arguments.  You can see if any arguments are accepted by running:
+$ analytics-host -l -t <template name>
+
+If you do need to pass arguments, you must pass them using the `-a, --arg`
+option in the form of `name=value` where name is the parameter name
+shown in the above command and value is the value you want to pass.
+
+For example, if you had a template named "excited_report" that took a
+parameter named title as a string and show_bold as a boolean, you would
+invoke it using:
+$ analytics-host -t excited_report -a "title=Your Title" -a show_bold=true
+
+Note that you need to use quote around your first argument since it contains a
+space.  Quotes around an argument not containing a space are optional.
 """
 
 
@@ -32,13 +107,14 @@ def build_args():
     parser.add_argument('-n', '--no-verify', action="store_true", help="Do not verify the SSL certificate of iotile.cloud")
     parser.add_argument('-p', '--password', default=None, type=str, help="Your iotile.cloud password.  If not specified it will be prompted when needed.")
     parser.add_argument('-o', '--output', type=str, default=None, help="The output path that you wish to save the report at.")
-    parser.add_argument('-t', '--report', type=str, help="The name of the report to generate")
-    parser.add_argument('-a', '--arg', action="append", default=[], help="Pass an argument to the livereport you are generating, should be in the form name=value")
-    parser.add_argument('-c', '--no-confirm', action="store_true", help="Do not confirm the report that you are about to generate and prompt for parameters")
-    parser.add_argument('-l', '--list', action="store_true", help="List all known report types without running one")
+    parser.add_argument('-t', '--template', type=str, help="The name of the analysis template to run")
+    parser.add_argument('-s', '--include-system', action="store_true", help="Also include hidden system streams.  This only affects reports created from device objects, not projects or datablocks/archives")
+    parser.add_argument('-a', '--arg', action="append", default=[], help="Pass an argument to the template you are running, should be in the form name=value")
+    parser.add_argument('-c', '--no-confirm', action="store_true", help="Do not confirm the analysis that you are about to perforn and prompt for parameters")
+    parser.add_argument('-l', '--list', action="store_true", help="List all known analysis types without running one")
     parser.add_argument('-b', '--bundle', action="store_true", help="Bundle the rendered output into a zip file")
     parser.add_argument('-d', '--domain', default=DOMAIN_NAME, help="Domain to use for remote queries, defaults to https://iotile.cloud")
-    parser.add_argument('analysis_group', default=None, nargs='?', help="The slug or path of the object you want to generate a report on")
+    parser.add_argument('analysis_group', default=None, nargs='?', help="The slug or path of the object you want to perform analysis on")
 
     return parser
 
@@ -53,7 +129,7 @@ def find_live_reports():
         obj = entry.load()
 
         if name in reports:
-            print("WARNING: LiveReport added twice with the same name %s, replacing older version" % name)
+            print("WARNING: AnalysisTemplate added twice with the same name %s, replacing older version" % name)
 
         reports[name] = obj
 
@@ -92,8 +168,8 @@ def list_known_reports():
     logger = logging.getLogger()
     reports = find_live_reports()
 
-    print("Installed Report Count: %d\n" % len(reports))
-    print("Known Reports:")
+    print("Installed AnalysisTemplate Count: %d\n" % len(reports))
+    print("Known Analysis Templates:")
     for name, obj in viewitems(reports):
         desc = 'No description given.'
 
@@ -103,8 +179,8 @@ def list_known_reports():
                 doc = ParsedDocstring(docstring)
                 desc = doc.short_desc
         except ValidationError:
-            logger.exception("Error parsing docstring for report type %s, class %s", name, obj)
-            desc = 'Error parsing docstring for report class.'
+            logger.exception("Error parsing docstring for AnalysisTemplate type %s, class %s", name, obj)
+            desc = 'Error parsing docstring for AnalysisTemplate class.'
 
         print(" - %s: %s" % (name, desc))
 
@@ -118,7 +194,14 @@ def print_report_details(report):
     try:
         if docstring is not None:
             doc = ParsedDocstring(docstring)
-            print(doc.wrap_and_format(include_params=True, include_return=False, excluded_params=['group']))
+            width, _height = get_terminal_size()
+
+            # Workaround terminals that do not support getting their width
+            # such as Travis CI's build server
+            if width is None or width <= 0:
+                width = 80
+
+            print(doc.wrap_and_format(include_params=True, width=width, include_return=False, excluded_params=['group']))
         else:
             print("Report has no usage information.")
     except ValidationError:
@@ -135,23 +218,25 @@ def find_analysis_group(args):
 
     if group.startswith('d--'):
         is_cloud = True
-        generator = lambda x: AnalysisGroup.FromDevice(x, domain=args.domain)
+        generator = lambda x: AnalysisGroup.FromDevice(x, domain=args.domain, include_system=args.include_system)
     elif group.startswith('b--'):
         is_cloud = True
         generator = lambda x: AnalysisGroup.FromArchive(x, domain=args.domain)
     elif os.path.exists(group):
         _name, ext = os.path.splitext(group)
         if ext != '.hdf5':
-            raise ValueError("Only hdf5 formatted local analysis group files are supported")
+            raise UsageError("Only hdf5 formatted local analysis group files are supported")
 
         generator = lambda x: AnalysisGroup.FromSaved(x, 'hdf5')
+    else:
+        raise UsageError("Could not find object specified for report source: %s" % group)
 
     if not args.no_confirm:
         if is_cloud:
-            print("Running report %s against object %s in the cloud" % (args.report, group))
+            print("Running report %s against object %s in the cloud" % (args.template, group))
             print("You will need to provide your iotile.cloud login credentials.")
         else:
-            print("Running report %s against local file %s" % (args.report, group))
+            print("Running report %s against local file %s" % (args.template, group))
 
         resp = input(" - Are you sure you wish to continue (y/n)? ")
         if resp.lower() != 'y':
@@ -219,18 +304,17 @@ def split_args(args):
     return split_args
 
 
-def render_report(report_class, group, output_path=None, args=None, bundle=False, domain=None):
-    """Render a report to an output path or the console."""
+def perform_analysis(report_class, group, output_path=None, args=None, bundle=False, domain=None):
+    """Save the results of an AnalysisTemplate to an output path or the console."""
 
     if args is None:
         args = {}
-
 
     metadata = AnnotatedMetadata(report_class)
     metadata.load_from_doc = True
 
     if 'domain' in args:
-        raise ValueError("You cannot explicitly pass a domain argument to a report.")
+        raise UsageError("You cannot explicitly pass a domain argument to an AnalysisTemplate.")
 
     if 'domain' in metadata.arg_names:
         args['domain'] = domain
@@ -240,9 +324,31 @@ def render_report(report_class, group, output_path=None, args=None, bundle=False
     report_obj = report_class(group, **conv_args)
 
     if not report_obj.standalone and output_path is None:
-        raise ValueError("You must specify an output path for this report type.")
+        raise UsageError("You must specify an output path for this AnalysisTemplate type.")
 
-    return report_obj.render(output_path, bundle=bundle)
+    paths = report_obj.run(output_path)
+    if paths is None:
+        paths = []
+
+    if bundle and len(paths) == 0:
+        raise UsageError("The report did not produce any output files so there is nothing to bundle.")
+
+    if bundle:
+        output_name = os.path.splitext(output_path)[0]
+        bundle_path = output_name + ".zip"
+        if report_obj.standalone:
+            main_path = paths[0]
+
+            zip_obj = zipfile.ZipFile(bundle_path, 'w', zipfile.ZIP_DEFLATED)
+            zip_obj.write(main_path, os.path.basename(main_path))
+            os.remove(main_path)
+        else:
+            shutil.make_archive(output_path, "zip", os.path.join(output_path, '..'), os.path.relpath(output_path, start=os.path.join(output_path, '..')))
+            shutil.rmtree(output_path)
+
+        return [bundle_path]
+
+    return paths
 
 
 def main(argv=None):
@@ -259,14 +365,14 @@ def main(argv=None):
 
     setup_logging(args)
 
-    if args.list and args.report is None:
+    if args.list and args.template is None:
         list_known_reports()
         return 0
 
     reports = find_live_reports()
-    report_obj = reports.get(args.report)
+    report_obj = reports.get(args.template)
     if report_obj is None:
-        print("ERROR: could not find report by name: %s\n" % args.report)
+        print("ERROR: could not find report by name: %s\n" % args.template)
         list_known_reports()
         return 1
 
@@ -274,17 +380,32 @@ def main(argv=None):
         print_report_details(report_obj)
         return 0
 
-    try:
-        report_args = split_args(args.arg)
-        group = find_analysis_group(args)
+    report_args = split_args(args.arg)
+    group = find_analysis_group(args)
 
-        check_arguments(report_obj, report_args, confirm=not args.no_confirm)
+    check_arguments(report_obj, report_args, confirm=not args.no_confirm)
 
-        rendered_path = render_report(report_obj, group, args.output, args=report_args, bundle=args.bundle, domain=args.domain)
-        if args.output is not None:
-            print("Rendered report to: %s" % rendered_path)
-    except ValueError as exc:
-        print("ERROR: %s" % exc.message)
-        return 1
+    rendered_paths = perform_analysis(report_obj, group, args.output, args=report_args, bundle=args.bundle, domain=args.domain)
+    if len(rendered_paths) > 0:
+        print("Rendered report to: %s" % rendered_paths[0])
+
 
     return 0
+
+
+def cmdline_main(argv=None):
+    """Wrapper around main that catches exceptions and prints them nicely."""
+
+    try:
+        retval = main(argv)
+    except AuthenticationError:
+        print('\nERROR: Could not log in to iotile cloud server using provided username and password.')
+        retval = 1
+    except UsageError as exc:
+        print("\nUSAGE ERROR: %s" % exc.msg)
+        for key, val in viewitems(exc.params):
+            print("- %s: %s" % (key, str(val)))
+
+        retval = 2
+
+    return retval

@@ -89,6 +89,27 @@ class StreamSeries(pd.DataFrame):
 
         return (m, d, o)
 
+    def apply_mdo(self, m, d, o):
+        """Convert this stream by applying a fixed m, d, o transformation.
+
+        Args:
+            m (float): The number to multiply by.
+            d (float): The number to divide by.
+            o (float): The number to add as an offset.
+
+        Returns:
+            pd.DataFrame: The converted data stream.
+        """
+
+        out = pd.DataFrame(self.values, copy=True, index=self.index)
+
+        out[0] *= float(m)
+        out[0] /= float(d)
+        out[0] += float(o)
+
+        return out
+
+
     def convert(self, units):
         """Convert this stream to another set of supported units.
 
@@ -99,12 +120,5 @@ class StreamSeries(pd.DataFrame):
             pd.DataFrame: The converted data stream.
         """
 
-        out = pd.DataFrame(self.values, copy=True, index=self.index)
-
         m, d, o = self._mdo_for_unit(units)
-
-        out[0] *= float(m)
-        out[0] /= float(d)
-        out[0] += float(o)
-
-        return out
+        return self.apply_mdo(m, d, o)

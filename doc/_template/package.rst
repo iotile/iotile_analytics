@@ -19,7 +19,7 @@
 {% for item in submodules %}
        {{ fullname }}.{{ item }}
        {%- endfor %}
-    {%- endif -%}
+    {%- endif %}
 
 {% if subpackages %}
     Subpackages:

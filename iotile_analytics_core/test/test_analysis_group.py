@@ -8,7 +8,7 @@ import pytest
 from typedargs.exceptions import ArgumentError
 from iotile_analytics.core import CloudSession, AnalysisGroup
 from iotile_analytics.core.stream_series import StreamSeries
-from iotile_analytics.core.exceptions import AuthenticationError, CertificateVerificationError
+from iotile_analytics.core.exceptions import AuthenticationError, CertificateVerificationError, CloudError
 
 
 def test_session_login(water_meter):
@@ -126,3 +126,16 @@ def test_channel_info(filter_group):
     props = filter_group.properties
     assert props['CargoDescription'] == 'SO# 83469'
     assert props['Country'] == 'KOREA'
+
+
+def test_hidden_streams(filter_group, with_system):
+    """Make sure we can successfully download streams with and without system info."""
+
+    nosys_group = filter_group
+    withsys_group = with_system
+
+    with pytest.raises(ArgumentError):
+        nosys_group.fetch_stream('5c00')
+
+    data = withsys_group.fetch_stream('5c00')
+    assert len(data) == 4

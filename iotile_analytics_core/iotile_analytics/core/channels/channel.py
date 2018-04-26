@@ -4,12 +4,11 @@
 class AnalysisGroupChannel(object):
     """A delegate object that can find and download streams.
 
-    AnalysisGroupChannels must provide ways to locate streams,
-    download time series data and event data for them as well
-    as a few other routines.  AnalysisGroups delegate requests
-    for streams to their internal AnalysisGroupChannel so that
-    you can access IOTile data that is either stored locally
-    or remotely.
+    AnalysisGroupChannels must provide ways to locate streams, download time
+    series data and event data for them as well as a few other routines.
+    AnalysisGroups delegate requests for streams to their internal
+    AnalysisGroupChannel so that you can access IOTile data that is either
+    stored locally or remotely.
     """
 
     def list_streams(self):

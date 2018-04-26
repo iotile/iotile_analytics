@@ -1,21 +1,39 @@
 language: python
+cache: 
+  pip: true
 sudo: false
 python:
 - '2.7'
 - '3.6'
 - '3.5'
+matrix:
+  include:
+  - python: 3.6
+    env: TRAVIS_BUILD_DOCS=1
 install:
 - pip install --upgrade tox-travis -r requirements_build.txt
 script:
-- tox
+- if [[ "$TRAVIS_BUILD_DOCS" != "1" ]]; then tox; fi
+- if [[ "$TRAVIS_BUILD_DOCS" == "1" ]]; then tox -e docs; fi
+
 deploy:
-  skip_cleanup: true
-  provider: script
-  script: python scripts/release.py $TRAVIS_TAG
-  on:
-    branch: master
-    tags: true
-    condition: $TRAVIS_PYTHON_VERSION = "2.7"
+  - provider: script
+    skip_cleanup: true
+    script: python scripts/release.py $TRAVIS_TAG
+    on:
+      branch: master
+      tags: true
+      condition: $TRAVIS_PYTHON_VERSION = "2.7"
+  - provider: pages
+    skip-cleanup: true
+    github-token: $GITHUB_TOKEN
+    committer-from-gh: true
+    keep-history: true
+    local-dir: built_docs
+    on:
+      branch: master
+      condition: $TRAVIS_BUILD_DOCS = "1"
+
 notifications:
   on_success: always
   on_failure: always

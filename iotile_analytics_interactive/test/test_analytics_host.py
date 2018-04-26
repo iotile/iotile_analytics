@@ -2,13 +2,14 @@
 
 from __future__ import unicode_literals
 import json
+import os
 import zipfile
 from iotile_analytics.interactive.scripts.analytics_host import main
 from iotile_analytics.core import CloudSession
 
 ARCHIVE_DATA = (
-"Source Properties\n"
-"-----------------\n"
+"Source Info\n"
+"-----------\n"
 "block                          1\n"
 "created_by                     tim\n"
 "created_on                     2017-10-27T21:23:36Z\n"
@@ -18,11 +19,13 @@ ARCHIVE_DATA = (
 "pid                            \n"
 "sg                             saver-v1-0-0\n"
 "slug                           b--0001-0000-0000-04e7\n"
-"title                          Archive: Test Saver Device (04e7)\n")
+"title                          Archive: Test Saver Device (04e7)\n"
+"\nProperties\n"
+"----------\n")
 
 DEVICE_DATA = (
-"Source Properties\n"
-"-----------------\n"
+"Source Info\n"
+"-----------\n"
 "active                         True\n"
 "claimed_by                     test\n"
 "claimed_on                     None\n"
@@ -38,7 +41,8 @@ DEVICE_DATA = (
 "sg                             water-meter-v1-1-0\n"
 "slug                           d--0000-0000-0000-00d2\n"
 "template                       1d1p2bt101es-v2-0-0\n"
-)
+"\nProperties\n"
+"----------\n")
 
 
 def test_info_report_archive_stdout(shipping, capsys):
@@ -88,6 +92,9 @@ def test_info_report_to_file(water_meter, tmpdir):
 
     assert out == DEVICE_DATA
 
+    # Prepare for the next test
+    os.remove(file + '.txt')
+
     # Make sure .txt is properly stripped
     retval = main(['-t', 'basic_info', slug, '-d', domain, '--no-verify', '-o', file + '.txt', '-c'])
     assert retval == 0
@@ -98,7 +105,7 @@ def test_info_report_to_file(water_meter, tmpdir):
     assert out == DEVICE_DATA
 
 
-def test_info_report_to_file(water_meter, tmpdir):
+def test_info_report_to_zip(water_meter, tmpdir):
     """Make sure we can bundle into a zip."""
 
     file = str(tmpdir.join('temp_file'))
@@ -132,3 +139,32 @@ def test_user_pass_handling(water_meter, capsys):
     out, _err = capsys.readouterr()
 
     assert out == DEVICE_DATA
+
+
+def test_local_files(water_meter, tmpdir):
+    """Make sure we can run a report from a local file."""
+
+    domain, _cloud = water_meter
+    slug = 'd--0000-0000-0000-00d2'
+
+    saved_file = str(tmpdir.join('saved_file.hdf5'))
+    file = str(tmpdir.join('temp_file.txt'))
+
+    retval = main(['-t', 'save_hdf5', slug, '-d', domain, '--no-verify', '-o', saved_file, '-c'])
+    assert retval == 0
+    assert os.path.isfile(saved_file)
+
+    retval = main(['-t', 'basic_info', saved_file, '-o', file, '-c'])
+    assert retval == 0
+
+    with open(file, 'r') as infile:
+        out = infile.read()
+
+    assert out == DEVICE_DATA
+
+
+def test_stream_overview_desc():
+    """Make sure we can print help info for an AnalysisTemplate."""
+
+    retval = main(['-t', 'stream_overview', '-l'])
+    assert retval == 0

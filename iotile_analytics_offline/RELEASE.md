@@ -1,5 +1,10 @@
 # Release Notes
 
+## 0.2.1
+
+- Fix bug when saving streams that do not have metadata associated with them.
+  Now we correctly unserialize them.
+
 ## 0.2.0
 
 - Improve saving of hdf5 files when overwriting old files or reading from

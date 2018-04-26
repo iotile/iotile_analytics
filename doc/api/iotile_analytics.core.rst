@@ -18,6 +18,8 @@ iotile_analytics.core package
        iotile_analytics.core.group
        iotile_analytics.core.session
        iotile_analytics.core.stream_series
+
+
     Subpackages:
 
     .. toctree::

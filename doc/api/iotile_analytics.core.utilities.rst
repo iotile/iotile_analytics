@@ -20,6 +20,8 @@ iotile_analytics.core.utilities package
 
 
 
+
+
     ``__all__``: :class:`TimeseriesSelector <iotile_analytics.core.utilities.aggregator.TimeseriesSelector>`, :func:`combine_domains <iotile_analytics.core.utilities.domain.combine_domains>`, :func:`envelope <iotile_analytics.core.utilities.envelope.envelope>`, :func:`find_domain <iotile_analytics.core.utilities.domain.find_domain>`
 
 

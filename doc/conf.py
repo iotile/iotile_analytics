@@ -14,13 +14,12 @@
 
 import sys
 import os
-import shlex
 
 # Set environment variables so bokeh plot plugin will work
 os.environ['BOKEH_DOCS_MISSING_API_KEY_OK'] = "1"
 
-on_rtd = os.environ.get('READTHEDOCS') == 'True'
-if on_rtd:
+ON_RTD = os.environ.get('READTHEDOCS') == 'True'
+if ON_RTD:
     from unittest.mock import MagicMock
 
     class _Mock(MagicMock):
@@ -57,7 +56,8 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
-    'bokeh.sphinxext.bokeh_plot'
+    'bokeh.sphinxext.bokeh_plot',
+    'sphinxcontrib.programoutput'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -138,8 +138,7 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if not on_rtd:  # only import and set the theme if we're building docs locally
+if not ON_RTD:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
     html_theme = 'sphinx_rtd_theme'
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]

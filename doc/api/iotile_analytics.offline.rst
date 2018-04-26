@@ -16,6 +16,8 @@ iotile_analytics.offline package
        iotile_analytics.offline.database
        iotile_analytics.offline.integration
        iotile_analytics.offline.report
+
+
     Subpackages:
 
     .. toctree::
