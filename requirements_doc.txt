@@ -8,3 +8,4 @@ pandas
 scipy
 numpy
 sphinxcontrib-programoutput
+tables==3.4.2
