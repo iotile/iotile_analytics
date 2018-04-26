@@ -1,0 +1,663 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.core.session &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.core.session</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.core.session</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Simple session management system to save an iotile.cloud token.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span>
+                        <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">range</span>
+
+<span class="c1"># For some reason using the future input = raw_input patch in builtins</span>
+<span class="c1"># does not work on jupyter so fall back to this manual patch.</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="n">raw_input</span>
+<span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">ssl</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1">#python2</span>
+    <span class="kn">from</span> <span class="nn">urllib2</span> <span class="k">import</span> <span class="n">urlopen</span><span class="p">,</span> <span class="n">Request</span>
+    <span class="kn">from</span> <span class="nn">urllib</span> <span class="k">import</span> <span class="n">urlencode</span>
+    <span class="kn">import</span> <span class="nn">requests.packages.urllib3</span> <span class="k">as</span> <span class="nn">urllib3</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1">#python3</span>
+    <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="k">import</span> <span class="n">urlopen</span><span class="p">,</span> <span class="n">Request</span>
+    <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urlencode</span>
+    <span class="kn">import</span> <span class="nn">requests.packages.urllib3</span> <span class="k">as</span> <span class="nn">urllib3</span>
+
+<span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Lock</span>
+<span class="kn">from</span> <span class="nn">multiprocessing.pool</span> <span class="k">import</span> <span class="n">ThreadPool</span>
+<span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">ArgumentError</span>
+<span class="kn">from</span> <span class="nn">iotile_cloud.api.connection</span> <span class="k">import</span> <span class="n">Api</span><span class="p">,</span> <span class="n">DOMAIN_NAME</span>
+<span class="kn">from</span> <span class="nn">iotile_cloud.api.exceptions</span> <span class="k">import</span> <span class="n">HttpNotFoundError</span><span class="p">,</span> <span class="n">HttpClientError</span><span class="p">,</span> <span class="n">RestHttpBaseException</span><span class="p">,</span> <span class="n">HttpCouldNotVerifyServerError</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="k">import</span> <span class="n">CloudError</span><span class="p">,</span> <span class="n">AuthenticationError</span><span class="p">,</span> <span class="n">CertificateVerificationError</span>
+<span class="kn">from</span> <span class="nn">.interaction</span> <span class="k">import</span> <span class="n">ProgressBar</span>
+
+
+<div class="viewcode-block" id="CloudSession"><a class="viewcode-back" href="../../../api/iotile_analytics.core.session.html#iotile_analytics.core.session.CloudSession">[docs]</a><span class="k">class</span> <span class="nc">CloudSession</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A persistent session to IOTile.cloud.</span>
+
+<span class="sd">    CloudSession internally caches results and information from iotile.cloud</span>
+<span class="sd">    so that you don&#39;t have to login multiple times per script invocation.</span>
+
+<span class="sd">    All caching is performed on a per domain basis so you can have multiple sessions</span>
+<span class="sd">    going to different IOTile.cloud instances if needed.  If you login to the same</span>
+<span class="sd">    domain mulitple times with different users, the cache for that domain will be</span>
+<span class="sd">    cleared with each login.</span>
+
+<span class="sd">    You can create a CloudSession instance with no arguments and it will use stored credentials</span>
+<span class="sd">    from the last time you logged into that cloud server.  So you can do:</span>
+
+<span class="sd">    CloudSession(user=&quot;Username&quot;, password=&quot;Password&quot;)</span>
+
+<span class="sd">    and then later just call:</span>
+<span class="sd">    CloudSession()</span>
+
+<span class="sd">    The SSL certificate verification option is also saved with each successful login</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (str): The user name to login with</span>
+<span class="sd">        password (str): The user&#39;s password</span>
+<span class="sd">        domain (str): The complete domain name of the iotile.cloud instance to login to.</span>
+<span class="sd">            This defaults to https://iotile.cloud</span>
+<span class="sd">        concurrence (int): The maximum number of simultaneous requests to send to iotile.cloud</span>
+<span class="sd">            when we are requesting multiple resources at a time.  Default: CloudSession.MAX_CONCURRENCY</span>
+<span class="sd">        verify (bool): If set to false, do not verify the SSL certificate of the remote</span>
+<span class="sd">            iotile.cloud server.  This option is **NOT RECOMMENDED** but sometimes required</span>
+<span class="sd">            if you are behind a corporate firewall that terminates SSL connections at the</span>
+<span class="sd">            firewall and uses a self-signed certificate.  Setting this option allows your</span>
+<span class="sd">            connection to iotile.cloud to be intercepted by third parties in a Man in the</span>
+<span class="sd">            Middle Attack.  Obviously, the default option is True.  If you don&#39;t pass any option here</span>
+<span class="sd">            the default is use the same verification options that were used in the last successful</span>
+<span class="sd">            login to the domain that you are talking to.</span>
+<span class="sd">        token (str): An optional, manually entered IOTile token.</span>
+<span class="sd">            If valid, bypasses the user+password login, then proceeds as usual</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">MAX_CONCURRENCY</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">_login_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1">#pytest: disable=R0913; These arguments are all necessary and appropriate, with sane defaults</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">DOMAIN_NAME</span><span class="p">,</span> <span class="n">concurrency</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">concurrency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">concurrency</span> <span class="o">=</span> <span class="n">CloudSession</span><span class="o">.</span><span class="n">MAX_CONCURRENCY</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="n">ThreadPool</span><span class="p">(</span><span class="n">concurrency</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">domain</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">CloudSession</span><span class="o">.</span><span class="n">_login_cache</span><span class="p">:</span>
+            <span class="n">CloudSession</span><span class="o">.</span><span class="n">_login_cache</span><span class="p">[</span><span class="n">domain</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;requests&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;request_lock&#39;</span><span class="p">:</span> <span class="n">Lock</span><span class="p">()}</span>
+
+        <span class="c1"># If we are logging in with a different user than before, clear out the old cache data.</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="n">CloudSession</span><span class="o">.</span><span class="n">_login_cache</span><span class="p">[</span><span class="n">domain</span><span class="p">]</span>
+        <span class="k">with</span> <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;request_lock&#39;</span><span class="p">]:</span>
+            <span class="n">old_user</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">old_user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">old_user</span> <span class="o">!=</span> <span class="n">user</span><span class="p">:</span>
+                <span class="n">CloudSession</span><span class="o">.</span><span class="n">_login_cache</span><span class="p">[</span><span class="n">domain</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;requests&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;request_lock&#39;</span><span class="p">:</span> <span class="n">Lock</span><span class="p">()}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">domain</span>
+
+        <span class="k">if</span> <span class="n">verify</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="o">=</span> <span class="n">verify</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;verify&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">token</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">token_type</span> <span class="o">=</span> <span class="s2">&quot;jwt&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;token&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">token_type</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;token_type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_api</span> <span class="o">=</span> <span class="n">Api</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verify</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">set_token</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_type</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_token</span><span class="p">():</span>
+                <span class="k">with</span> <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;request_lock&#39;</span><span class="p">]:</span>
+                    <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span>
+                    <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;token_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_type</span>
+                    <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;verify&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">verify</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="s2">&quot;Could not login to IOTile.cloud&quot;</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
+
+        <span class="c1"># Explictly log in if we&#39;re passed all of the right information</span>
+        <span class="c1"># or our current token is invalid</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_token</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Please enter your IOTile.cloud email: &quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">password</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">&quot;Please enter your IOTile.cloud password: &quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">urllib3</span><span class="o">.</span><span class="n">disable_warnings</span><span class="p">(</span><span class="n">urllib3</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">InsecureRequestWarning</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">RestHttpBaseException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_translate_error</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s2">&quot;Error logging into iotile.cloud&quot;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="s2">&quot;Could not login to IOTile.cloud&quot;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">token_type</span>
+
+        <span class="k">with</span> <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;request_lock&#39;</span><span class="p">]:</span>
+            <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span>
+            <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;token&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span>
+            <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;token_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_type</span>
+            <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;verify&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">verify</span>
+
+
+    <span class="k">def</span> <span class="nf">_check_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Verify that we&#39;re able to log in to IOTile.cloud with our token.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">account</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="n">HttpClientError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="CloudSession.fetch_multiple"><a class="viewcode-back" href="../../../api/iotile_analytics.core.session.html#iotile_analytics.core.session.CloudSession.fetch_multiple">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_multiple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="n">per_call_kw</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch multiple resources in parallel.</span>
+
+<span class="sd">        Up to concurrency max calls are in flight at a given time.  The results</span>
+<span class="sd">        are returned in the same order as resources is passed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resources (RestResource[]): Should be created from an Api object.</span>
+<span class="sd">            per_call_kw (dict[]): An optional set of keyword arguments that should be individual</span>
+<span class="sd">                for each fetch call.  For example, you could pass a custom filter argument for</span>
+<span class="sd">                each call.</span>
+<span class="sd">            message (str): Optional descriptive message that is printed with the progress bar</span>
+<span class="sd">            **kwargs (str): Additional keyword arguments that are passed as part of</span>
+<span class="sd">                the query string in the get request.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict[]: A list of the results for each resource.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">per_call_kw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">per_call_kw</span> <span class="o">=</span> <span class="p">[{}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">))]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">per_call_kw</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;You must pass the same number of per_call keyword arguments as resources (or none at all)&quot;</span><span class="p">,</span> <span class="n">fetch_length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">),</span> <span class="n">kw_length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">per_call_kw</span><span class="p">))</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">),</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">progbar</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">_merge_dicts</span><span class="p">(</span><span class="n">per_call_kw</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">),</span> <span class="n">progbar</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">resources</span><span class="p">)]</span>
+                <span class="n">wrapped_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resource_fetcher</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+                <span class="n">failed</span> <span class="o">=</span> <span class="p">[</span><span class="n">err</span> <span class="k">for</span> <span class="n">result</span><span class="p">,</span> <span class="n">err</span> <span class="ow">in</span> <span class="n">wrapped_results</span> <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">failed</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">failed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="k">return</span> <span class="p">[</span><span class="n">result</span> <span class="k">for</span> <span class="n">result</span><span class="p">,</span> <span class="n">_err</span> <span class="ow">in</span> <span class="n">wrapped_results</span><span class="p">]</span>
+        <span class="k">except</span> <span class="n">RestHttpBaseException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate_error</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Error fetching resources in parallel from IOTile.cloud&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CloudSession.fetch_all"><a class="viewcode-back" href="../../../api/iotile_analytics.core.session.html#iotile_analytics.core.session.CloudSession.fetch_all">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch and concatenate all pages of a given resource.</span>
+
+<span class="sd">        The pages are fetched in parallel using up to concurrency requests</span>
+<span class="sd">        at a time.</span>
+
+<span class="sd">        If one page request fails, the fetch fails.  A single call is made to</span>
+<span class="sd">        figure out how many results there are and then batched calls are made</span>
+<span class="sd">        to download the pages in parallel.</span>
+
+<span class="sd">        The RestResource is accessed using get with any keyword arguments passed</span>
+<span class="sd">        to this function.</span>
+
+<span class="sd">        **You cannot pass the page keyword argument to this function explicitly since</span>
+<span class="sd">        that keyword is generated and used internally.**</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resource (RestResource): Should be created from an Api object.</span>
+<span class="sd">            page_size (int): The desired page size to use for fetches.</span>
+<span class="sd">            message (str): Optional descriptive message that is printed with the progress bar</span>
+<span class="sd">            **kwargs (str): Additional keyword arguments that are passed as part of</span>
+<span class="sd">                the query string in the get request.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict[]: A list of the results concatenated from all pages.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span> <span class="k">as</span> <span class="n">progbar</span><span class="p">:</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">page_size</span><span class="o">=</span><span class="n">page_size</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">total_count</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="p">[])</span>
+
+                <span class="k">if</span> <span class="n">total_count</span> <span class="o">&lt;=</span> <span class="n">page_size</span><span class="p">:</span>
+                    <span class="n">progbar</span><span class="o">.</span><span class="n">total</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">progbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">results</span>
+
+                <span class="n">pages</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">total_count</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">page_size</span><span class="p">)))</span>
+                <span class="n">progbar</span><span class="o">.</span><span class="n">total</span> <span class="o">=</span> <span class="n">pages</span>
+                <span class="n">progbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+                <span class="n">args</span> <span class="o">=</span> <span class="p">[(</span><span class="n">resource</span><span class="p">,</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">page_size</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">progbar</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pages</span><span class="p">)]</span>
+
+                <span class="n">wrapped_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_url_fetcher</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+                <span class="n">failed</span> <span class="o">=</span> <span class="p">[</span><span class="n">err</span> <span class="k">for</span> <span class="n">result</span><span class="p">,</span> <span class="n">err</span> <span class="ow">in</span> <span class="n">wrapped_results</span> <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">failed</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">failed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">result</span><span class="p">,</span> <span class="n">_err</span> <span class="ow">in</span> <span class="n">wrapped_results</span><span class="p">:</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;results&#39;</span><span class="p">))</span>
+
+                <span class="k">return</span> <span class="n">results</span>
+        <span class="k">except</span> <span class="n">RestHttpBaseException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate_error</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Error fetching resource from IOTile.cloud&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">resource</span><span class="o">.</span><span class="n">url</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">_resource_fetcher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="n">resource</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">progress</span> <span class="o">=</span> <span class="n">args</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">url</span><span class="p">()</span>
+            <span class="n">query_string</span> <span class="o">=</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="n">cache_key</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">?</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">query_string</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_cache</span><span class="p">(</span><span class="n">cache_key</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="sa">b</span><span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">token_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)}</span>
+                <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="n">cache_key</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="n">context</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">SSLContext</span><span class="p">(</span><span class="n">ssl</span><span class="o">.</span><span class="n">PROTOCOL_SSLv23</span><span class="p">)</span>
+                    <span class="n">context</span><span class="o">.</span><span class="n">options</span> <span class="o">|=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">OP_NO_SSLv2</span>
+                    <span class="n">context</span><span class="o">.</span><span class="n">options</span> <span class="o">|=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">OP_NO_SSLv3</span>
+
+                    <span class="n">resp</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">resp</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+                <span class="n">data</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cache_result</span><span class="p">(</span><span class="n">cache_key</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>  <span class="c1"># pylint:disable=W0703; we do the exception processing in the calling function</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">err</span>
+
+    <span class="k">def</span> <span class="nf">_url_fetcher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method for fetching a url page in a worker thread.&quot;&quot;&quot;</span>
+
+        <span class="n">resource</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">page_size</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">progress</span> <span class="o">=</span> <span class="n">args</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">url</span><span class="p">()</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">query</span><span class="p">[</span><span class="s1">&#39;page_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">page_size</span>
+            <span class="n">query</span><span class="p">[</span><span class="s1">&#39;page&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">page</span>
+            <span class="n">query_string</span> <span class="o">=</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+            <span class="n">cache_key</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">?</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">query_string</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_cache</span><span class="p">(</span><span class="n">cache_key</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="sa">b</span><span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">token_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)}</span>
+                <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="n">cache_key</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="n">context</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">SSLContext</span><span class="p">(</span><span class="n">ssl</span><span class="o">.</span><span class="n">PROTOCOL_SSLv23</span><span class="p">)</span>
+                    <span class="n">context</span><span class="o">.</span><span class="n">options</span> <span class="o">|=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">OP_NO_SSLv2</span>
+                    <span class="n">context</span><span class="o">.</span><span class="n">options</span> <span class="o">|=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">OP_NO_SSLv3</span>
+
+                    <span class="n">resp</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">resp</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+                <span class="n">data</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cache_result</span><span class="p">(</span><span class="n">cache_key</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>  <span class="c1"># pylint:disable=W0703; we do the exception processing in the calling function</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">err</span>
+
+    <span class="k">def</span> <span class="nf">_cache_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_login_cache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="p">]</span>
+
+        <span class="k">with</span> <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;request_lock&#39;</span><span class="p">]:</span>
+            <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;requests&#39;</span><span class="p">][</span><span class="n">query</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">_check_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_login_cache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="p">]</span>
+
+        <span class="k">with</span> <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;request_lock&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">cache</span><span class="p">[</span><span class="s1">&#39;requests&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CloudSession.get_api"><a class="viewcode-back" href="../../../api/iotile_analytics.core.session.html#iotile_analytics.core.session.CloudSession.get_api">[docs]</a>    <span class="k">def</span> <span class="nf">get_api</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a logged in API object to IOTile.cloud.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Api</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_translate_error</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Error interacting with iotile.cloud&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Translate a raw rest error into a user friendly cloud error.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">HttpCouldNotVerifyServerError</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CertificateVerificationError</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">raw_eror</span><span class="o">=</span><span class="n">error</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">CloudError</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">raw_error</span><span class="o">=</span><span class="n">error</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CloudSession.find_device"><a class="viewcode-back" href="../../../api/iotile_analytics.core.session.html#iotile_analytics.core.session.CloudSession.find_device">[docs]</a>    <span class="k">def</span> <span class="nf">find_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find an IOTile device by its slug or external_id.</span>
+
+<span class="sd">        The device can be found either by passing its slug or numeric</span>
+<span class="sd">        id directly or by passing a device specific external_id.</span>
+
+<span class="sd">        External ids are typically used to link a virtual IOTile device</span>
+<span class="sd">        with a separate physical object.  If you have a POD or Arch Node</span>
+<span class="sd">        then you don&#39;t need to worry about external ids.</span>
+
+<span class="sd">        **You must pass either a slug or an external_id but not both.**</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): the slug of the device that we want.  This can either</span>
+<span class="sd">                 be a short slug with leading zeros omitted or long slug. It</span>
+<span class="sd">                 should start with &#39;d--&#39; since it is a device slug.</span>
+<span class="sd">            external_id (str): The external id of the device that we want to</span>
+<span class="sd">                search for. This external_id must be unique among all devices</span>
+<span class="sd">                so that it matches a single device.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">slug</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">external_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;You must pass either a device slug or an external_id but not both&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">external_id</span><span class="p">)</span>
+
+        <span class="n">api</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_api</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">external_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">devices</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">external_id</span><span class="o">=</span><span class="n">external_id</span><span class="p">)</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">devices</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;results&#39;</span><span class="p">,</span> <span class="p">[])</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;No device matching external_id could be found&quot;</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">external_id</span><span class="p">,</span> <span class="n">suggestion</span><span class="o">=</span><span class="s2">&quot;Make sure the external id is correct&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">slugs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]</span>
+                    <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;More than one device with given external id found&quot;</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">external_id</span><span class="p">,</span> <span class="n">found_devices</span><span class="o">=</span><span class="n">slugs</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">except</span> <span class="n">HttpClientError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate_error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">api</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">HttpNotFoundError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;No device with the given slug could be found&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">HttpClientError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate_error</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s2">&quot;Error fetching device information&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CloudSession.fetch_raw_event"><a class="viewcode-back" href="../../../api/iotile_analytics.core.session.html#iotile_analytics.core.session.CloudSession.fetch_raw_event">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_raw_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_or_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch associated raw data for an event.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event_or_id (pd.Series or int): Either an event returned as a member of the response</span>
+<span class="sd">                of fetch_events with the event_id key set or an id for an event as an integer.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The raw event object data fetched from iotile.cloud.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">event_or_id</span><span class="p">,</span> <span class="s1">&#39;event_id&#39;</span><span class="p">):</span>
+            <span class="n">event_id</span> <span class="o">=</span> <span class="n">event_or_id</span><span class="p">[</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">event_id</span> <span class="o">=</span> <span class="n">event_or_id</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event_id</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">event_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">event_id</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Invalid event passed to fetch_raw_event that could not be converted to an integer&quot;</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="n">event_or_id</span><span class="p">,</span> <span class="n">event_id</span><span class="o">=</span><span class="n">event_id</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">api</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_api</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">api</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">event_id</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">HttpNotFoundError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;No event with the given id could be found&quot;</span><span class="p">,</span> <span class="n">event_id</span><span class="o">=</span><span class="n">event_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">HttpClientError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate_error</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="s2">&quot;Error fetching event data&quot;</span><span class="p">,</span> <span class="n">event_id</span><span class="o">=</span><span class="n">event_id</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_merge_dicts</span><span class="p">(</span><span class="n">dict1</span><span class="p">,</span> <span class="n">dict2</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">dict1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dict2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

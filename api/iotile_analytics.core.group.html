@@ -1,0 +1,645 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.core.group module &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="iotile_analytics.core.session module" href="iotile_analytics.core.session.html" />
+    <link rel="prev" title="iotile_analytics.core.exceptions module" href="iotile_analytics.core.exceptions.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="iotile_analytics.core.html">iotile_analytics.core package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.environment.html">iotile_analytics.core.environment module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.exceptions.html">iotile_analytics.core.exceptions module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">iotile_analytics.core.group module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.session.html">iotile_analytics.core.session module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.stream_series.html">iotile_analytics.core.stream_series module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.channels.html">iotile_analytics.core.channels package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.interaction.html">iotile_analytics.core.interaction package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.utilities.html">iotile_analytics.core.utilities package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iotile_analytics.offline.html">iotile_analytics.offline package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iotile_analytics.interactive.html">iotile_analytics.interactive package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="iotile_analytics.core.html">iotile_analytics.core package</a> &raquo;</li>
+        
+      <li>iotile_analytics.core.group module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/iotile_analytics.core.group.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-iotile_analytics.core.group">
+<span id="iotile-analytics-core-group-module"></span><h1>iotile_analytics.core.group module<a class="headerlink" href="#module-iotile_analytics.core.group" title="Permalink to this headline">¶</a></h1>
+<p>The AnalysisGroup is the main entry point for analyzing data.</p>
+<p>It allows you to select data streams from IOTile.cloud and turn them
+into Pandas time series for analysis.  You can create an AnalysisGroup
+from a Project, a Device or a DataBlock.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.core.group.AnalysisGroup" title="iotile_analytics.core.group.AnalysisGroup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnalysisGroup</span></code></a></td>
+<td>A top level entry point for selecting and analyzing data.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="iotile_analytics.core.group.AnalysisGroup">
+<em class="property">class </em><code class="descclassname">iotile_analytics.core.group.</code><code class="descname">AnalysisGroup</code><span class="sig-paren">(</span><em>channel</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A top level entry point for selecting and analyzing data.</p>
+<p>Currently AnalysisGroups must be created by passing the id
+or slug of a project in iotile.cloud and then are populated with
+all of the data streams and variables in that project.</p>
+<p>You should use one of the static methods FromDevice, FromArchive,
+FromProject or FromFile.</p>
+<p>If you use FromDevice, you should pass a slug for the device that you want
+to fetch streams from.</p>
+<p>If you use FromArchive you should pass a slug for the archive
+that you want to fetch streams from.</p>
+<p>If you use FromProject, you should pass the UUID of the project
+that you want to fetch streams from.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>channel</strong> (<a class="reference internal" href="iotile_analytics.core.channels.channel.html#iotile_analytics.core.channels.channel.AnalysisGroupChannel" title="iotile_analytics.core.channels.channel.AnalysisGroupChannel"><em>AnalysisGroupChannel</em></a>) – The channel by which we can
+find and download streams.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="iotile_analytics.core.group.AnalysisGroup.stream_empty">
+<code class="descname">stream_empty</code><span class="sig-paren">(</span><em>slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.stream_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.stream_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a stream is empty.</p>
+<p>Empty streams have neither event data nor time series data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The slug of the stream tha we want to check to
+see if it empty</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the stream is empty, otherwise false.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.group.AnalysisGroup.print_source_info">
+<code class="descname">print_source_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.print_source_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.print_source_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a table with source object info</p>
+<p>The source object is the Project, Device or DataBlock this channel was created from</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.group.AnalysisGroup.print_streams">
+<code class="descname">print_streams</code><span class="sig-paren">(</span><em>include_empty=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.print_streams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.print_streams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a table of the streams in this AnalysisGroup.</p>
+<p>By default this function does not print streams that have no data
+but you can override that by passing include_empty=True.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>include_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Also show streams that have no data.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.group.AnalysisGroup.get_stream_name">
+<code class="descname">get_stream_name</code><span class="sig-paren">(</span><em>slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.get_stream_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.get_stream_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a user-friendly name from a stream.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The slug that we wish to get the name of.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The name of the stream</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.group.AnalysisGroup.find_stream">
+<code class="descname">find_stream</code><span class="sig-paren">(</span><em>partial</em>, <em>include_empty=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.find_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.find_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a stream by a partial identifier.</p>
+<p>The identifier can either be a part of its slug or its name or the
+name of the variable that it comes from.  Whatever you pass must
+uniquely match exactly one stream in this analysis project or an
+exception will be thrown.</p>
+<p>Matching is done in a case insensitive fashion.</p>
+<p>By default, only streams that are not empty are searched.  You can
+override this by passing include_empty=True.  This behavior is the
+same as the print_streams() behavior, so searching for a stream based
+on what you find in print streams will work as expected.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>partial</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A partial slug or identifier to use to uniquely
+find one stream.</li>
+<li><strong>include_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Also include streams that have no data in
+the search.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>The full slug of the stream that we were looking for, suitable</dt>
+<dd><p class="first last">for passing to an IOTile.cloud api.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ArgumentError</span></code> – If the partial matches no streams or if it matches
+multiple streams.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.group.AnalysisGroup.fetch_stream">
+<code class="descname">fetch_stream</code><span class="sig-paren">(</span><em>slug_or_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.fetch_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.fetch_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch data from a stream by its slug or name.</p>
+<p>For example say you have the following stream in this analysis project:
+s–0000-0011–0000-0000-0000-0222–5001 (Temperature)</p>
+<dl class="docutils">
+<dt>You could fetch it by passing any of:</dt>
+<dd><ul class="first last simple">
+<li>temp</li>
+<li>5001</li>
+<li>Temperature</li>
+<li>s–0000-0011–0000-0000-0000-0222–5001</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug_or_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The stream that we want to fetch.  This
+can be a partial match to a full stream slug or name so long
+as it uniquely matches.  This is passed to find_stream so anything
+that find_stream accepts will be accepted here.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>A pandas DataFrame subclass containing the data points as columns.</dt>
+<dd>The index of the dataframe is time in UTC.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="iotile_analytics.core.stream_series.html#iotile_analytics.core.stream_series.StreamSeries" title="iotile_analytics.core.stream_series.StreamSeries">StreamSeries</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.group.AnalysisGroup.fetch_events">
+<code class="descname">fetch_events</code><span class="sig-paren">(</span><em>slug_or_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.fetch_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.fetch_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch event metadata from a stream by its slug or name.</p>
+<p>This function will return a Pandas DataFrame with all of the
+events in the stream.  It will return only the extra summary
+data stored with the event itself however.  If you need access to
+any raw data uploaded with the event that was not part of the
+summary, you need to use fetch_event for each event to get
+the raw data.</p>
+<p>slug_or_name is passed to find_stream to convert it into a slug so
+partial stream names are accepted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug_or_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The stream that we want to fetch.  This
+can be a partial match to a full stream slug or name so long
+as it uniquely matches.  This is passed to find_stream so anything
+that find_stream accepts will be accepted here.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>All of the extra_data associated with the event as a</dt>
+<dd>Pandas DataFrame.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.group.AnalysisGroup.fetch_raw_events">
+<code class="descname">fetch_raw_events</code><span class="sig-paren">(</span><em>slug_or_name</em>, <em>subkey=None</em>, <em>postprocess=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.fetch_raw_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.fetch_raw_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch multiple raw events by numeric id.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>slug_or_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The stream that we want to fetch.  This
+can be a partial match to a full stream slug or name so long
+as it uniquely matches.  This is passed to find_stream so anything
+that find_stream accepts will be accepted here.</li>
+<li><strong>subkey</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Only include a single key of the event.  This is usefuly for complex
+events where you want to just focus on a portion of them.</li>
+<li><strong>postprocess</strong> (<em>callable</em>) – (Optional) function to call on each raw event before
+adding it to the dataframe.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The raw event object data fetched from iotile.cloud.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pd.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="iotile_analytics.core.group.AnalysisGroup.FromDevice">
+<em class="property">classmethod </em><code class="descname">FromDevice</code><span class="sig-paren">(</span><em>slug=None</em>, <em>external_id=None</em>, <em>domain='https://iotile.cloud'</em>, <em>include_system=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.FromDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.FromDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new AnalysisGroup from a single device.</p>
+<p>The device can be found either by passing its slug or numeric
+id directly or by passing a device specific external_id.</p>
+<p>External ids are typically used to link a virtual IOTile device
+with a separate physical object.  If you have a POD or Arch Node
+then you don’t need to worry about external ids.</p>
+<p><strong>You must pass either a slug or an external_id but not both.</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the slug of the device that we want.  This can either
+be a short slug with leading zeros omitted or long slug. It
+should start with ‘d–’ since it is a device slug.</li>
+<li><strong>external_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The external id of the device that we want to
+search for. This external_id must be unique among all devices
+so that it matches a single device.</li>
+<li><strong>domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Optional iotile.cloud domain to connect to (defaults to
+<a class="reference external" href="https://iotile.cloud">https://iotile.cloud</a>).</li>
+<li><strong>include_system</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Also include hidden system streams when fetching data
+for this device.  System streams are not generally useful so this defaults
+to False.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="iotile_analytics.core.group.AnalysisGroup.FromArchive">
+<em class="property">classmethod </em><code class="descname">FromArchive</code><span class="sig-paren">(</span><em>slug=None</em>, <em>domain='https://iotile.cloud'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.FromArchive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.FromArchive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new AnalysisGroup from a single archive.</p>
+<p>The archive is found by passing its archive slug:
+b–XXXX-XXXX-XXXX-XXXX</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the slug of the archive that we want.  This can either
+be a short slug with leading zeros omitted or long slug. It
+should start with ‘b–’ since it is an archive slug.</li>
+<li><strong>domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Optional iotile.cloud domain to connect to (defaults to
+<a class="reference external" href="https://iotile.cloud">https://iotile.cloud</a>).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="iotile_analytics.core.group.AnalysisGroup.FromSaved">
+<em class="property">classmethod </em><code class="descname">FromSaved</code><span class="sig-paren">(</span><em>identifier</em>, <em>format_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.FromSaved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.FromSaved" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a saved AnalysisGroup.</p>
+<p>You must have previously called save on an AnalysisGroup
+and passed it a known format_name and identifier.  Passing
+that same identifier and format_name will reload that same
+AnalysisGroup without needing online access to IOTile.cloud.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The format specific identifier that we will
+use to name this saved AnalysisGroup.  The meaning of this
+parameter depends on the format but, for example, it could
+be the file name.</li>
+<li><strong>format_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – An identifier for the format we wish to use to
+save our data.  You can find the list of available formats
+by calling list_formats().</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The saved AnalysisGroup</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#iotile_analytics.core.group.AnalysisGroup" title="iotile_analytics.core.group.AnalysisGroup">AnalysisGroup</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.group.AnalysisGroup.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>identifier</em>, <em>format_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save this AnalysisGroup.</p>
+<p>You can then load this analysis group again by calling
+AnalysisGroup.FromSaved(identifier, format)</p>
+<p>with the same identifier and format information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The format specific identifier that we will
+use to name this saved AnalysisGroup.  The meaning of this
+parameter depends on the format but, for example, it could
+be the file name.</li>
+<li><strong>format_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – An identifier for the format we wish to use to
+save our data.  You can find the list of available formats
+by calling list_formats().</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="iotile_analytics.core.group.AnalysisGroup.list_formats">
+<em class="property">classmethod </em><code class="descname">list_formats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.list_formats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.list_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>List the installed formats in which we can save an AnalysisGroup.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of the names that can be passed to save or FromSaved.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="iotile_analytics.core.session.html" class="btn btn-neutral float-right" title="iotile_analytics.core.session module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="iotile_analytics.core.exceptions.html" class="btn btn-neutral" title="iotile_analytics.core.exceptions module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

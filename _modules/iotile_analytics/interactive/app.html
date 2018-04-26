@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.interactive.app &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.interactive.app</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.interactive.app</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Default implementation for a bokeh application that can show itself in a server or notebook.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">bokeh.application</span> <span class="k">import</span> <span class="n">Application</span>
+<span class="kn">from</span> <span class="nn">bokeh.application.handlers</span> <span class="k">import</span> <span class="n">FunctionHandler</span>
+<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="k">import</span> <span class="n">show</span> <span class="k">as</span> <span class="n">bokeh_show</span>
+<span class="kn">from</span> <span class="nn">iotile_analytics.core.exceptions</span> <span class="k">import</span> <span class="n">UsageError</span>
+
+
+<div class="viewcode-block" id="AnalyticsObject"><a class="viewcode-back" href="../../../api/iotile_analytics.interactive.app.html#iotile_analytics.interactive.app.AnalyticsObject">[docs]</a><span class="k">class</span> <span class="nc">AnalyticsObject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for all objects that can be added to an AnalyticsApplication.</span>
+
+<span class="sd">    These objects must have a root property that returns a Model or LayoutDOM</span>
+<span class="sd">    object that corresponds to the root object that should be added to the</span>
+<span class="sd">    application.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="AnalyticsApplication"><a class="viewcode-back" href="../../../api/iotile_analytics.interactive.app.html#iotile_analytics.interactive.app.AnalyticsApplication">[docs]</a><span class="k">class</span> <span class="nc">AnalyticsApplication</span><span class="p">(</span><span class="n">Application</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for Bokeh applications built from iotile_analytics objects.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">objects</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">AnalyticsObject</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;You must only pass AnalyticsObject subclasses to an AnalyticsApplication&quot;</span><span class="p">,</span> <span class="nb">object</span><span class="o">=</span><span class="n">obj</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">roots</span> <span class="o">=</span> <span class="n">objects</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">AnalyticsApplication</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">FunctionHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modify_document_with_roots</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_modify_document_with_roots</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roots</span><span class="p">:</span>
+            <span class="n">doc</span><span class="o">.</span><span class="n">add_root</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="show"><a class="viewcode-back" href="../../../api/iotile_analytics.interactive.app.html#iotile_analytics.interactive.app.show">[docs]</a><span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="n">analytics_obj</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Show an application or analytics object in a notebook.</span>
+
+<span class="sd">    This function will ultimately call bokeh.io.show() to actually show the</span>
+<span class="sd">    object and with either wrap it inside an AnalyticsApplication object in</span>
+<span class="sd">    order to have python callbacks work (if interactive==True, which is</span>
+<span class="sd">    the default behavior) or it will just show the root Model objects without</span>
+<span class="sd">    a bokeh server if interactive==False.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        analytics_obj (AnalyticsApplication or AnalyticsObject): The object that we</span>
+<span class="sd">            wish to show.  If this is an AnalyticsObject and noninteractive</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">objs_to_show</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">analytics_obj</span><span class="p">,</span> <span class="n">AnalyticsApplication</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">interactive</span><span class="p">:</span>
+            <span class="n">objs_to_show</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">root</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">analytics_obj</span><span class="o">.</span><span class="n">roots</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">objs_to_show</span> <span class="o">=</span> <span class="p">[</span><span class="n">analytics_obj</span><span class="p">]</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">analytics_obj</span><span class="p">,</span> <span class="n">AnalyticsObject</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">interactive</span><span class="p">:</span>
+            <span class="n">objs_to_show</span> <span class="o">=</span> <span class="p">[</span><span class="n">analytics_obj</span><span class="o">.</span><span class="n">root</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">objs_to_show</span> <span class="o">=</span> <span class="p">[</span><span class="n">AnalyticsApplication</span><span class="p">(</span><span class="n">analytics_obj</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;You must pass either an AnalyticsObject or AnalyticsApplication subclass to show()&quot;</span><span class="p">,</span>
+                         <span class="nb">object</span><span class="o">=</span><span class="n">analytics_obj</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">analytics_obj</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs_to_show</span><span class="p">:</span>
+        <span class="n">bokeh_show</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,564 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.core.channels.cloud_api &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.core.channels.cloud_api</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.core.channels.cloud_api</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A wrapper around the iotile.cloud API to fetch data diretcly.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span>
+                        <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">viewitems</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">iotile_cloud.stream.data</span> <span class="k">import</span> <span class="n">StreamData</span>
+<span class="kn">from</span> <span class="nn">iotile_cloud.api.exceptions</span> <span class="k">import</span> <span class="n">RestHttpBaseException</span>
+<span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">ArgumentError</span>
+<span class="kn">from</span> <span class="nn">.channel</span> <span class="k">import</span> <span class="n">AnalysisGroupChannel</span>
+<span class="kn">from</span> <span class="nn">..session</span> <span class="k">import</span> <span class="n">CloudSession</span>
+<span class="kn">from</span> <span class="nn">..interaction</span> <span class="k">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">..stream_series</span> <span class="k">import</span> <span class="n">StreamSeries</span>
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="k">import</span> <span class="n">CloudError</span>
+
+
+<div class="viewcode-block" id="IOTileCloudChannel"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel">[docs]</a><span class="k">class</span> <span class="nc">IOTileCloudChannel</span><span class="p">(</span><span class="n">AnalysisGroupChannel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An AnalysisGroupChannel that fetches data from IOTile.cloud</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        domain (str): The domain of the iotile.cloud instance that</span>
+<span class="sd">            you want to fetch data from.</span>
+<span class="sd">        cloud_id (str): The slug or id of the object to be enumerated to</span>
+<span class="sd">            create this cloud channel.  If you do not want to enumerate</span>
+<span class="sd">            any object, you can pass None here.</span>
+<span class="sd">        include_system (bool): Include hidden system streams when query device</span>
+<span class="sd">            objects.  This defaults to False.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cloud_id</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">include_system</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">IOTileCloudChannel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="n">stream_finders</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;project&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_project_streams</span><span class="p">,</span>
+            <span class="s1">&#39;device&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_device_streams</span><span class="p">,</span>
+            <span class="s1">&#39;datablock&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_archive_streams</span>
+        <span class="p">}</span>
+
+        <span class="n">stream_counters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;device&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_device_streams</span>
+        <span class="p">}</span>
+
+        <span class="n">stream_finder</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">source_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">cloud_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">source_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_classify_object</span><span class="p">(</span><span class="n">cloud_id</span><span class="p">)</span>
+            <span class="n">stream_finder</span> <span class="o">=</span> <span class="n">stream_finders</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">source_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">CloudSession</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_api</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get_api</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cloud_id</span> <span class="o">=</span> <span class="n">cloud_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_include_system</span> <span class="o">=</span> <span class="n">include_system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_source_type</span> <span class="o">=</span> <span class="n">source_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stream_finder</span> <span class="o">=</span> <span class="n">stream_finder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stream_counter</span> <span class="o">=</span> <span class="n">stream_counters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">source_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_generic_streams</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_classify_object</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cloud_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cloud_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;p--&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s1">&#39;project&#39;</span>
+
+        <span class="k">if</span> <span class="n">cloud_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;d--&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s1">&#39;device&#39;</span>
+
+        <span class="k">if</span> <span class="n">cloud_id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;b--&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s1">&#39;datablock&#39;</span>
+
+        <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Invalid source type&quot;</span><span class="p">,</span> <span class="n">cloud_id</span><span class="o">=</span><span class="n">cloud_id</span><span class="p">,</span> <span class="n">supported_sources</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;project&#39;</span><span class="p">,</span> <span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="s1">&#39;datablock&#39;</span><span class="p">),</span>
+                            <span class="n">suggestion</span><span class="o">=</span><span class="s2">&quot;Try using one of the convenience functions for creating an AnalysisGroup like FromDevice or FromProject&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="IOTileCloudChannel.list_streams"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.list_streams">[docs]</a>    <span class="k">def</span> <span class="nf">list_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of all streams.</span>
+
+<span class="sd">        This is equivalent to the IOTile.cloud API method</span>
+<span class="sd">        /api/v1/stream/</span>
+
+<span class="sd">        for datablocks and projects.  For devices, this calls the</span>
+<span class="sd">        api:</span>
+<span class="sd">        /api/v1/device/&lt;cloud_id&gt;/extra/</span>
+
+<span class="sd">        to also get information on system streams that do not show</span>
+<span class="sd">        up in the normal stream API.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list(dict): A list of dictionaries, one for each</span>
+<span class="sd">                stream that should be part of this analysis group.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cloud_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_finder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cloud_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IOTileCloudChannel.fetch_source_info"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_source_info">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_source_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch the record associated to the channel object (project, device or datablock)</span>
+
+<span class="sd">        This is the object dictionary for the project, device or datablock</span>
+<span class="sd">        this channel is based on</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            with_properties: If True, will also fetch object properties and</span>
+<span class="sd">                add them as dictionary entries</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The raw source object that our analytics group was generated from.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cloud_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">resource</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_type</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">resource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cloud_id</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">RestHttpBaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CloudError</span><span class="p">(</span><span class="s2">&quot;Error calling method on iotile.cloud&quot;</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">exc</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="IOTileCloudChannel.fetch_properties"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_properties">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch all properties for a given object (project, device or datablock).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dict of property names and values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cloud_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">property_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">property</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cloud_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;count&#39;</span> <span class="ow">in</span> <span class="n">property_data</span> <span class="ow">and</span> <span class="n">property_data</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">property_data</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="n">RestHttpBaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CloudError</span><span class="p">(</span><span class="s2">&quot;Error calling method on iotile.cloud&quot;</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">exc</span><span class="p">,</span>
+                             <span class="n">response</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="IOTileCloudChannel.count_streams"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.count_streams">[docs]</a>    <span class="k">def</span> <span class="nf">count_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slugs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count the number of events and data points in a stream.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (list(str)): The slugs of the stream that we should count.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict(&lt;slug&gt;: {&#39;points&#39;: int, &#39;events&#39;: int}): A dict mapping dicts of 2</span>
+<span class="sd">                integers with the count of the number of events and the number of</span>
+<span class="sd">                data points in this stream.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_counter</span><span class="p">(</span><span class="n">slugs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_count_device_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slugs</span><span class="p">):</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cloud_id</span><span class="p">)</span><span class="o">.</span><span class="n">extra</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+        <span class="n">stream_table</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;stream_counts&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="c1"># Note the specific logic here of is not False.  We explictly want to exclude has_streamid is True and is None</span>
+        <span class="c1"># since those corresponds with normal streams like app only streams.</span>
+        <span class="n">normal_streams</span> <span class="o">=</span> <span class="p">[</span><span class="n">slug</span> <span class="k">for</span> <span class="n">slug</span> <span class="ow">in</span> <span class="n">slugs</span> <span class="k">if</span> <span class="n">stream_table</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;has_streamid&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">]</span>
+
+        <span class="n">normal_counts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_generic_streams</span><span class="p">(</span><span class="n">normal_streams</span><span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">slug</span> <span class="ow">in</span> <span class="n">slugs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">slug</span> <span class="ow">in</span> <span class="n">normal_counts</span><span class="p">:</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span> <span class="o">=</span> <span class="n">normal_counts</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">slug</span> <span class="ow">in</span> <span class="n">stream_table</span><span class="p">:</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;points&#39;</span><span class="p">:</span> <span class="n">stream_table</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_cnt&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;events&#39;</span><span class="p">:</span> <span class="n">stream_table</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;event_cnt&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CloudError</span><span class="p">(</span><span class="s2">&quot;Could not find stream to perform a count&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span>
+
+    <span class="k">def</span> <span class="nf">_count_generic_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slugs</span><span class="p">):</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">slugs</span><span class="p">]</span>
+        <span class="n">ts_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_multiple</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;Counting Events in Streams&#39;</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">event_resources</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">event</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">slugs</span><span class="p">]</span>
+        <span class="n">event_args</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;filter&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">slugs</span><span class="p">]</span>
+
+        <span class="n">event_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_multiple</span><span class="p">(</span><span class="n">event_resources</span><span class="p">,</span> <span class="n">event_args</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;Counting Data in Streams&#39;</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">slug</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;points&#39;</span><span class="p">:</span> <span class="n">ts</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">],</span> <span class="s1">&#39;events&#39;</span><span class="p">:</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]}</span> <span class="k">for</span> <span class="n">slug</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">event</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">slugs</span><span class="p">,</span> <span class="n">ts_results</span><span class="p">,</span> <span class="n">event_results</span><span class="p">)}</span>
+
+<div class="viewcode-block" id="IOTileCloudChannel.fetch_variable_types"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_variable_types">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_variable_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slugs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch variable type information for a list of variable slugs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slugs (list(str)): The slugs of the variable types that we should fetch.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict(&lt;slug&gt;: dict): A dict mapping variable slugs to variable type definitions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">resources</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">vartype</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">slugs</span><span class="p">]</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_multiple</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;Fetching Variable Types&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="IOTileCloudChannel.fetch_events"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch all events for a given stream.</span>
+
+<span class="sd">        These are the event metadata dictionaries, not the raw</span>
+<span class="sd">        event data that may be stored along with the metadata.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): The slug of the stream that we should fetch</span>
+<span class="sd">                events for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: A data frame with all of the events in this</span>
+<span class="sd">                stream.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">event</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Downloading Events&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+
+            <span class="n">dt_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+            <span class="n">extra_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;extra_data&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">event</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="n">extra_data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+                <span class="n">extra_data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;has_raw_data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;has_raw_data&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">extra_data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">dt_index</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">RestHttpBaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CloudError</span><span class="p">(</span><span class="s2">&quot;Error fetching events from stream&quot;</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">exc</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IOTileCloudChannel.fetch_raw_events"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_raw_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_raw_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch all raw event data for this stream.</span>
+
+<span class="sd">        These are the raw json dictionaries that may be stored for</span>
+<span class="sd">        each event.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): The slug of the stream that we should fetch</span>
+<span class="sd">                raw events for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: All of the raw events.  This will be empty if</span>
+<span class="sd">                there are no raw events.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_events</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+        <span class="n">event_ids</span> <span class="o">=</span> <span class="n">events</span><span class="p">[</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="c1"># event.has_raw_data is true if there is an associated raw JSON file stored on S3 for this event</span>
+        <span class="n">event_has_data</span> <span class="o">=</span> <span class="n">events</span><span class="p">[</span><span class="s1">&#39;has_raw_data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">new_index</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">event_ids</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">event_has_data</span><span class="p">[</span><span class="n">index</span><span class="p">]:</span>
+                <span class="n">resources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">event_ids</span><span class="p">[</span><span class="n">index</span><span class="p">])</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">new_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indexes</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_multiple</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Downloading Raw Event Data&quot;</span><span class="p">)</span>
+        <span class="c1"># new_index includes all indexes with actual data</span>
+        <span class="n">new_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">new_index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">new_index</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IOTileCloudChannel.fetch_datapoints"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_datapoints">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_datapoints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch all data points for this stream.</span>
+
+<span class="sd">        These are time, value data pairs stored in the stream. Internal</span>
+<span class="sd">        metadata about those data points is not returned. The result is a norm</span>
+<span class="sd">        pandas Series subclass with additional functionality to support unit</span>
+<span class="sd">        conversion.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): The slug of the stream that we should fetch</span>
+<span class="sd">                raw data points for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            StreamSeries: A data fame with internal value as floating</span>
+<span class="sd">                point data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">use_data_api</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">with</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Fetching </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">slug</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">prog</span><span class="p">:</span>
+            <span class="n">raw_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="n">slug</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">)</span>
+
+            <span class="n">str_data</span> <span class="o">=</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">str_data</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># There is a single header line</span>
+
+            <span class="c1"># FIXME: Hack to work around issue returning int_value for these objects</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">use_data_api</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dt_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+
+            <span class="n">prog</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">use_data_api</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">StreamSeries</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">dt_index</span><span class="p">)</span>
+
+        <span class="n">resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">raw_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Downloading Data&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="n">dt_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">raw_json</span><span class="p">])</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;int_value&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">raw_json</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">StreamSeries</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">dt_index</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_find_device_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find all streams for a device by its slug.&quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device_slug</span><span class="p">)</span>
+            <span class="n">streams</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_include_system</span><span class="p">:</span>
+                <span class="n">hidden_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device_slug</span><span class="p">)</span><span class="o">.</span><span class="n">extra</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">hidden_streams</span> <span class="o">=</span> <span class="p">[</span><span class="n">slug</span> <span class="k">for</span> <span class="n">slug</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="n">hidden_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;stream_counts&#39;</span><span class="p">,</span> <span class="p">{}))</span> <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;has_streamid&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">]</span>
+
+                <span class="n">streams</span> <span class="o">+=</span> <span class="n">hidden_streams</span>
+
+            <span class="k">return</span> <span class="n">streams</span>
+        <span class="k">except</span> <span class="n">RestHttpBaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CloudError</span><span class="p">(</span><span class="s2">&quot;Error calling method on iotile.cloud&quot;</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">exc</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_find_archive_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">archive_slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find all streams for an archive by its slug.&quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="n">archive_slug</span><span class="p">,</span> <span class="nb">all</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="n">RestHttpBaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CloudError</span><span class="p">(</span><span class="s2">&quot;Error calling method on iotile.cloud&quot;</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">exc</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_find_project_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find all streams in a project by its uuid.&quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="n">project_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="n">RestHttpBaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CloudError</span><span class="p">(</span><span class="s2">&quot;Error calling method on iotile.cloud&quot;</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">exc</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

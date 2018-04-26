@@ -1,0 +1,479 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.core.channels.cloud_api module &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="iotile_analytics.core.interaction package" href="iotile_analytics.core.interaction.html" />
+    <link rel="prev" title="iotile_analytics.core.channels.channel module" href="iotile_analytics.core.channels.channel.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="iotile_analytics.core.html">iotile_analytics.core package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.environment.html">iotile_analytics.core.environment module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.exceptions.html">iotile_analytics.core.exceptions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.group.html">iotile_analytics.core.group module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.session.html">iotile_analytics.core.session module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.stream_series.html">iotile_analytics.core.stream_series module</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="iotile_analytics.core.channels.html">iotile_analytics.core.channels package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.core.channels.channel.html">iotile_analytics.core.channels.channel module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">iotile_analytics.core.channels.cloud_api module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.interaction.html">iotile_analytics.core.interaction package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.utilities.html">iotile_analytics.core.utilities package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iotile_analytics.offline.html">iotile_analytics.offline package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iotile_analytics.interactive.html">iotile_analytics.interactive package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="iotile_analytics.core.html">iotile_analytics.core package</a> &raquo;</li>
+        
+          <li><a href="iotile_analytics.core.channels.html">iotile_analytics.core.channels package</a> &raquo;</li>
+        
+      <li>iotile_analytics.core.channels.cloud_api module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/iotile_analytics.core.channels.cloud_api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-iotile_analytics.core.channels.cloud_api">
+<span id="iotile-analytics-core-channels-cloud-api-module"></span><h1>iotile_analytics.core.channels.cloud_api module<a class="headerlink" href="#module-iotile_analytics.core.channels.cloud_api" title="Permalink to this headline">¶</a></h1>
+<p>A wrapper around the iotile.cloud API to fetch data diretcly.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel" title="iotile_analytics.core.channels.cloud_api.IOTileCloudChannel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IOTileCloudChannel</span></code></a></td>
+<td>An AnalysisGroupChannel that fetches data from IOTile.cloud</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="iotile_analytics.core.channels.cloud_api.IOTileCloudChannel">
+<em class="property">class </em><code class="descclassname">iotile_analytics.core.channels.cloud_api.</code><code class="descname">IOTileCloudChannel</code><span class="sig-paren">(</span><em>cloud_id</em>, <em>domain</em>, <em>include_system=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/channels/cloud_api.html#IOTileCloudChannel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="iotile_analytics.core.channels.channel.html#iotile_analytics.core.channels.channel.AnalysisGroupChannel" title="iotile_analytics.core.channels.channel.AnalysisGroupChannel"><code class="xref py py-class docutils literal notranslate"><span class="pre">iotile_analytics.core.channels.channel.AnalysisGroupChannel</span></code></a></p>
+<p>An AnalysisGroupChannel that fetches data from IOTile.cloud</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The domain of the iotile.cloud instance that
+you want to fetch data from.</li>
+<li><strong>cloud_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The slug or id of the object to be enumerated to
+create this cloud channel.  If you do not want to enumerate
+any object, you can pass None here.</li>
+<li><strong>include_system</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Include hidden system streams when query device
+objects.  This defaults to False.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.list_streams">
+<code class="descname">list_streams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/channels/cloud_api.html#IOTileCloudChannel.list_streams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.list_streams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all streams.</p>
+<p>This is equivalent to the IOTile.cloud API method
+/api/v1/stream/</p>
+<p>for datablocks and projects.  For devices, this calls the
+api:
+/api/v1/device/&lt;cloud_id&gt;/extra/</p>
+<p>to also get information on system streams that do not show
+up in the normal stream API.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>A list of dictionaries, one for each</dt>
+<dd>stream that should be part of this analysis group.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_source_info">
+<code class="descname">fetch_source_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/channels/cloud_api.html#IOTileCloudChannel.fetch_source_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_source_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch the record associated to the channel object (project, device or datablock)</p>
+<p>This is the object dictionary for the project, device or datablock
+this channel is based on</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>with_properties</strong> – If True, will also fetch object properties and
+add them as dictionary entries</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The raw source object that our analytics group was generated from.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_properties">
+<code class="descname">fetch_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/channels/cloud_api.html#IOTileCloudChannel.fetch_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch all properties for a given object (project, device or datablock).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A dict of property names and values.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.count_streams">
+<code class="descname">count_streams</code><span class="sig-paren">(</span><em>slugs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/channels/cloud_api.html#IOTileCloudChannel.count_streams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.count_streams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count the number of events and data points in a stream.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – The slugs of the stream that we should count.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>{‘points’: int, ‘events’: int}): A dict mapping dicts of 2</dt>
+<dd>integers with the count of the number of events and the number of
+data points in this stream.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(&lt;slug&gt;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_variable_types">
+<code class="descname">fetch_variable_types</code><span class="sig-paren">(</span><em>slugs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/channels/cloud_api.html#IOTileCloudChannel.fetch_variable_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_variable_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch variable type information for a list of variable slugs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slugs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – The slugs of the variable types that we should fetch.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict): A dict mapping variable slugs to variable type definitions</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(&lt;slug&gt;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_events">
+<code class="descname">fetch_events</code><span class="sig-paren">(</span><em>slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/channels/cloud_api.html#IOTileCloudChannel.fetch_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch all events for a given stream.</p>
+<p>These are the event metadata dictionaries, not the raw
+event data that may be stored along with the metadata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The slug of the stream that we should fetch
+events for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>A data frame with all of the events in this</dt>
+<dd>stream.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pd.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_raw_events">
+<code class="descname">fetch_raw_events</code><span class="sig-paren">(</span><em>slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/channels/cloud_api.html#IOTileCloudChannel.fetch_raw_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_raw_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch all raw event data for this stream.</p>
+<p>These are the raw json dictionaries that may be stored for
+each event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The slug of the stream that we should fetch
+raw events for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>All of the raw events.  This will be empty if</dt>
+<dd>there are no raw events.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pd.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_datapoints">
+<code class="descname">fetch_datapoints</code><span class="sig-paren">(</span><em>slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/channels/cloud_api.html#IOTileCloudChannel.fetch_datapoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_datapoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch all data points for this stream.</p>
+<p>These are time, value data pairs stored in the stream. Internal
+metadata about those data points is not returned. The result is a norm
+pandas Series subclass with additional functionality to support unit
+conversion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The slug of the stream that we should fetch
+raw data points for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>A data fame with internal value as floating</dt>
+<dd>point data.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="iotile_analytics.core.stream_series.html#iotile_analytics.core.stream_series.StreamSeries" title="iotile_analytics.core.stream_series.StreamSeries">StreamSeries</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="iotile_analytics.core.interaction.html" class="btn btn-neutral float-right" title="iotile_analytics.core.interaction package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="iotile_analytics.core.channels.channel.html" class="btn btn-neutral" title="iotile_analytics.core.channels.channel module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

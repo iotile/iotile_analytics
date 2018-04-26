@@ -1,0 +1,461 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.interactive.reports.report module &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="iotile_analytics.interactive.reports.stream_report module" href="iotile_analytics.interactive.reports.stream_report.html" />
+    <link rel="prev" title="iotile_analytics.interactive.reports.info_report module" href="iotile_analytics.interactive.reports.info_report.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iotile_analytics.core.html">iotile_analytics.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iotile_analytics.offline.html">iotile_analytics.offline package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="iotile_analytics.interactive.html">iotile_analytics.interactive package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.app.html">iotile_analytics.interactive.app module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.viewer_base.html">iotile_analytics.interactive.viewer_base module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.viewer_loglog.html">iotile_analytics.interactive.viewer_loglog module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.viewer_timeselect.html">iotile_analytics.interactive.viewer_timeselect module</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="iotile_analytics.interactive.reports.html">iotile_analytics.interactive.reports package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.interactive.reports.analysis_template.html">iotile_analytics.interactive.reports.analysis_template module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.interactive.reports.branded_report.html">iotile_analytics.interactive.reports.branded_report module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.interactive.reports.info_report.html">iotile_analytics.interactive.reports.info_report module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">iotile_analytics.interactive.reports.report module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.interactive.reports.stream_report.html">iotile_analytics.interactive.reports.stream_report module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.scripts.html">iotile_analytics.interactive.scripts package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="iotile_analytics.interactive.html">iotile_analytics.interactive package</a> &raquo;</li>
+        
+          <li><a href="iotile_analytics.interactive.reports.html">iotile_analytics.interactive.reports package</a> &raquo;</li>
+        
+      <li>iotile_analytics.interactive.reports.report module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/iotile_analytics.interactive.reports.report.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-iotile_analytics.interactive.reports.report">
+<span id="iotile-analytics-interactive-reports-report-module"></span><h1>iotile_analytics.interactive.reports.report module<a class="headerlink" href="#module-iotile_analytics.interactive.reports.report" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.interactive.reports.report.LiveReport" title="iotile_analytics.interactive.reports.report.LiveReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LiveReport</span></code></a></td>
+<td>Base class for all dynamic html documents that can be exported.</td>
+</tr>
+</tbody>
+</table>
+<p>Functions:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.interactive.reports.report.include_file" title="iotile_analytics.interactive.reports.report.include_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">include_file</span></code></a></td>
+<td>Jinja2 function to allow including literal files into a template.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="iotile_analytics.interactive.reports.report.include_file">
+<code class="descclassname">iotile_analytics.interactive.reports.report.</code><code class="descname">include_file</code><span class="sig-paren">(</span><em>ctx</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/report.html#include_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.report.include_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Jinja2 function to allow including literal files into a template.</p>
+<p>This is used for emdedding jquery into our unhosted reports.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="iotile_analytics.interactive.reports.report.LiveReport">
+<em class="property">class </em><code class="descclassname">iotile_analytics.interactive.reports.report.</code><code class="descname">LiveReport</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/report.html#LiveReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="iotile_analytics.interactive.reports.analysis_template.html#iotile_analytics.interactive.reports.analysis_template.AnalysisTemplate" title="iotile_analytics.interactive.reports.analysis_template.AnalysisTemplate"><code class="xref py py-class docutils literal notranslate"><span class="pre">iotile_analytics.interactive.reports.analysis_template.AnalysisTemplate</span></code></a>, <a class="reference internal" href="iotile_analytics.interactive.app.html#iotile_analytics.interactive.app.AnalyticsObject" title="iotile_analytics.interactive.app.AnalyticsObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">iotile_analytics.interactive.app.AnalyticsObject</span></code></a></p>
+<p>Base class for all dynamic html documents that can be exported.</p>
+<p>A LiveReport is basically a Bokeh embedded document that can reference
+external files.  If external files are referenced, they must be done so
+using one of the primitive methods defined by this class so that we are
+able to properly export the files in a way that allows them to be loaded
+outside of the context of a bokeh application or notebook.</p>
+<p>Structuring a Bokeh document so that we can export it is the primary job
+of the LiveReport class.  The primary difference between a LiveReport and
+a standard embedded Bokeh document is the method by which a LiveReport is
+able to reference a tree of local files and load them into
+ColumnDataSource objects without needing a web browser.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Whether we are targetting a hosted or unhosted environment
+so that we generate the appropriate content.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="iotile_analytics.interactive.reports.report.LiveReport.UNHOSTED">
+<code class="descname">UNHOSTED</code><em class="property"> = 0</em><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.UNHOSTED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="iotile_analytics.interactive.reports.report.LiveReport.HOSTED">
+<code class="descname">HOSTED</code><em class="property"> = 1</em><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.HOSTED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="iotile_analytics.interactive.reports.report.LiveReport.root">
+<code class="descname">root</code><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Root object containing all models for this report.</p>
+<p>This is autogenerated from the list of models that the report
+generates but does not include any explanatory text above the
+models in before_content or after_content.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iotile_analytics.interactive.reports.report.LiveReport.standalone">
+<code class="descname">standalone</code><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.standalone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether this report creates a single file or multiple files.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.interactive.reports.report.LiveReport.mark_loadable_source">
+<code class="descname">mark_loadable_source</code><span class="sig-paren">(</span><em>source</em>, <em>loadable_options</em>, <em>columns</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/report.html#LiveReport.mark_loadable_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.mark_loadable_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mark a ColumnDataSource as externally loadable.</p>
+<p>This function returns the name of a javascript function that takes a
+single argument and loads the passed data source with one of the
+loadable options given its dictionary key which should be string or
+an integer that will be formated in decimal and used as a file name.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="iotile_analytics.interactive.reports.report.LiveReport.render_jsonp">
+<em class="property">classmethod </em><code class="descname">render_jsonp</code><span class="sig-paren">(</span><em>path</em>, <em>info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/report.html#LiveReport.render_jsonp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.render_jsonp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a dictionary as a jsonp file.</p>
+<p>These files are suitable for loading from a local filesystem so they
+can be used for unhosted LiveReports that are just opened in a web
+browser.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path at which to save the resulting jsonp file.</li>
+<li><strong>info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – An info dictionary as created by the mark_loadable_source
+function.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="iotile_analytics.interactive.reports.report.LiveReport.find_template">
+<em class="property">classmethod </em><code class="descname">find_template</code><span class="sig-paren">(</span><em>package</em>, <em>folder</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/report.html#LiveReport.find_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.find_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a template inside package data.</p>
+<p>This helper function will find a jinja2 template for you by looking
+inside a data inside an installed package.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>package</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A dotted package name for the subpackage that
+contains folder, which should not have an __init__.py file</li>
+<li><strong>folder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the folder that contains the templates
+and is located in the installed subpackage specified by package.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the template that we wish to load.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The loaded template.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">jinja2.Template</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="iotile_analytics.interactive.reports.report.LiveReport.render_string_template">
+<em class="property">classmethod </em><code class="descname">render_string_template</code><span class="sig-paren">(</span><em>template_str</em>, <em>variables</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/report.html#LiveReport.render_string_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.render_string_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a string jinja2 template as a string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>template_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The template that we wish to render.</li>
+<li><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The variables that we wish to substitute
+into the template.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The rendered string template.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.interactive.reports.report.LiveReport.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/report.html#LiveReport.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render this report to output_path.</p>
+<p>If this report is a standalone html file, the output path
+will have .html appended to it and be a single file.</p>
+<p>If this report is not standalone, the output will be
+folder that is created at output_path.</p>
+<p>If bundle is True and the report is not standalone, it will be zipped
+into a file at output_path.zip.  Any html or directory that was
+created as an intermediary before zipping will be deleted before this
+function returns.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the path to the folder that we wish
+to create.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>The path to the actual file or directory created.  This</dt>
+<dd>may differ from the file you pass in output_path by an
+extension or the addition of a subdirectory.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="iotile_analytics.interactive.reports.stream_report.html" class="btn btn-neutral float-right" title="iotile_analytics.interactive.reports.stream_report module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="iotile_analytics.interactive.reports.info_report.html" class="btn btn-neutral" title="iotile_analytics.interactive.reports.info_report module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

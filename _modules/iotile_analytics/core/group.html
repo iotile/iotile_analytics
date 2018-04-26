@@ -1,0 +1,648 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.core.group &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.core.group</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.core.group</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The AnalysisGroup is the main entry point for analyzing data.</span>
+
+<span class="sd">It allows you to select data streams from IOTile.cloud and turn them</span>
+<span class="sd">into Pandas time series for analysis.  You can create an AnalysisGroup</span>
+<span class="sd">from a Project, a Device or a DataBlock.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span>
+                        <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">viewitems</span><span class="p">,</span> <span class="n">viewvalues</span>
+<span class="kn">from</span> <span class="nn">past.builtins</span> <span class="k">import</span> <span class="n">basestring</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">iotile_cloud.api.connection</span> <span class="k">import</span> <span class="n">DOMAIN_NAME</span>
+<span class="kn">from</span> <span class="nn">iotile_cloud.api.exceptions</span> <span class="k">import</span> <span class="n">RestHttpBaseException</span>
+<span class="kn">from</span> <span class="nn">iotile_cloud.stream.data</span> <span class="k">import</span> <span class="n">StreamData</span>
+<span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">ArgumentError</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="k">import</span> <span class="n">CloudError</span>
+<span class="kn">from</span> <span class="nn">.session</span> <span class="k">import</span> <span class="n">CloudSession</span>
+<span class="kn">from</span> <span class="nn">.channels</span> <span class="k">import</span> <span class="n">IOTileCloudChannel</span>
+
+
+<div class="viewcode-block" id="AnalysisGroup"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup">[docs]</a><span class="k">class</span> <span class="nc">AnalysisGroup</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A top level entry point for selecting and analyzing data.</span>
+
+<span class="sd">    Currently AnalysisGroups must be created by passing the id</span>
+<span class="sd">    or slug of a project in iotile.cloud and then are populated with</span>
+<span class="sd">    all of the data streams and variables in that project.</span>
+
+<span class="sd">    You should use one of the static methods FromDevice, FromArchive,</span>
+<span class="sd">    FromProject or FromFile.</span>
+
+<span class="sd">    If you use FromDevice, you should pass a slug for the device that you want</span>
+<span class="sd">    to fetch streams from.</span>
+
+<span class="sd">    If you use FromArchive you should pass a slug for the archive</span>
+<span class="sd">    that you want to fetch streams from.</span>
+
+<span class="sd">    If you use FromProject, you should pass the UUID of the project</span>
+<span class="sd">    that you want to fetch streams from.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        channel (AnalysisGroupChannel): The channel by which we can</span>
+<span class="sd">            find and download streams.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span> <span class="o">=</span> <span class="n">channel</span>
+
+        <span class="n">stream_list</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">list_streams</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_info</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">fetch_source_info</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">fetch_properties</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_stream_list</span><span class="p">(</span><span class="n">stream_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_counts</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">count_streams</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">])</span>
+
+        <span class="n">var_type_slugs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;var_type&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">viewvalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;var_type&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">variable_types</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">fetch_variable_types</span><span class="p">(</span><span class="n">var_type_slugs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stream_table</span> <span class="o">=</span> <span class="p">[(</span><span class="n">slug</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stream_name</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span> <span class="k">for</span> <span class="n">slug</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">]</span>
+
+<div class="viewcode-block" id="AnalysisGroup.stream_empty"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.stream_empty">[docs]</a>    <span class="k">def</span> <span class="nf">stream_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if a stream is empty.</span>
+
+<span class="sd">        Empty streams have neither event data nor time series data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): The slug of the stream tha we want to check to</span>
+<span class="sd">                see if it empty</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the stream is empty, otherwise false.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">counts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_counts</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">counts</span><span class="p">[</span><span class="s1">&#39;points&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">counts</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="AnalysisGroup.print_source_info"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.print_source_info">[docs]</a>    <span class="k">def</span> <span class="nf">print_source_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Print a table with source object info</span>
+
+<span class="sd">        The source object is the Project, Device or DataBlock this channel was created from</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:30s}</span><span class="s2"> </span><span class="si">{:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:30s}</span><span class="s2"> </span><span class="si">{:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;----&quot;</span><span class="p">,</span> <span class="s2">&quot;----&quot;</span><span class="p">))</span>
+        <span class="n">new_line</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">31</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_info</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">37</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="p">[:</span><span class="mi">37</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;...&#39;</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0:30s}</span><span class="s1"> </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_info</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">new_line</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="AnalysisGroup.print_streams"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.print_streams">[docs]</a>    <span class="k">def</span> <span class="nf">print_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Print a table of the streams in this AnalysisGroup.</span>
+
+<span class="sd">        By default this function does not print streams that have no data</span>
+<span class="sd">        but you can override that by passing include_empty=True.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            include_empty (bool): Also show streams that have no data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:40s}</span><span class="s2"> </span><span class="si">{:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Slug&quot;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:40s}</span><span class="s2"> </span><span class="si">{:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;----&quot;</span><span class="p">,</span> <span class="s2">&quot;----&quot;</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">slug</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_empty</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">include_empty</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stream_name</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">37</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="mi">37</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;...&#39;</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:40s}</span><span class="s1"> </span><span class="si">{:s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">slug</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="AnalysisGroup.get_stream_name"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.get_stream_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_stream_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Extract a user-friendly name from a stream.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): The slug that we wish to get the name of.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The name of the stream</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stream</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;System Data </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">slug</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data_label&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;var_name&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;(from variable)&quot;</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Unnamed&quot;</span>
+
+        <span class="k">return</span> <span class="n">name</span></div>
+
+<div class="viewcode-block" id="AnalysisGroup.find_stream"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.find_stream">[docs]</a>    <span class="k">def</span> <span class="nf">find_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partial</span><span class="p">,</span> <span class="n">include_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find a stream by a partial identifier.</span>
+
+<span class="sd">        The identifier can either be a part of its slug or its name or the</span>
+<span class="sd">        name of the variable that it comes from.  Whatever you pass must</span>
+<span class="sd">        uniquely match exactly one stream in this analysis project or an</span>
+<span class="sd">        exception will be thrown.</span>
+
+<span class="sd">        Matching is done in a case insensitive fashion.</span>
+
+<span class="sd">        By default, only streams that are not empty are searched.  You can</span>
+<span class="sd">        override this by passing include_empty=True.  This behavior is the</span>
+<span class="sd">        same as the print_streams() behavior, so searching for a stream based</span>
+<span class="sd">        on what you find in print streams will work as expected.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            partial (str): A partial slug or identifier to use to uniquely</span>
+<span class="sd">                find one stream.</span>
+<span class="sd">            include_empty (bool): Also include streams that have no data in</span>
+<span class="sd">                the search.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The full slug of the stream that we were looking for, suitable</span>
+<span class="sd">                for passing to an IOTile.cloud api.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ArgumentError: If the partial matches no streams or if it matches</span>
+<span class="sd">                multiple streams.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partial</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">partial</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:x}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">partial</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partial</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">partial</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">partial</span><span class="p">)</span>
+
+        <span class="n">partial</span> <span class="o">=</span> <span class="n">partial</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="n">found</span> <span class="o">=</span> <span class="p">[</span><span class="n">slug</span> <span class="k">for</span> <span class="n">slug</span><span class="p">,</span> <span class="n">stream</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_table</span> <span class="k">if</span> <span class="p">(</span><span class="n">partial</span> <span class="ow">in</span> <span class="n">slug</span> <span class="ow">or</span> <span class="n">partial</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">include_empty</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_empty</span><span class="p">(</span><span class="n">slug</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">found</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;No stream found matching given partial identifier&quot;</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="n">partial</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">found</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Multiple matching streams found&quot;</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="n">partial</span><span class="p">,</span> <span class="n">slugs</span><span class="o">=</span><span class="n">found</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">found</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="AnalysisGroup.fetch_stream"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.fetch_stream">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug_or_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch data from a stream by its slug or name.</span>
+
+<span class="sd">        For example say you have the following stream in this analysis project:</span>
+<span class="sd">        s--0000-0011--0000-0000-0000-0222--5001 (Temperature)</span>
+
+<span class="sd">        You could fetch it by passing any of:</span>
+<span class="sd">         - temp</span>
+<span class="sd">         - 5001</span>
+<span class="sd">         - Temperature</span>
+<span class="sd">         - s--0000-0011--0000-0000-0000-0222--5001</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug_or_name (str): The stream that we want to fetch.  This</span>
+<span class="sd">                can be a partial match to a full stream slug or name so long</span>
+<span class="sd">                as it uniquely matches.  This is passed to find_stream so anything</span>
+<span class="sd">                that find_stream accepts will be accepted here.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            StreamSeries: A pandas DataFrame subclass containing the data points as columns.</span>
+<span class="sd">                The index of the dataframe is time in UTC.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_stream</span><span class="p">(</span><span class="n">slug_or_name</span><span class="p">)</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span><span class="o">.</span><span class="n">fetch_datapoints</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stream</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">raw</span><span class="o">.</span><span class="n">set_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+            <span class="n">vartype_slug</span> <span class="o">=</span> <span class="n">stream</span><span class="p">[</span><span class="s1">&#39;var_type&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">vartype_slug</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">vartype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_types</span><span class="p">[</span><span class="n">stream</span><span class="p">[</span><span class="s1">&#39;var_type&#39;</span><span class="p">]]</span>
+                <span class="n">raw</span><span class="o">.</span><span class="n">set_vartype</span><span class="p">(</span><span class="n">vartype</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">raw</span></div>
+
+<div class="viewcode-block" id="AnalysisGroup.fetch_events"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.fetch_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug_or_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch event metadata from a stream by its slug or name.</span>
+
+<span class="sd">        This function will return a Pandas DataFrame with all of the</span>
+<span class="sd">        events in the stream.  It will return only the extra summary</span>
+<span class="sd">        data stored with the event itself however.  If you need access to</span>
+<span class="sd">        any raw data uploaded with the event that was not part of the</span>
+<span class="sd">        summary, you need to use fetch_event for each event to get</span>
+<span class="sd">        the raw data.</span>
+
+<span class="sd">        slug_or_name is passed to find_stream to convert it into a slug so</span>
+<span class="sd">        partial stream names are accepted.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug_or_name (str): The stream that we want to fetch.  This</span>
+<span class="sd">                can be a partial match to a full stream slug or name so long</span>
+<span class="sd">                as it uniquely matches.  This is passed to find_stream so anything</span>
+<span class="sd">                that find_stream accepts will be accepted here.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            DataFrame: All of the extra_data associated with the event as a</span>
+<span class="sd">                Pandas DataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_stream</span><span class="p">(</span><span class="n">slug_or_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span><span class="o">.</span><span class="n">fetch_events</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AnalysisGroup.fetch_raw_events"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.fetch_raw_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_raw_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug_or_name</span><span class="p">,</span> <span class="n">subkey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch multiple raw events by numeric id.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug_or_name (str): The stream that we want to fetch.  This</span>
+<span class="sd">                can be a partial match to a full stream slug or name so long</span>
+<span class="sd">                as it uniquely matches.  This is passed to find_stream so anything</span>
+<span class="sd">                that find_stream accepts will be accepted here.</span>
+<span class="sd">            subkey (str): Only include a single key of the event.  This is usefuly for complex</span>
+<span class="sd">                events where you want to just focus on a portion of them.</span>
+<span class="sd">            postprocess (callable): (Optional) function to call on each raw event before</span>
+<span class="sd">                adding it to the dataframe.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: The raw event object data fetched from iotile.cloud.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_stream</span><span class="p">(</span><span class="n">slug_or_name</span><span class="p">)</span>
+
+        <span class="n">raw_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span><span class="o">.</span><span class="n">fetch_raw_events</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">postprocess</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">raw_events</span>
+
+        <span class="k">if</span> <span class="n">subkey</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">postprocess</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">subkey</span><span class="p">])</span> <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">raw_events</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">postprocess</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">raw_events</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()]</span>
+
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">raw_events</span><span class="o">.</span><span class="n">index</span><span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_stream_list</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">stream_list</span><span class="p">):</span>
+        <span class="n">out_streams</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">stream_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+                <span class="n">out_streams</span><span class="p">[</span><span class="n">obj</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out_streams</span><span class="p">[</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">obj</span>
+
+        <span class="k">return</span> <span class="n">out_streams</span>
+
+<div class="viewcode-block" id="AnalysisGroup.FromDevice"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.FromDevice">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">FromDevice</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">DOMAIN_NAME</span><span class="p">,</span> <span class="n">include_system</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a new AnalysisGroup from a single device.</span>
+
+<span class="sd">        The device can be found either by passing its slug or numeric</span>
+<span class="sd">        id directly or by passing a device specific external_id.</span>
+
+<span class="sd">        External ids are typically used to link a virtual IOTile device</span>
+<span class="sd">        with a separate physical object.  If you have a POD or Arch Node</span>
+<span class="sd">        then you don&#39;t need to worry about external ids.</span>
+
+<span class="sd">        **You must pass either a slug or an external_id but not both.**</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): the slug of the device that we want.  This can either</span>
+<span class="sd">                 be a short slug with leading zeros omitted or long slug. It</span>
+<span class="sd">                 should start with &#39;d--&#39; since it is a device slug.</span>
+<span class="sd">            external_id (str): The external id of the device that we want to</span>
+<span class="sd">                search for. This external_id must be unique among all devices</span>
+<span class="sd">                so that it matches a single device.</span>
+<span class="sd">            domain (str): Optional iotile.cloud domain to connect to (defaults to</span>
+<span class="sd">                https://iotile.cloud).</span>
+<span class="sd">            include_system (bool): Also include hidden system streams when fetching data</span>
+<span class="sd">                for this device.  System streams are not generally useful so this defaults</span>
+<span class="sd">                to False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">session</span> <span class="o">=</span> <span class="n">CloudSession</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">find_device</span><span class="p">(</span><span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">external_id</span><span class="p">)</span>
+
+        <span class="n">channel</span> <span class="o">=</span> <span class="n">IOTileCloudChannel</span><span class="p">(</span><span class="n">device</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">],</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">include_system</span><span class="o">=</span><span class="n">include_system</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AnalysisGroup</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AnalysisGroup.FromArchive"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.FromArchive">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">FromArchive</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">DOMAIN_NAME</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a new AnalysisGroup from a single archive.</span>
+
+<span class="sd">        The archive is found by passing its archive slug:</span>
+<span class="sd">        b--XXXX-XXXX-XXXX-XXXX</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): the slug of the archive that we want.  This can either</span>
+<span class="sd">                 be a short slug with leading zeros omitted or long slug. It</span>
+<span class="sd">                 should start with &#39;b--&#39; since it is an archive slug.</span>
+<span class="sd">            domain (str): Optional iotile.cloud domain to connect to (defaults to</span>
+<span class="sd">                https://iotile.cloud).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">channel</span> <span class="o">=</span> <span class="n">IOTileCloudChannel</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AnalysisGroup</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AnalysisGroup.FromSaved"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.FromSaved">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">FromSaved</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">format_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load a saved AnalysisGroup.</span>
+
+<span class="sd">        You must have previously called save on an AnalysisGroup</span>
+<span class="sd">        and passed it a known format_name and identifier.  Passing</span>
+<span class="sd">        that same identifier and format_name will reload that same</span>
+<span class="sd">        AnalysisGroup without needing online access to IOTile.cloud.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            identifier (str): The format specific identifier that we will</span>
+<span class="sd">                use to name this saved AnalysisGroup.  The meaning of this</span>
+<span class="sd">                parameter depends on the format but, for example, it could</span>
+<span class="sd">                be the file name.</span>
+<span class="sd">            format_name (str): An identifier for the format we wish to use to</span>
+<span class="sd">                save our data.  You can find the list of available formats</span>
+<span class="sd">                by calling list_formats().</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AnalysisGroup: The saved AnalysisGroup</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">loader</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_find_load_format</span><span class="p">(</span><span class="n">format_name</span><span class="p">)</span>
+
+        <span class="n">channel</span> <span class="o">=</span> <span class="n">loader</span><span class="p">(</span><span class="n">identifier</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AnalysisGroup</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AnalysisGroup.save"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">format_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save this AnalysisGroup.</span>
+
+<span class="sd">        You can then load this analysis group again by calling</span>
+<span class="sd">        AnalysisGroup.FromSaved(identifier, format)</span>
+
+<span class="sd">        with the same identifier and format information.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            identifier (str): The format specific identifier that we will</span>
+<span class="sd">                use to name this saved AnalysisGroup.  The meaning of this</span>
+<span class="sd">                parameter depends on the format but, for example, it could</span>
+<span class="sd">                be the file name.</span>
+<span class="sd">            format_name (str): An identifier for the format we wish to use to</span>
+<span class="sd">                save our data.  You can find the list of available formats</span>
+<span class="sd">                by calling list_formats().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">saver_factory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_save_format</span><span class="p">(</span><span class="n">format_name</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">saver_factory</span><span class="p">(</span><span class="n">identifier</span><span class="p">)</span> <span class="k">as</span> <span class="n">saver</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">slug</span><span class="p">,</span> <span class="n">stream</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">events</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">raw_events</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_empty</span><span class="p">(</span><span class="n">slug</span><span class="p">):</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_stream</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+                    <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_events</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+                    <span class="n">raw_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_raw_events</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+
+                <span class="n">saver</span><span class="o">.</span><span class="n">save_stream</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">raw_events</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">slug</span><span class="p">,</span> <span class="n">vartype</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variable_types</span><span class="p">):</span>
+                <span class="n">saver</span><span class="o">.</span><span class="n">save_vartype</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="n">vartype</span><span class="p">)</span>
+
+            <span class="n">saver</span><span class="o">.</span><span class="n">save_source_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_find_save_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">format_name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">iter_entry_points</span><span class="p">(</span><span class="s1">&#39;iotile_analytics.save_format&#39;</span><span class="p">,</span> <span class="n">format_name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">entry</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+        <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Could not find output format by name&quot;</span><span class="p">,</span> <span class="n">available_formats</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">list_formats</span><span class="p">())</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_find_load_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">format_name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">iter_entry_points</span><span class="p">(</span><span class="s1">&#39;iotile_analytics.load_format&#39;</span><span class="p">,</span> <span class="n">format_name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">entry</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+        <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Could not find output format by name&quot;</span><span class="p">,</span> <span class="n">available_formats</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">list_formats</span><span class="p">())</span>
+
+<div class="viewcode-block" id="AnalysisGroup.list_formats"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.list_formats">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list_formats</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List the installed formats in which we can save an AnalysisGroup.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list(str): A list of the names that can be passed to save or FromSaved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">iter_entry_points</span><span class="p">(</span><span class="s1">&#39;iotile_analytics.save_format&#39;</span><span class="p">)]</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

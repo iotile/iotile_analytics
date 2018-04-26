@@ -1,0 +1,686 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.offline.database &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.offline.database</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.offline.database</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Overall class for creating and managing offline data.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span>
+                        <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">int</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">past.builtins</span> <span class="k">import</span> <span class="n">basestring</span>
+<span class="kn">import</span> <span class="nn">tables</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">viewitems</span>
+<span class="kn">from</span> <span class="nn">iotile_analytics.core.stream_series</span> <span class="k">import</span> <span class="n">StreamSeries</span>
+<span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">ArgumentError</span>
+<span class="kn">from</span> <span class="nn">.table_descriptions</span> <span class="k">import</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">EventIndex</span><span class="p">,</span> <span class="n">PropertyTable</span><span class="p">,</span> <span class="n">DatabaseInfoTable</span><span class="p">,</span> <span class="n">PropertyTypes</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pickle</span>
+
+
+<div class="viewcode-block" id="CompatibleObjectAtom"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.CompatibleObjectAtom">[docs]</a><span class="k">class</span> <span class="nc">CompatibleObjectAtom</span><span class="p">(</span><span class="n">tables</span><span class="o">.</span><span class="n">ObjectAtom</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An object atom with a lower cpickle protocol.</span>
+
+<span class="sd">    This enables sharing hdf5 files between python 2 and python 3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_tobuffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">object_</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CompatibleObjectAtom.fromarray"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.CompatibleObjectAtom.fromarray">[docs]</a>    <span class="k">def</span> <span class="nf">fromarray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+        <span class="c1"># We have to check for an empty array because of a possible</span>
+        <span class="c1"># bug in HDF5 which makes it claim that a dataset has one</span>
+        <span class="c1"># record when in fact it is empty.</span>
+        <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="OfflineDatabase"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase">[docs]</a><span class="k">class</span> <span class="nc">OfflineDatabase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An offline database.</span>
+
+<span class="sd">    If you pass an existing file, this database will open that</span>
+<span class="sd">    file.  If you pass a non-existing file, this database will</span>
+<span class="sd">    create a new database.  If you pass nothing, a new in-memory</span>
+<span class="sd">    database will be created that will not be backed by file</span>
+<span class="sd">    storage.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): The path to the database file that we want</span>
+<span class="sd">            to create or open.  If None if passed (the default),</span>
+<span class="sd">            a new, in-memory database is created that will be</span>
+<span class="sd">            lost when the program is exited.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">tables</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;H5FD_CORE&quot;</span><span class="p">,</span> <span class="n">driver_core_backing_store</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_database</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_only</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span>
+
+        <span class="c1"># NB. It is important that this is a real str object and not a future.newstr</span>
+        <span class="c1"># otherwise pytables will throw an exception when it tries to open the file.</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">tables</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_only</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">tables</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_database</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_only</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_initialize_database</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create all necessary tables.&quot;&quot;&quot;</span>
+
+        <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;streams&#39;</span><span class="p">)</span>
+
+        <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;meta&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;archive_definitions&#39;</span><span class="p">,</span> <span class="n">CompatibleObjectAtom</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;device_definitions&#39;</span><span class="p">,</span> <span class="n">CompatibleObjectAtom</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;vartype_definitions&#39;</span><span class="p">,</span> <span class="n">CompatibleObjectAtom</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;source_info&#39;</span><span class="p">,</span> <span class="n">PropertyTable</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;properties&#39;</span><span class="p">,</span> <span class="n">PropertyTable</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">DatabaseInfoTable</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_populate_db_info</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_populate_db_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">info</span>
+
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">row</span>
+        <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;major_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;minor_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;patch_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">append</span><span class="p">()</span>
+
+<div class="viewcode-block" id="OfflineDatabase.save_stream"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.save_stream">[docs]</a>    <span class="k">def</span> <span class="nf">save_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raw_events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save a stream with timeseries and event data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): The stream slug to save</span>
+<span class="sd">            definition (dict): The stream metadata dictionary that comes</span>
+<span class="sd">                from the /api/v1/stream/&lt;slug&gt;/ API</span>
+<span class="sd">                This may be None if there is no stream metadata for this stream</span>
+<span class="sd">                which can happen if the stream is a hidden system stream.</span>
+<span class="sd">            data (StreamData): The raw stream timeseries data to save.</span>
+<span class="sd">            events (pandas.DataFrame): Any event summary data to save.</span>
+<span class="sd">            raw_events (pandas.DataFrame): The raw event data to save.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_only</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Attemping to save a stream in a read only database&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="c1"># Create a natural name for ease of access</span>
+        <span class="n">slug</span> <span class="o">=</span> <span class="n">slug</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+        <span class="n">node_path</span> <span class="o">=</span> <span class="s1">&#39;/streams/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">slug</span>
+
+        <span class="k">if</span> <span class="n">node_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Stream already exists in file, cannot save&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="n">has_raw_events</span> <span class="o">=</span> <span class="n">raw_events</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw_events</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">has_raw_events</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw_events</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;If you pass raw events, you must pass the same number as the number of events&quot;</span><span class="p">)</span>
+
+        <span class="n">filters</span> <span class="o">=</span> <span class="n">tables</span><span class="o">.</span><span class="n">Filters</span><span class="p">(</span><span class="n">complevel</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;/streams&#39;</span><span class="p">,</span> <span class="n">slug</span><span class="p">)</span>
+
+        <span class="n">arr_def</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;definition&#39;</span><span class="p">,</span> <span class="n">CompatibleObjectAtom</span><span class="p">(),</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
+        <span class="n">arr_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;events&#39;</span><span class="p">,</span> <span class="n">CompatibleObjectAtom</span><span class="p">(),</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
+        <span class="n">arr_rawevents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;raw_events&#39;</span><span class="p">,</span> <span class="n">CompatibleObjectAtom</span><span class="p">(),</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
+        <span class="n">table_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="n">Stream</span><span class="p">)</span>
+        <span class="n">table_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;event_index&#39;</span><span class="p">,</span> <span class="n">EventIndex</span><span class="p">)</span>
+
+        <span class="n">arr_def</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">definition</span><span class="p">)</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="n">table_events</span><span class="o">.</span><span class="n">row</span>
+
+        <span class="k">if</span> <span class="n">events</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()):</span>
+                <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_timecol</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
+                <span class="n">row</span><span class="p">[</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span>
+                <span class="n">row</span><span class="p">[</span><span class="s1">&#39;event_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+
+                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">()</span>
+
+                <span class="n">arr_events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">has_raw_events</span><span class="p">:</span>
+                    <span class="n">arr_rawevents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">raw_events</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+
+            <span class="n">table_events</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="n">table_data</span><span class="o">.</span><span class="n">row</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="n">row</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_timecol</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
+                <span class="n">row</span><span class="p">[</span><span class="s1">&#39;internal_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">()</span>
+
+            <span class="n">table_data</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OfflineDatabase.save_vartype"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.save_vartype">[docs]</a>    <span class="k">def</span> <span class="nf">save_vartype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_slug</span><span class="p">,</span> <span class="n">vartype</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save a vartype into the database.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            _slug (str): The variable type slug to save.</span>
+<span class="sd">            vartype (dict): The variable type data to save.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_only</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Attempted to save variable type in read only file&quot;</span><span class="p">)</span>
+
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">vartype_definitions</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vartype</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OfflineDatabase.save_source_info"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.save_source_info">[docs]</a>    <span class="k">def</span> <span class="nf">save_source_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save analysis group source metadata including properties if set.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            info (dict): A dict of string -&gt; string with the properties and data</span>
+<span class="sd">                about the analysis group source.</span>
+<span class="sd">            properties (dict): A dict of string -&gt; string with the properties and data</span>
+<span class="sd">                about the analysis group source.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_only</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Attempted to save source info in read only file&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encode_dict_in_table</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">source_info</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encode_dict_in_table</span><span class="p">(</span><span class="n">properties</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_encode_dict_in_table</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">table</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">row</span>
+            <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
+                <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;value_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PropertyTypes</span><span class="o">.</span><span class="n">STRING</span>
+                <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;str_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>  <span class="c1"># Important that this check comes first because isinstance(True, int) is True</span>
+                <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;value_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PropertyTypes</span><span class="o">.</span><span class="n">BOOL</span>
+                <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;bool_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;value_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PropertyTypes</span><span class="o">.</span><span class="n">INT</span>
+                <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;int_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;value_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PropertyTypes</span><span class="o">.</span><span class="n">NONE</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Unsupported data type in dictionary&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+            <span class="n">entry</span><span class="o">.</span><span class="n">append</span><span class="p">()</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_decode_dict_in_table</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">table</span><span class="p">):</span>
+        <span class="n">out_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">value_type</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;value_type&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">value_type</span> <span class="o">==</span> <span class="n">PropertyTypes</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;str_value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">value_type</span> <span class="o">==</span> <span class="n">PropertyTypes</span><span class="o">.</span><span class="n">INT</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;int_value&#39;</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">value_type</span> <span class="o">==</span> <span class="n">PropertyTypes</span><span class="o">.</span><span class="n">BOOL</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;bool_value&#39;</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">value_type</span> <span class="o">==</span> <span class="n">PropertyTypes</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Unsupported value type in database property&quot;</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">)</span>
+
+            <span class="n">out_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="n">out_data</span>
+
+<div class="viewcode-block" id="OfflineDatabase.fetch_source_info"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.fetch_source_info">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_source_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch presaved source info.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The decoded source information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decode_dict_in_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">source_info</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OfflineDatabase.fetch_properties"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.fetch_properties">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch saved properties.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The saved properties.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decode_dict_in_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_to_timecol</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">to_datetime64</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OfflineDatabase.list_streams"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.list_streams">[docs]</a>    <span class="k">def</span> <span class="nf">list_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of all streams.</span>
+
+<span class="sd">        This is equivalent to the IOTile.cloud API method</span>
+<span class="sd">        /api/v1/stream/</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list(dict): A list of dictionaries, one for each</span>
+<span class="sd">                stream that should be part of this analysis group.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">streams</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">_f_iter_nodes</span><span class="p">():</span>
+            <span class="n">slug</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">_v_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+            <span class="n">info_obj</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">info_obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">streams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">streams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info_obj</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">streams</span></div>
+
+<div class="viewcode-block" id="OfflineDatabase.close"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OfflineDatabase.get_stream_definition"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.get_stream_definition">[docs]</a>    <span class="k">def</span> <span class="nf">get_stream_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the stream definitions for a stream.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): The stream slug to query</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The stream metadata</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="n">slug</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Stream slug not found in OfflineDatabase&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="n">group</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">group</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="OfflineDatabase.fetch_datapoints"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.fetch_datapoints">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_datapoints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all timeseries data for a stream.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): The stream slug to query</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            StreamSeries: The stream data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="n">slug</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Stream slug not found in OfflineDatabase&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s1">&#39;timestamp&#39;</span><span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="s1">&#39;internal_value&#39;</span><span class="p">)</span>
+
+        <span class="n">dt_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">StreamSeries</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">dt_index</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_event_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">event_index</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<div class="viewcode-block" id="OfflineDatabase.fetch_events"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.fetch_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch all events for a given stream.</span>
+
+<span class="sd">        These are the event metadata dictionaries, not the raw</span>
+<span class="sd">        event data that may be stored along with the metadata.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): The slug of the stream that we should fetch</span>
+<span class="sd">                events for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: All of the events.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="n">slug</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Stream slug not found in OfflineDatabase&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event_index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">event_data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">events</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">event_data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_count_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count the number of data points and events in a stream.&quot;&quot;&quot;</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="n">slug</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Stream slug not found in OfflineDatabase&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="n">stream</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">data_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">event_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">events</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;points&#39;</span><span class="p">:</span> <span class="n">data_count</span><span class="p">,</span> <span class="s1">&#39;events&#39;</span><span class="p">:</span> <span class="n">event_count</span><span class="p">}</span>
+
+<div class="viewcode-block" id="OfflineDatabase.fetch_raw_events"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.fetch_raw_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_raw_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch all raw event data for this stream.</span>
+
+<span class="sd">        These are the raw json dictionaries that are stored for</span>
+<span class="sd">        each event.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slug (str): The slug of the stream that we should fetch</span>
+<span class="sd">                raw events for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: All of the raw events.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="n">slug</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Stream slug not found in OfflineDatabase&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event_index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">event_data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">raw_events</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">events</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">event_data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OfflineDatabase.count_streams"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.count_streams">[docs]</a>    <span class="k">def</span> <span class="nf">count_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slugs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count the number of events and data points in a stream.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slugs (list(str)): The slugs of the stream that we should count.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict(&lt;slug&gt;: {&#39;points&#39;: int, &#39;events&#39;: int}): A dict mapping dicts of 2</span>
+<span class="sd">                integers with the count of the number of events and the number of</span>
+<span class="sd">                data points in this stream.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="n">slug</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_stream</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span> <span class="k">for</span> <span class="n">slug</span> <span class="ow">in</span> <span class="n">slugs</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="OfflineDatabase.fetch_variable_types"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.fetch_variable_types">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_variable_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slugs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch variable type information for a list of variable slugs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            slugs (list(str)): The slugs of the variable types that we should fetch.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict(&lt;slug&gt;: dict): A dict mapping variable slugs to variable type definitions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">slugs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">slugs</span><span class="p">)</span>
+        <span class="n">vartypes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">vartype_definitions</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">vartypes</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">slugs</span><span class="p">}</span></div></div>
+
+
+<span class="c1"># Register hook to silently close files at process exit</span>
+<span class="c1"># From: http://www.pytables.org/cookbook/tailoring_atexit_hooks.html</span>
+<span class="k">def</span> <span class="nf">_silently_close_open_files</span><span class="p">(</span><span class="n">verbose</span><span class="p">):</span>
+    <span class="n">open_files</span> <span class="o">=</span> <span class="n">tables</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_open_files</span>
+
+    <span class="n">are_open_files</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">open_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">are_open_files</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Closing remaining open files:&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">StrictVersion</span><span class="p">(</span><span class="n">tables</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">StrictVersion</span><span class="p">(</span><span class="s2">&quot;3.1.0&quot;</span><span class="p">):</span>
+        <span class="c1"># make a copy of the open_files.handlers container for the iteration</span>
+        <span class="n">handlers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">open_files</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># for older versions of pytables, setup the handlers list from the</span>
+        <span class="c1"># keys</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">open_files</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">handlers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">open_files</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">fileh</span> <span class="ow">in</span> <span class="n">handlers</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">...&quot;</span> <span class="o">%</span> <span class="n">fileh</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="n">fileh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;done&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">are_open_files</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">atexit</span>
+<span class="kn">from</span> <span class="nn">distutils.version</span> <span class="k">import</span> <span class="n">StrictVersion</span>
+<span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">_silently_close_open_files</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,326 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.interactive.reports.stream_report &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.interactive.reports.stream_report</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.interactive.reports.stream_report</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="k">import</span> <span class="n">row</span><span class="p">,</span> <span class="n">layout</span>
+<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="k">import</span> <span class="n">BoxZoomTool</span><span class="p">,</span> <span class="n">PanTool</span><span class="p">,</span> <span class="n">ResetTool</span><span class="p">,</span> <span class="n">WheelZoomTool</span>
+<span class="kn">from</span> <span class="nn">iotile_analytics.core.exceptions</span> <span class="k">import</span> <span class="n">UsageError</span>
+<span class="kn">from</span> <span class="nn">iotile_analytics.interactive</span> <span class="k">import</span> <span class="n">BaseViewer</span><span class="p">,</span> <span class="n">TimeSelectViewer</span>
+<span class="kn">from</span> <span class="nn">.report</span> <span class="k">import</span> <span class="n">LiveReport</span>
+
+<span class="n">HEADER_TEMPLATE</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+
+<span class="s2">&lt;div class=&quot;before-content&quot;&gt;</span>
+<span class="s2">    &lt;h2 class=&#39;title&#39;&gt;Stream Overview ({{ stream_name }})&lt;/h2&gt;</span>
+<span class="s2">    &lt;ul&gt;</span>
+<span class="s2">        &lt;li&gt; Slug: {{ stream_slug }} &lt;/li&gt;</span>
+<span class="s2">        &lt;li&gt; Point Count: {{ stream_count }} &lt;/li&gt;</span>
+<span class="s2">        &lt;li&gt; First Point: {{ stream_first }} &lt;/li&gt;</span>
+<span class="s2">        &lt;li&gt; Last Point: {{ stream_last }} &lt;/li&gt;</span>
+<span class="s2">        &lt;li&gt; Display Units: {{ stream_units }}&lt;/li&gt;</span>
+<span class="s2">        {</span><span class="si">% i</span><span class="s2">f mdo is not none %}</span>
+<span class="s2">        &lt;li&gt; Custom Transformation: multiply={{ mdo[0] }}, divide={{ mdo[1] }}, offset={{ mdo[2] }}&lt;/li&gt;</span>
+<span class="s2">        {</span><span class="si">% e</span><span class="s2">ndif %}</span>
+<span class="s2">    &lt;/ul&gt;</span>
+<span class="s2">&lt;/div&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="StreamOverviewReport"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.stream_report.html#iotile_analytics.interactive.reports.stream_report.StreamOverviewReport">[docs]</a><span class="k">class</span> <span class="nc">StreamOverviewReport</span><span class="p">(</span><span class="n">LiveReport</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Display histogram and time series information about a stream.</span>
+
+<span class="sd">    This report generates two plots.  The first is a bar graph that shows how many</span>
+<span class="sd">    data points were received in this stream every X hours/weeks/days etc.  This is</span>
+<span class="sd">    particularly useful for diagnosing issue where data should be received regularly but</span>
+<span class="sd">    is not.  It can also help you orient yourself when looking through a stream with</span>
+<span class="sd">    data collected over widely separated time intervals like data for 2 months then a 3 month</span>
+<span class="sd">    gap then 1 month of data, etc.</span>
+
+<span class="sd">    The second plot is just a graph of the data in the stream over time.  You units of the</span>
+<span class="sd">    graph are whatever the internal units of the stream are unless you override them by</span>
+<span class="sd">    passing the name of your desired units as a parameter.  If you do choose to override</span>
+<span class="sd">    the units, you must specify a units name that has a known conversion from the internal</span>
+<span class="sd">    stream units.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stream (str): A unique identifier for the stream that we wish to download</span>
+<span class="sd">            and display.  This can be anything that could be passed to AnalysisGroup.fetch_stream</span>
+<span class="sd">            including a 4-character variable ID, a partial string that matches the label of the</span>
+<span class="sd">            stream, etc.</span>
+<span class="sd">        window (str): The aggregation period for showing when there is data in a stream.  You can</span>
+<span class="sd">            pass a value like &#39;days&#39;, &#39;hours&#39;, &#39;weeks&#39;, &#39;months&#39;.  This will be given to TimeSelectViewer</span>
+<span class="sd">            so any valid value there is acceptable here.  Defaults to days.</span>
+<span class="sd">        units (str): The desired units in which you want to see the data.  This must be defined as an</span>
+<span class="sd">            available output unit on the stream.  If not passed, the default is to use whatever the</span>
+<span class="sd">            internal units are of the stream.  You can see what output unit options are by passing</span>
+<span class="sd">            a random string here and looking at the error message.</span>
+<span class="sd">        mdo (list(float)): An optional MDO to use to convert the data stored in this stream.  If passed</span>
+<span class="sd">            this must be 3 float values that define a linear transformation of the data stored in the stream.</span>
+<span class="sd">            The values are interpreted as m/d*value + o where the argument is specified as [m, d, o].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;days&#39;</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mdo</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StreamOverviewReport</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">UNHOSTED</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">fetch_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mdo</span> <span class="o">=</span> <span class="n">mdo</span>
+        <span class="k">if</span> <span class="n">units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">units</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span><span class="o">.</span><span class="n">available_units</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Unknown output units specified&quot;</span><span class="p">,</span> <span class="n">known_units</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span><span class="o">.</span><span class="n">available_units</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mdo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mdo</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;When specifying a fixed MDO, you must specify 3 float values for the multiple, divide and offset&quot;</span><span class="p">,</span> <span class="n">mdo</span><span class="o">=</span><span class="n">mdo</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span><span class="o">.</span><span class="n">apply_mdo</span><span class="p">(</span><span class="o">*</span><span class="n">mdo</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">before_content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_info</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">stream</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selector</span> <span class="o">=</span> <span class="n">TimeSelectViewer</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span><span class="p">],</span> <span class="n">window</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">960</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">y_label</span><span class="o">=</span><span class="s2">&quot;Point Count&quot;</span><span class="p">,</span> <span class="n">toolbar_location</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+                                          <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">BoxZoomTool</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="s1">&#39;width&#39;</span><span class="p">),</span> <span class="n">WheelZoomTool</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="s2">&quot;width&quot;</span><span class="p">),</span> <span class="n">PanTool</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="s1">&#39;width&#39;</span><span class="p">),</span> <span class="n">ResetTool</span><span class="p">()])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">BaseViewer</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">960</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">x_type</span><span class="o">=</span><span class="s1">&#39;datetime&#39;</span><span class="p">,</span> <span class="n">y_label</span><span class="o">=</span><span class="s2">&quot;Stream Value (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit_name</span><span class="p">(),</span> <span class="n">toolbar_location</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+                                <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">BoxZoomTool</span><span class="p">(),</span> <span class="n">PanTool</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="s1">&#39;width&#39;</span><span class="p">),</span> <span class="n">WheelZoomTool</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="s2">&quot;width&quot;</span><span class="p">),</span> <span class="n">ResetTool</span><span class="p">()])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">add_series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_selector</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">figure</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_unit_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Custom Transformation&quot;</span>
+
+        <span class="k">return</span> <span class="s1">&#39;Internal Units&#39;</span>
+
+    <span class="k">def</span> <span class="nf">_render_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+        <span class="n">slug</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">find_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+        <span class="n">first</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">first</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;stream_name&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">get_stream_name</span><span class="p">(</span><span class="n">slug</span><span class="p">),</span>
+            <span class="s1">&#39;stream_slug&#39;</span><span class="p">:</span> <span class="n">slug</span><span class="p">,</span>
+            <span class="s1">&#39;stream_count&#39;</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">stream_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;points&#39;</span><span class="p">,</span> <span class="s1">&#39;Unknown&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;stream_units&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit_name</span><span class="p">(),</span>
+            <span class="s1">&#39;stream_first&#39;</span><span class="p">:</span> <span class="n">first</span><span class="p">,</span>
+            <span class="s1">&#39;stream_last&#39;</span><span class="p">:</span> <span class="n">last</span><span class="p">,</span>
+            <span class="s1">&#39;mdo&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdo</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_string_template</span><span class="p">(</span><span class="n">HEADER_TEMPLATE</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

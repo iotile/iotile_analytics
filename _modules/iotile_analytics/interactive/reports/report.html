@@ -1,0 +1,474 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.interactive.reports.report &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.interactive.reports.report</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.interactive.reports.report</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="nb">open</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="k">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">PackageLoader</span><span class="p">,</span> <span class="n">contextfunction</span><span class="p">,</span> <span class="n">Markup</span>
+<span class="kn">from</span> <span class="nn">iotile_analytics.core.exceptions</span> <span class="k">import</span> <span class="n">UsageError</span>
+<span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">viewitems</span>
+<span class="kn">from</span> <span class="nn">bokeh.embed</span> <span class="k">import</span> <span class="n">file_html</span>
+<span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="k">import</span> <span class="n">column</span>
+<span class="kn">from</span> <span class="nn">bokeh.resources</span> <span class="k">import</span> <span class="n">Resources</span>
+<span class="kn">from</span> <span class="nn">..app</span> <span class="k">import</span> <span class="n">AnalyticsObject</span>
+<span class="kn">from</span> <span class="nn">.analysis_template</span> <span class="k">import</span> <span class="n">AnalysisTemplate</span>
+
+
+<div class="viewcode-block" id="include_file"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.include_file">[docs]</a><span class="nd">@contextfunction</span>
+<span class="k">def</span> <span class="nf">include_file</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Jinja2 function to allow including literal files into a template.</span>
+
+<span class="sd">    This is used for emdedding jquery into our unhosted reports.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">env</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">environment</span>
+    <span class="k">return</span> <span class="n">Markup</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">get_source</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="LiveReport"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport">[docs]</a><span class="k">class</span> <span class="nc">LiveReport</span><span class="p">(</span><span class="n">AnalysisTemplate</span><span class="p">,</span> <span class="n">AnalyticsObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for all dynamic html documents that can be exported.</span>
+
+<span class="sd">    A LiveReport is basically a Bokeh embedded document that can reference</span>
+<span class="sd">    external files.  If external files are referenced, they must be done so</span>
+<span class="sd">    using one of the primitive methods defined by this class so that we are</span>
+<span class="sd">    able to properly export the files in a way that allows them to be loaded</span>
+<span class="sd">    outside of the context of a bokeh application or notebook.</span>
+
+<span class="sd">    Structuring a Bokeh document so that we can export it is the primary job</span>
+<span class="sd">    of the LiveReport class.  The primary difference between a LiveReport and</span>
+<span class="sd">    a standard embedded Bokeh document is the method by which a LiveReport is</span>
+<span class="sd">    able to reference a tree of local files and load them into</span>
+<span class="sd">    ColumnDataSource objects without needing a web browser.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        target (int): Whether we are targetting a hosted or unhosted environment</span>
+<span class="sd">            so that we generate the appropriate content.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Export targets</span>
+    <span class="n">UNHOSTED</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">HOSTED</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Unnamed Live Report&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_files</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadable_models</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_relative_dir</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>
+
+        <span class="c1"># Internal template variables that subclasses can override to insert details into the</span>
+        <span class="c1"># template.</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">before_content</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">after_content</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">footer</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_scripts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_css</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Root object containing all models for this report.</span>
+
+<span class="sd">        This is autogenerated from the list of models that the report</span>
+<span class="sd">        generates but does not include any explanatory text above the</span>
+<span class="sd">        models in before_content or after_content.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">column</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">standalone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Whether this report creates a single file or multiple files.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="LiveReport.mark_loadable_source"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport.mark_loadable_source">[docs]</a>    <span class="k">def</span> <span class="nf">mark_loadable_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">loadable_options</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Mark a ColumnDataSource as externally loadable.</span>
+
+<span class="sd">        This function returns the name of a javascript function that takes a</span>
+<span class="sd">        single argument and loads the passed data source with one of the</span>
+<span class="sd">        loadable options given its dictionary key which should be string or</span>
+<span class="sd">        an integer that will be formated in decimal and used as a file name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ref</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">ref</span>
+        <span class="n">model_id</span> <span class="o">=</span> <span class="n">ref</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="n">safe_model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+        <span class="n">func_name</span> <span class="o">=</span> <span class="s2">&quot;load_model_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">safe_model_id</span><span class="p">)</span>
+        <span class="n">trigger_name</span> <span class="o">=</span> <span class="s2">&quot;trigger_load_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">safe_model_id</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="n">loadable_options</span><span class="p">):</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">safe_model_id</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+            <span class="n">file_obj</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">file_name</span><span class="p">,</span>
+                <span class="s1">&#39;columns&#39;</span><span class="p">:</span> <span class="n">columns</span><span class="p">,</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">model_id</span><span class="p">,</span>
+                <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">values</span><span class="p">,</span>
+                <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="n">func_name</span>
+            <span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">external_files</span><span class="p">[</span><span class="n">file_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_obj</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadable_models</span><span class="p">[</span><span class="n">model_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;trigger_function&#39;</span><span class="p">:</span> <span class="n">trigger_name</span><span class="p">,</span>
+            <span class="s1">&#39;load_function&#39;</span><span class="p">:</span> <span class="n">func_name</span><span class="p">,</span>
+            <span class="s1">&#39;safe_id&#39;</span><span class="p">:</span> <span class="n">safe_model_id</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">trigger_name</span></div>
+
+<div class="viewcode-block" id="LiveReport.render_jsonp"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport.render_jsonp">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">render_jsonp</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Render a dictionary as a jsonp file.</span>
+
+<span class="sd">        These files are suitable for loading from a local filesystem so they</span>
+<span class="sd">        can be used for unhosted LiveReports that are just opened in a web</span>
+<span class="sd">        browser.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path (str): The path at which to save the resulting jsonp file.</span>
+<span class="sd">            info (dict): An info dictionary as created by the mark_loadable_source</span>
+<span class="sd">                function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">])</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="n">write_data</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">);&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;func&#39;</span><span class="p">],</span> <span class="n">json_data</span><span class="p">)</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">write_data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LiveReport.find_template"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport.find_template">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">find_template</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find a template inside package data.</span>
+
+<span class="sd">        This helper function will find a jinja2 template for you by looking</span>
+<span class="sd">        inside a data inside an installed package.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            package (str): A dotted package name for the subpackage that</span>
+<span class="sd">                contains folder, which should not have an __init__.py file</span>
+<span class="sd">            folder (str): The name of the folder that contains the templates</span>
+<span class="sd">                and is located in the installed subpackage specified by package.</span>
+<span class="sd">            name (str): The name of the template that we wish to load.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            jinja2.Template: The loaded template.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">loader</span><span class="o">=</span><span class="n">PackageLoader</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">folder</span><span class="p">))</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">template</span></div>
+
+<div class="viewcode-block" id="LiveReport.render_string_template"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport.render_string_template">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">render_string_template</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">template_str</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Render a string jinja2 template as a string.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            template_str (str): The template that we wish to render.</span>
+<span class="sd">            variables (dict): The variables that we wish to substitute</span>
+<span class="sd">                into the template.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The rendered string template.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">template_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LiveReport.run"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Render this report to output_path.</span>
+
+<span class="sd">        If this report is a standalone html file, the output path</span>
+<span class="sd">        will have .html appended to it and be a single file.</span>
+
+<span class="sd">        If this report is not standalone, the output will be</span>
+<span class="sd">        folder that is created at output_path.</span>
+
+<span class="sd">        If bundle is True and the report is not standalone, it will be zipped</span>
+<span class="sd">        into a file at output_path.zip.  Any html or directory that was</span>
+<span class="sd">        created as an intermediary before zipping will be deleted before this</span>
+<span class="sd">        function returns.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            output_path (str): the path to the folder that we wish</span>
+<span class="sd">                to create.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The path to the actual file or directory created.  This</span>
+<span class="sd">                may differ from the file you pass in output_path by an</span>
+<span class="sd">                extension or the addition of a subdirectory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">all_files</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;You must pass an output_path to render this LiveReport&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Make sure we have the path stem</span>
+        <span class="k">if</span> <span class="n">output_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">):</span>
+            <span class="n">output_path</span> <span class="o">=</span> <span class="n">output_path</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">standalone</span><span class="p">:</span>
+            <span class="n">html_path</span> <span class="o">=</span> <span class="n">output_path</span> <span class="o">+</span> <span class="s2">&quot;.html&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+            <span class="n">html_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;index.html&#39;</span><span class="p">)</span>
+
+        <span class="n">all_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">html_path</span><span class="p">)</span>
+
+        <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">loader</span><span class="o">=</span><span class="n">PackageLoader</span><span class="p">(</span><span class="s1">&#39;iotile_analytics.interactive.reports&#39;</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">))</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="p">[</span><span class="s1">&#39;include_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">include_file</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNHOSTED</span><span class="p">:</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s1">&#39;unhosted_file.html&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;HOSTED mode for LiveReports is not yet supported&quot;</span><span class="p">)</span>
+
+        <span class="n">template_vars</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;loadable_models&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadable_models</span><span class="p">,</span>
+            <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">,</span>
+            <span class="s1">&#39;before_content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">before_content</span><span class="p">,</span>
+            <span class="s1">&#39;after_content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">after_content</span><span class="p">,</span>
+            <span class="s1">&#39;footer&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">footer</span><span class="p">,</span>
+            <span class="s1">&#39;extra_scripts&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_scripts</span>
+        <span class="p">}</span>
+
+        <span class="n">rendered_html</span> <span class="o">=</span> <span class="n">file_html</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">,</span> <span class="n">Resources</span><span class="p">(</span><span class="s1">&#39;inline&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">template_vars</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">html_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">rendered_html</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">standalone</span><span class="p">:</span>
+            <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">fileinfo</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_files</span><span class="p">):</span>
+                <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+                <span class="n">all_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNHOSTED</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">render_jsonp</span><span class="p">(</span><span class="n">file_path</span> <span class="o">+</span> <span class="s2">&quot;.jsonp&quot;</span><span class="p">,</span> <span class="n">fileinfo</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;HOSTED mode for LiveReports is not yet supported&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">all_files</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

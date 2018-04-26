@@ -1,0 +1,625 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.interactive.scripts.analytics_host &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.interactive.scripts.analytics_host</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.interactive.scripts.analytics_host</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A cmdline host for running AnalysisTemplates on data from iotile.cloud.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">input</span><span class="p">,</span> <span class="nb">str</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+<span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">viewitems</span>
+<span class="kn">from</span> <span class="nn">iotile_analytics.core.exceptions</span> <span class="k">import</span> <span class="n">UsageError</span><span class="p">,</span> <span class="n">AuthenticationError</span>
+<span class="kn">from</span> <span class="nn">iotile_analytics.core</span> <span class="k">import</span> <span class="n">CloudSession</span><span class="p">,</span> <span class="n">AnalysisGroup</span><span class="p">,</span> <span class="n">Environment</span>
+<span class="kn">from</span> <span class="nn">typedargs.doc_parser</span> <span class="k">import</span> <span class="n">ParsedDocstring</span>
+<span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">ValidationError</span><span class="p">,</span> <span class="n">ArgumentError</span>
+<span class="kn">from</span> <span class="nn">typedargs.metadata</span> <span class="k">import</span> <span class="n">AnnotatedMetadata</span>
+<span class="kn">from</span> <span class="nn">typedargs.terminal</span> <span class="k">import</span> <span class="n">get_terminal_size</span>
+<span class="kn">from</span> <span class="nn">iotile_cloud.api.connection</span> <span class="k">import</span> <span class="n">DOMAIN_NAME</span>
+
+
+<span class="n">DESCRIPTION</span> <span class="o">=</span> \
+<span class="sd">&quot;&quot;&quot;Run precreated analysis templates against devices or archives stored locally or in iotile.cloud.</span>
+
+<span class="sd">analytics-host is designed to let people quickly run precreated analysis</span>
+<span class="sd">operatation on their data. An example would be creating a summary report that</span>
+<span class="sd">shows high level information about all data received from a given device or</span>
+<span class="sd">inside of a particular archive.</span>
+
+<span class="sd">You do not need to have an internet connection to use analytics-host.  While</span>
+<span class="sd">it can automatically pull your information from iotile.cloud using your login</span>
+<span class="sd">credentials, it can also run most analyses locally using predownloaded data</span>
+<span class="sd">that you have on your computer.</span>
+
+<span class="sd">The most up-to-date reference information is always available online at:</span>
+<span class="sd">http://iotile-analytics.readthedocs.io/en/latest/</span>
+
+<span class="sd">Most of the analysis templates included with analytics-host create interactive</span>
+<span class="sd">html web pages that embed graphs, controls and tables showing the results of</span>
+<span class="sd">the analysis performed.  These html files are designed to be opened in any</span>
+<span class="sd">modern web browser and typically do not need an internet connection.</span>
+
+<span class="sd">basic usage:</span>
+
+<span class="sd">- analytics-host will ask you to confirm everything before you do it unless</span>
+<span class="sd">  you pass the -c flag indicating that you don&#39;t want this behavior.</span>
+
+<span class="sd">- you typically need to specify an output path for where the results of your</span>
+<span class="sd">  analysis should be saved.  You do this using the -o,--output &lt;path&gt; flag.</span>
+<span class="sd">  Some simple analysis templates can just print their output to the screen</span>
+<span class="sd">  but most require a file.  Some analysis template generate many files so the</span>
+<span class="sd">  path you pass here will be interpreted as a directory where all of the files</span>
+<span class="sd">  should be saved.</span>
+
+<span class="sd">- you need to identify the data you are looking for in the cloud by its *slug*</span>
+<span class="sd">  which is an alphanumeric identifier that starts with d-- for a device or</span>
+<span class="sd">  b-- for an archive.</span>
+
+<span class="sd">  For example, &quot;d--0000-0000-0000-0123&quot; or &quot;b--0001-0000-0000-0100&quot;.</span>
+
+<span class="sd">- if your analysis generates multiple files you can have analytics-host bundle</span>
+<span class="sd">  them into a zip file for you by using the `-b` flag.</span>
+
+<span class="sd">examples:</span>
+
+<span class="sd">To see what types of analysis you have installed run:</span>
+<span class="sd">$ analytics-host -l</span>
+
+<span class="sd">To see help information about a specific AnalysisTemplate, pass it by name</span>
+<span class="sd">using -t along with -l:</span>
+<span class="sd">$ analytics-host -l -t basic_info</span>
+
+<span class="sd">To see this help information do:</span>
+<span class="sd">$ analytics-host -h</span>
+
+<span class="sd">If you have the package iotile-analytics-offline installed, you can download</span>
+<span class="sd">all data from a specific device for offline access using:</span>
+<span class="sd">$ analytics-host -t save_hdf5 &lt;device slug&gt; -o &lt;output_path&gt; -c</span>
+
+<span class="sd">advanced usage:</span>
+
+<span class="sd">Some analysis templates are configurable and require that you pass them</span>
+<span class="sd">arguments.  You can see if any arguments are accepted by running:</span>
+<span class="sd">$ analytics-host -l -t &lt;template name&gt;</span>
+
+<span class="sd">If you do need to pass arguments, you must pass them using the `-a, --arg`</span>
+<span class="sd">option in the form of `name=value` where name is the parameter name</span>
+<span class="sd">shown in the above command and value is the value you want to pass.</span>
+
+<span class="sd">For example, if you had a template named &quot;excited_report&quot; that took a</span>
+<span class="sd">parameter named title as a string and show_bold as a boolean, you would</span>
+<span class="sd">invoke it using:</span>
+<span class="sd">$ analytics-host -t excited_report -a &quot;title=Your Title&quot; -a show_bold=true</span>
+
+<span class="sd">Note that you need to use quote around your first argument since it contains a</span>
+<span class="sd">space.  Quotes around an argument not containing a space are optional.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="build_args"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.build_args">[docs]</a><span class="k">def</span> <span class="nf">build_args</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Create a command line parser.&quot;&quot;&quot;</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">DESCRIPTION</span><span class="p">,</span> <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawDescriptionHelpFormatter</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--verbose&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Increase logging level (goes error, warn, info, debug)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-u&#39;</span><span class="p">,</span> <span class="s1">&#39;--user&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Your iotile.cloud user name.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="s1">&#39;--no-verify&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Do not verify the SSL certificate of iotile.cloud&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="s1">&#39;--password&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Your iotile.cloud password.  If not specified it will be prompted when needed.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--output&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The output path that you wish to save the report at.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="s1">&#39;--template&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The name of the analysis template to run&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--include-system&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Also include hidden system streams.  This only affects reports created from device objects, not projects or datablocks/archives&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="s1">&#39;--arg&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pass an argument to the template you are running, should be in the form name=value&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--no-confirm&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Do not confirm the analysis that you are about to perforn and prompt for parameters&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-l&#39;</span><span class="p">,</span> <span class="s1">&#39;--list&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;List all known analysis types without running one&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="s1">&#39;--bundle&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Bundle the rendered output into a zip file&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--domain&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">DOMAIN_NAME</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Domain to use for remote queries, defaults to https://iotile.cloud&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;analysis_group&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The slug or path of the object you want to perform analysis on&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parser</span></div>
+
+
+<div class="viewcode-block" id="find_live_reports"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.find_live_reports">[docs]</a><span class="k">def</span> <span class="nf">find_live_reports</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Find all installed live reports.&quot;&quot;&quot;</span>
+
+    <span class="n">reports</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">iter_entry_points</span><span class="p">(</span><span class="s1">&#39;iotile_analytics.live_report&#39;</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">reports</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: AnalysisTemplate added twice with the same name </span><span class="si">%s</span><span class="s2">, replacing older version&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="n">reports</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>
+
+    <span class="k">return</span> <span class="n">reports</span></div>
+
+
+<div class="viewcode-block" id="setup_logging"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.setup_logging">[docs]</a><span class="k">def</span> <span class="nf">setup_logging</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Setup log level and output.&quot;&quot;&quot;</span>
+
+    <span class="n">should_log</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">verbosity</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span>
+
+    <span class="n">root</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">should_log</span><span class="p">:</span>
+        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1">.</span><span class="si">%(msecs)03d</span><span class="s1"> </span><span class="si">%(levelname).3s</span><span class="s1"> </span><span class="si">%(name)s</span><span class="s1"> </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;%y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span>
+        <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+
+        <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+
+        <span class="n">loglevels</span> <span class="o">=</span> <span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">verbosity</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">loglevels</span><span class="p">):</span>
+            <span class="n">verbosity</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">loglevels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="n">level</span> <span class="o">=</span> <span class="n">loglevels</span><span class="p">[</span><span class="n">verbosity</span><span class="p">]</span>
+
+        <span class="n">root</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="list_known_reports"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.list_known_reports">[docs]</a><span class="k">def</span> <span class="nf">list_known_reports</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Print a table of all known analysis report types.&quot;&quot;&quot;</span>
+
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+    <span class="n">reports</span> <span class="o">=</span> <span class="n">find_live_reports</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Installed AnalysisTemplate Count: </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">reports</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Known Analysis Templates:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="n">reports</span><span class="p">):</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;No description given.&#39;</span>
+
+        <span class="n">docstring</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">docstring</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">doc</span> <span class="o">=</span> <span class="n">ParsedDocstring</span><span class="p">(</span><span class="n">docstring</span><span class="p">)</span>
+                <span class="n">desc</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">short_desc</span>
+        <span class="k">except</span> <span class="n">ValidationError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error parsing docstring for AnalysisTemplate type </span><span class="si">%s</span><span class="s2">, class </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+            <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;Error parsing docstring for AnalysisTemplate class.&#39;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">desc</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="print_report_details"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.print_report_details">[docs]</a><span class="k">def</span> <span class="nf">print_report_details</span><span class="p">(</span><span class="n">report</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Print detailed usage information for a report class.&quot;&quot;&quot;</span>
+
+    <span class="n">docstring</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">docstring</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">ParsedDocstring</span><span class="p">(</span><span class="n">docstring</span><span class="p">)</span>
+            <span class="n">width</span><span class="p">,</span> <span class="n">_height</span> <span class="o">=</span> <span class="n">get_terminal_size</span><span class="p">()</span>
+
+            <span class="c1"># Workaround terminals that do not support getting their width</span>
+            <span class="c1"># such as Travis CI&#39;s build server</span>
+            <span class="k">if</span> <span class="n">width</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">width</span> <span class="o">=</span> <span class="mi">80</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">wrap_and_format</span><span class="p">(</span><span class="n">include_params</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">include_return</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">excluded_params</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Report has no usage information.&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">ValidationError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error parsing docstring for report.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="find_analysis_group"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.find_analysis_group">[docs]</a><span class="k">def</span> <span class="nf">find_analysis_group</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find an analysis group by name.&quot;&quot;&quot;</span>
+
+    <span class="n">Environment</span><span class="o">.</span><span class="n">SetupScript</span><span class="p">()</span>
+
+    <span class="n">group</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">analysis_group</span>
+    <span class="n">is_cloud</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;d--&#39;</span><span class="p">):</span>
+        <span class="n">is_cloud</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">generator</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">AnalysisGroup</span><span class="o">.</span><span class="n">FromDevice</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">include_system</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">include_system</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">group</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;b--&#39;</span><span class="p">):</span>
+        <span class="n">is_cloud</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">generator</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">AnalysisGroup</span><span class="o">.</span><span class="n">FromArchive</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">domain</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">group</span><span class="p">):</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ext</span> <span class="o">!=</span> <span class="s1">&#39;.hdf5&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Only hdf5 formatted local analysis group files are supported&quot;</span><span class="p">)</span>
+
+        <span class="n">generator</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">AnalysisGroup</span><span class="o">.</span><span class="n">FromSaved</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;hdf5&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Could not find object specified for report source: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">group</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_confirm</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_cloud</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running report </span><span class="si">%s</span><span class="s2"> against object </span><span class="si">%s</span><span class="s2"> in the cloud&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">template</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You will need to provide your iotile.cloud login credentials.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running report </span><span class="si">%s</span><span class="s2"> against local file </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">template</span><span class="p">,</span> <span class="n">group</span><span class="p">))</span>
+
+        <span class="n">resp</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot; - Are you sure you wish to continue (y/n)? &quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Aborting because the user did not confirm.&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">is_cloud</span><span class="p">:</span>
+        <span class="n">CloudSession</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_verify</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">generator</span><span class="p">(</span><span class="n">group</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_arguments"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.check_arguments">[docs]</a><span class="k">def</span> <span class="nf">check_arguments</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">confirm</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check and optionally explicitly confirm the arguments that will be used.&quot;&quot;&quot;</span>
+
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">AnnotatedMetadata</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+    <span class="n">metadata</span><span class="o">.</span><span class="n">load_from_doc</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">conv_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">metadata</span><span class="o">.</span><span class="n">convert_argument</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="n">args</span><span class="p">)}</span>
+    <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">exc</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Argument: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">exc</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;argument&#39;</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Value: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">exc</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;arg_value&#39;</span><span class="p">])</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;domain&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">arg_names</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;domain&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+
+        <span class="n">metadata</span><span class="o">.</span><span class="n">check_spec</span><span class="p">([</span><span class="kc">None</span><span class="p">],</span> <span class="n">args</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">ArgumentError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: Missing or excessive argument.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">exc</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">confirm</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Passing no arguments to report generator.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Passing the following arguments to report generator:&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="n">conv_args</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; - </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+
+    <span class="n">resp</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot; - Are you sure you wish to continue (y/n)? &quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Aborting because the user did not confirm arguments.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="split_args"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.split_args">[docs]</a><span class="k">def</span> <span class="nf">split_args</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Split name=value in a dictionary.&quot;&quot;&quot;</span>
+
+    <span class="n">split_args</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">comb</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">comb</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+        <span class="n">split_args</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">return</span> <span class="n">split_args</span></div>
+
+
+<div class="viewcode-block" id="perform_analysis"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.perform_analysis">[docs]</a><span class="k">def</span> <span class="nf">perform_analysis</span><span class="p">(</span><span class="n">report_class</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bundle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save the results of an AnalysisTemplate to an output path or the console.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">AnnotatedMetadata</span><span class="p">(</span><span class="n">report_class</span><span class="p">)</span>
+    <span class="n">metadata</span><span class="o">.</span><span class="n">load_from_doc</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="s1">&#39;domain&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;You cannot explicitly pass a domain argument to an AnalysisTemplate.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;domain&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">arg_names</span><span class="p">:</span>
+        <span class="n">args</span><span class="p">[</span><span class="s1">&#39;domain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain</span>
+
+    <span class="n">conv_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">metadata</span><span class="o">.</span><span class="n">convert_argument</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="n">args</span><span class="p">)}</span>
+
+    <span class="n">report_obj</span> <span class="o">=</span> <span class="n">report_class</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="o">**</span><span class="n">conv_args</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">report_obj</span><span class="o">.</span><span class="n">standalone</span> <span class="ow">and</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;You must specify an output path for this AnalysisTemplate type.&quot;</span><span class="p">)</span>
+
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">report_obj</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">paths</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">bundle</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;The report did not produce any output files so there is nothing to bundle.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">bundle</span><span class="p">:</span>
+        <span class="n">output_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">output_path</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">bundle_path</span> <span class="o">=</span> <span class="n">output_name</span> <span class="o">+</span> <span class="s2">&quot;.zip&quot;</span>
+        <span class="k">if</span> <span class="n">report_obj</span><span class="o">.</span><span class="n">standalone</span><span class="p">:</span>
+            <span class="n">main_path</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">zip_obj</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">bundle_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span>
+            <span class="n">zip_obj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">main_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">main_path</span><span class="p">))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">main_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">make_archive</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;zip&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">)))</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">bundle_path</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">paths</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main entry point for analytics-report script.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">argv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">argv</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">argv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">build_args</span><span class="p">()</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">argv</span><span class="p">)</span>
+
+    <span class="n">setup_logging</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">list</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">template</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">list_known_reports</span><span class="p">()</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="n">reports</span> <span class="o">=</span> <span class="n">find_live_reports</span><span class="p">()</span>
+    <span class="n">report_obj</span> <span class="o">=</span> <span class="n">reports</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">template</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">report_obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: could not find report by name: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">template</span><span class="p">)</span>
+        <span class="n">list_known_reports</span><span class="p">()</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">list</span><span class="p">:</span>
+        <span class="n">print_report_details</span><span class="p">(</span><span class="n">report_obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="n">report_args</span> <span class="o">=</span> <span class="n">split_args</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">arg</span><span class="p">)</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">find_analysis_group</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="n">check_arguments</span><span class="p">(</span><span class="n">report_obj</span><span class="p">,</span> <span class="n">report_args</span><span class="p">,</span> <span class="n">confirm</span><span class="o">=</span><span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_confirm</span><span class="p">)</span>
+
+    <span class="n">rendered_paths</span> <span class="o">=</span> <span class="n">perform_analysis</span><span class="p">(</span><span class="n">report_obj</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">report_args</span><span class="p">,</span> <span class="n">bundle</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">bundle</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">domain</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rendered_paths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Rendered report to: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rendered_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="cmdline_main"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.cmdline_main">[docs]</a><span class="k">def</span> <span class="nf">cmdline_main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wrapper around main that catches exceptions and prints them nicely.&quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="n">main</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">AuthenticationError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">ERROR: Could not log in to iotile cloud server using provided username and password.&#39;</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">except</span> <span class="n">UsageError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">USAGE ERROR: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">exc</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">params</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)))</span>
+
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">return</span> <span class="n">retval</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,320 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.core.utilities.envelope &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.core.utilities.envelope</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.core.utilities.envelope</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Envelope calculation from a series of sampled functions.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span>
+                        <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="k">import</span> <span class="n">interp1d</span>
+<span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">ArgumentError</span>
+<span class="kn">from</span> <span class="nn">.domain</span> <span class="k">import</span> <span class="n">combine_domains</span>
+
+
+<div class="viewcode-block" id="envelope"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.utilities.envelope.html#iotile_analytics.core.utilities.envelope.envelope">[docs]</a><span class="k">def</span> <span class="nf">envelope</span><span class="p">(</span><span class="o">*</span><span class="n">arrays</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the minimum and maximum envelopes from a series of arrays.</span>
+
+<span class="sd">    All passed in arguments should be 2D arrays.  The domain of all of the</span>
+<span class="sd">    functions is found using combine_domains() and this is then divided into</span>
+<span class="sd">    a fixed number of buckets using the bin_count keyword parameter (that</span>
+<span class="sd">    must be passed as a keyword).</span>
+
+<span class="sd">    For each bin in the combined domain, the minimum and maximum values in</span>
+<span class="sd">    all of the passed arrays is then found and the resulting min/max envelopes</span>
+<span class="sd">    are returned as a (bin_count, 3) array.  The first column is the bins that</span>
+<span class="sd">    were used.  You can either return the left side, center or right side of</span>
+<span class="sd">    the bins using the keyword bin_mark = &quot;left&quot; | &quot;right&quot; | &quot;center&quot;.</span>
+
+<span class="sd">    The default bin_mark is &quot;center&quot;.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        *arrays (ndarray): A list of numpy arrays that must be 2D and are used</span>
+<span class="sd">             to compute a min/max envelope.</span>
+<span class="sd">        bin_count (int): An optional keyword argument that indicates the number of</span>
+<span class="sd">            bins to divde the domain into for envelope calculation.  Default: 100</span>
+<span class="sd">        bin_spacing (str): An optional keyword argument of either &#39;linear&#39; or &#39;log&#39;</span>
+<span class="sd">            to indicate whether the bins should be generated using.  Default: linear</span>
+<span class="sd">        bin_mark (str): How to return the bins that were used to calculate the</span>
+<span class="sd">            envelope.  Possible options are &quot;left&quot;, &quot;right&quot; or &quot;center&quot; causing the</span>
+<span class="sd">            first column of the output to contain the left edge, right edge or center</span>
+<span class="sd">            of each bin respectively. Default: &quot;center&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">mark</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bin_mark&#39;</span><span class="p">,</span> <span class="s1">&#39;center&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mark</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="s1">&#39;center&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Invalid bin_mark, must be left, right or center&quot;</span><span class="p">,</span> <span class="n">bin_mark</span><span class="o">=</span><span class="n">mark</span><span class="p">)</span>
+
+    <span class="n">d_min</span><span class="p">,</span> <span class="n">d_max</span> <span class="o">=</span> <span class="n">combine_domains</span><span class="p">(</span><span class="o">*</span><span class="n">arrays</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;union&quot;</span><span class="p">)</span>
+
+    <span class="n">num_bins</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bin_count&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+    <span class="n">bin_spacing</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bin_spacing&#39;</span><span class="p">,</span> <span class="s1">&#39;linear&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bin_spacing</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Invalid bin spacing, must be linear or log&quot;</span><span class="p">,</span> <span class="n">bin_spacing</span><span class="o">=</span><span class="n">bin_spacing</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">bin_spacing</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">d_min</span><span class="p">,</span> <span class="n">d_max</span><span class="p">,</span> <span class="n">num_bins</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="n">d_min</span><span class="p">,</span> <span class="n">d_max</span><span class="p">,</span> <span class="n">num_bins</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+
+    <span class="n">env_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">env_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+    <span class="n">env_min</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">env_max</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">:</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">arr</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">right</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">arr_i</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">arr_i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">env_max</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="n">env_max</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">env_max</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">env_min</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="n">env_min</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">env_min</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="n">centers</span> <span class="o">=</span> <span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="n">bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+    <span class="c1"># Fill in empty gaps with interpolation in case there weren&#39;t any values</span>
+    <span class="c1"># in a given bucket.  We default to a simple linear interpolation</span>
+    <span class="n">nan_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">env_min</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">nan_index</span><span class="p">):</span>
+        <span class="n">nonnan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">nan_index</span><span class="p">)</span>
+        <span class="n">min_interp</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="n">nonnan</span><span class="p">],</span> <span class="n">env_min</span><span class="p">[</span><span class="n">nonnan</span><span class="p">],</span> <span class="n">assume_sorted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">env_min</span><span class="p">[</span><span class="n">nan_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_interp</span><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="n">nan_index</span><span class="p">])</span>
+
+    <span class="n">nan_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">env_max</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">nan_index</span><span class="p">):</span>
+        <span class="n">nonnan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">nan_index</span><span class="p">)</span>
+        <span class="n">max_interp</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="n">nonnan</span><span class="p">],</span> <span class="n">env_max</span><span class="p">[</span><span class="n">nonnan</span><span class="p">],</span> <span class="n">assume_sorted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">env_max</span><span class="p">[</span><span class="n">nan_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_interp</span><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="n">nan_index</span><span class="p">])</span>
+
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">([</span><span class="n">num_bins</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+    <span class="n">out</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">env_min</span>
+    <span class="n">out</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">env_max</span>
+
+    <span class="k">if</span> <span class="n">mark</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">mark</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="n">bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+
+
+    <span class="k">return</span> <span class="n">out</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,547 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.offline.database module &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="iotile_analytics.offline.integration module" href="iotile_analytics.offline.integration.html" />
+    <link rel="prev" title="iotile_analytics.offline package" href="iotile_analytics.offline.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iotile_analytics.core.html">iotile_analytics.core package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="iotile_analytics.offline.html">iotile_analytics.offline package</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">iotile_analytics.offline.database module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.offline.integration.html">iotile_analytics.offline.integration module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.offline.report.html">iotile_analytics.offline.report module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.offline.table_descriptions.html">iotile_analytics.offline.table_descriptions package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iotile_analytics.interactive.html">iotile_analytics.interactive package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="iotile_analytics.offline.html">iotile_analytics.offline package</a> &raquo;</li>
+        
+      <li>iotile_analytics.offline.database module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/iotile_analytics.offline.database.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-iotile_analytics.offline.database">
+<span id="iotile-analytics-offline-database-module"></span><h1>iotile_analytics.offline.database module<a class="headerlink" href="#module-iotile_analytics.offline.database" title="Permalink to this headline">¶</a></h1>
+<p>Overall class for creating and managing offline data.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.offline.database.CompatibleObjectAtom" title="iotile_analytics.offline.database.CompatibleObjectAtom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompatibleObjectAtom</span></code></a></td>
+<td>An object atom with a lower cpickle protocol.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#iotile_analytics.offline.database.OfflineDatabase" title="iotile_analytics.offline.database.OfflineDatabase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OfflineDatabase</span></code></a></td>
+<td>An offline database.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="iotile_analytics.offline.database.CompatibleObjectAtom">
+<em class="property">class </em><code class="descclassname">iotile_analytics.offline.database.</code><code class="descname">CompatibleObjectAtom</code><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#CompatibleObjectAtom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.CompatibleObjectAtom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tables.atom.ObjectAtom</span></code></p>
+<p>An object atom with a lower cpickle protocol.</p>
+<p>This enables sharing hdf5 files between python 2 and python 3.</p>
+<dl class="method">
+<dt id="iotile_analytics.offline.database.CompatibleObjectAtom.fromarray">
+<code class="descname">fromarray</code><span class="sig-paren">(</span><em>array</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#CompatibleObjectAtom.fromarray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.CompatibleObjectAtom.fromarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an <cite>array</cite> of base atoms into an object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="iotile_analytics.offline.database.OfflineDatabase">
+<em class="property">class </em><code class="descclassname">iotile_analytics.offline.database.</code><code class="descname">OfflineDatabase</code><span class="sig-paren">(</span><em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>An offline database.</p>
+<p>If you pass an existing file, this database will open that
+file.  If you pass a non-existing file, this database will
+create a new database.  If you pass nothing, a new in-memory
+database will be created that will not be backed by file
+storage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the database file that we want
+to create or open.  If None if passed (the default),
+a new, in-memory database is created that will be
+lost when the program is exited.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.save_stream">
+<code class="descname">save_stream</code><span class="sig-paren">(</span><em>slug</em>, <em>definition</em>, <em>data=None</em>, <em>events=None</em>, <em>raw_events=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.save_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.save_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a stream with timeseries and event data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The stream slug to save</li>
+<li><strong>definition</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The stream metadata dictionary that comes
+from the /api/v1/stream/&lt;slug&gt;/ API
+This may be None if there is no stream metadata for this stream
+which can happen if the stream is a hidden system stream.</li>
+<li><strong>data</strong> (<em>StreamData</em>) – The raw stream timeseries data to save.</li>
+<li><strong>events</strong> (<em>pandas.DataFrame</em>) – Any event summary data to save.</li>
+<li><strong>raw_events</strong> (<em>pandas.DataFrame</em>) – The raw event data to save.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.save_vartype">
+<code class="descname">save_vartype</code><span class="sig-paren">(</span><em>_slug</em>, <em>vartype</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.save_vartype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.save_vartype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a vartype into the database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>_slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The variable type slug to save.</li>
+<li><strong>vartype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The variable type data to save.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.save_source_info">
+<code class="descname">save_source_info</code><span class="sig-paren">(</span><em>info</em>, <em>properties</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.save_source_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.save_source_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save analysis group source metadata including properties if set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – A dict of string -&gt; string with the properties and data
+about the analysis group source.</li>
+<li><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – A dict of string -&gt; string with the properties and data
+about the analysis group source.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.fetch_source_info">
+<code class="descname">fetch_source_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.fetch_source_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.fetch_source_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch presaved source info.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The decoded source information.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.fetch_properties">
+<code class="descname">fetch_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.fetch_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.fetch_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch saved properties.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The saved properties.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.list_streams">
+<code class="descname">list_streams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.list_streams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.list_streams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all streams.</p>
+<p>This is equivalent to the IOTile.cloud API method
+/api/v1/stream/</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>A list of dictionaries, one for each</dt>
+<dd>stream that should be part of this analysis group.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.get_stream_definition">
+<code class="descname">get_stream_definition</code><span class="sig-paren">(</span><em>slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.get_stream_definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.get_stream_definition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the stream definitions for a stream.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The stream slug to query</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The stream metadata</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.fetch_datapoints">
+<code class="descname">fetch_datapoints</code><span class="sig-paren">(</span><em>slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.fetch_datapoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.fetch_datapoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all timeseries data for a stream.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The stream slug to query</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The stream data.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="iotile_analytics.core.stream_series.html#iotile_analytics.core.stream_series.StreamSeries" title="iotile_analytics.core.stream_series.StreamSeries">StreamSeries</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.fetch_events">
+<code class="descname">fetch_events</code><span class="sig-paren">(</span><em>slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.fetch_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.fetch_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch all events for a given stream.</p>
+<p>These are the event metadata dictionaries, not the raw
+event data that may be stored along with the metadata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The slug of the stream that we should fetch
+events for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">All of the events.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pd.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.fetch_raw_events">
+<code class="descname">fetch_raw_events</code><span class="sig-paren">(</span><em>slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.fetch_raw_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.fetch_raw_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch all raw event data for this stream.</p>
+<p>These are the raw json dictionaries that are stored for
+each event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The slug of the stream that we should fetch
+raw events for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">All of the raw events.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pd.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.count_streams">
+<code class="descname">count_streams</code><span class="sig-paren">(</span><em>slugs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.count_streams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.count_streams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count the number of events and data points in a stream.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slugs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – The slugs of the stream that we should count.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>{‘points’: int, ‘events’: int}): A dict mapping dicts of 2</dt>
+<dd>integers with the count of the number of events and the number of
+data points in this stream.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(&lt;slug&gt;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.fetch_variable_types">
+<code class="descname">fetch_variable_types</code><span class="sig-paren">(</span><em>slugs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.fetch_variable_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.fetch_variable_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch variable type information for a list of variable slugs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slugs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em>) – The slugs of the variable types that we should fetch.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dict): A dict mapping variable slugs to variable type definitions</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(&lt;slug&gt;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="iotile_analytics.offline.integration.html" class="btn btn-neutral float-right" title="iotile_analytics.offline.integration module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="iotile_analytics.offline.html" class="btn btn-neutral" title="iotile_analytics.offline package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,381 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.core.utilities.aggregator &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.core.utilities.aggregator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.core.utilities.aggregator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A class that lets you compare portions of multiple timeseries datasets.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">str</span>
+<span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">ArgumentError</span>
+<span class="kn">from</span> <span class="nn">iotile_analytics.core.exceptions</span> <span class="k">import</span> <span class="n">UsageError</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="TimeseriesSelector"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.utilities.aggregator.html#iotile_analytics.core.utilities.aggregator.TimeseriesSelector">[docs]</a><span class="k">class</span> <span class="nc">TimeseriesSelector</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A utility class for aggregating and selecting data from multiple timeseries.</span>
+
+<span class="sd">    The selector keeps track of the first and last timestamp that was added and lets</span>
+<span class="sd">    you restrict data to only a given day, week or month while iterating through every</span>
+<span class="sd">    such segment of the data.</span>
+
+<span class="sd">    This is particularly useful for producing coherent views and reports of data that</span>
+<span class="sd">    may cover different intersecting but not identical time spans.</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        timezone (str): The timezone to use to localize all data coming in so that days</span>
+<span class="sd">            correspond correctly to days in that timezone.  Default: UTC.  This should be</span>
+<span class="sd">            a timzeone value like &#39;US/Central&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="s1">&#39;UTC&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timezone</span> <span class="o">=</span> <span class="n">timezone</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">oldest_point</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newest_point</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="TimeseriesSelector.add_data"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.utilities.aggregator.html#iotile_analytics.core.utilities.aggregator.TimeseriesSelector.add_data">[docs]</a>    <span class="k">def</span> <span class="nf">add_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a new dataset to the aggregator.</span>
+
+<span class="sd">        The data is homogenized and the underlying domain of the aggregator is</span>
+<span class="sd">        extended if necessary.  The data itself is not stored.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (pd.DataFrame): A dataframe to add to our aggregator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># First localize the data into the right timezone</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_tz_naive</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="s1">&#39;UTC&#39;</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">tz_convert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timezone</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">oldest</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">newest</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">oldest_point</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">oldest</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">oldest_point</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">oldest_point</span> <span class="o">=</span> <span class="n">oldest</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">newest_point</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">newest</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">newest_point</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newest_point</span> <span class="o">=</span> <span class="n">newest</span></div>
+
+    <span class="k">def</span> <span class="nf">_check_tz_naive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_generate_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freq</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">oldest_point</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">newest_point</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;You must add at least one dataset to the selector first before trying to generate an index.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">PeriodIndex</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">oldest_point</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">newest_point</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TimeseriesSelector.months"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.utilities.aggregator.html#iotile_analytics.core.utilities.aggregator.TimeseriesSelector.months">[docs]</a>    <span class="k">def</span> <span class="nf">months</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all of the unique months spanning our data domain.</span>
+
+<span class="sd">        The results are returned in time order with duplicates removed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.PeriodIndex</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_index</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TimeseriesSelector.weeks"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.utilities.aggregator.html#iotile_analytics.core.utilities.aggregator.TimeseriesSelector.weeks">[docs]</a>    <span class="k">def</span> <span class="nf">weeks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all unique weeks spanning our data domain.</span>
+
+<span class="sd">        The results are returned in time order with duplicates removed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.PeriodIndex</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_index</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TimeseriesSelector.days"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.utilities.aggregator.html#iotile_analytics.core.utilities.aggregator.TimeseriesSelector.days">[docs]</a>    <span class="k">def</span> <span class="nf">days</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all unique days spanning our data domain.</span>
+
+<span class="sd">        The results are returned in time order with duplicates removed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of datemasks: The day date masks that can be used to select a subset</span>
+<span class="sd">                of data from this aggregator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_index</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TimeseriesSelector.divide_period"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.utilities.aggregator.html#iotile_analytics.core.utilities.aggregator.TimeseriesSelector.divide_period">[docs]</a>    <span class="k">def</span> <span class="nf">divide_period</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">freq</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Turn a single period into a PeriodIndex with a given frequency.</span>
+
+<span class="sd">        For example you could subdivide a month into days or a week into hours.</span>
+<span class="sd">        The subdivision will be performed down to second precision by default.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            period (pd.Period): The period that we wish to subdivide.  If this is None</span>
+<span class="sd">                we default to subdividing the entire domain of this object.</span>
+<span class="sd">            freq (str): A Pandas frequency string to use to determine how big the</span>
+<span class="sd">                chunks are that we are going to subdivid period into.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DatetimeIndex: The subdivided period.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">oldest_point</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">newest_point</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;You must add at least one dataset to the selector first before trying to generate an index.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">period</span><span class="o">.</span><span class="n">to_timestamp</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">)</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">period</span><span class="o">.</span><span class="n">to_timestamp</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">oldest_point</span><span class="o">.</span><span class="n">to_period</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span><span class="o">.</span><span class="n">to_timestamp</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">)</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newest_point</span><span class="o">.</span><span class="n">to_period</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span><span class="o">.</span><span class="n">to_timestamp</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_timezone</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TimeseriesSelector.resample"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.utilities.aggregator.html#iotile_analytics.core.utilities.aggregator.TimeseriesSelector.resample">[docs]</a>    <span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="s1">&#39;last&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convenience function to restrict and resample a data set.</span>
+
+<span class="sd">        The data set is restricted to the indicated period and if necessary</span>
+<span class="sd">        resampled to appropriate frequency.  If the data is already sampled</span>
+<span class="sd">        at the correct frequency then no resampling occurs and NaNs are used</span>
+<span class="sd">        to fill in any gaps in the indicated period.</span>
+
+<span class="sd">        Naive timestamps in data are assumed to be in UTC and localized to</span>
+<span class="sd">        the configured timezone of this selector before resampling.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (pd.DataFrame): The data that we would like to sample.</span>
+<span class="sd">            period (pd.Period): The period that we want to look at.</span>
+<span class="sd">            freq (str): The sampling frequency that we would like to use.</span>
+<span class="sd">            resample (str): An optional resampling function in case we need to</span>
+<span class="sd">                resample the data we are given.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># First localize the data into the right timezone</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_tz_naive</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="s1">&#39;UTC&#39;</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">tz_convert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timezone</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Create the final period index we will return</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">divide_period</span><span class="p">(</span><span class="n">period</span><span class="p">,</span> <span class="n">freq</span><span class="p">)</span>
+
+        <span class="c1"># If the data sampling frequency does not match our desired</span>
+        <span class="c1"># final sampling frequency, we need to resample it before</span>
+        <span class="c1"># we can reindex it.</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">freq</span> <span class="o">!=</span> <span class="n">index</span><span class="o">.</span><span class="n">freq</span><span class="p">:</span>
+            <span class="n">resampler</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resample</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">resampler</span><span class="p">,</span> <span class="n">resample</span><span class="p">)()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">resampler</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">resample</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>
