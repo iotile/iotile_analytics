@@ -35,10 +35,22 @@ that you have on your computer.
 The most up-to-date reference information is always available online at:
 http://iotile-analytics.readthedocs.io/en/latest/
 
+Most of the analysis templates included with analytics-host create interactive
+html web pages that embed graphs, controls and tables showing the results of
+the analysis performed.  These html files are designed to be opened in any
+modern web browser and typically do not need an internet connection.
+
 basic usage:
 
 - analytics-host will ask you to confirm everything before you do it unless
   you pass the -c flag indicating that you don't want this behavior.
+
+- you typically need to specify an output path for where the results of your
+  analysis should be saved.  You do this using the -o,--output <path> flag.
+  Some simple analysis templates can just print their output to the screen
+  but most require a file.  Some analysis template generate many files so the
+  path you pass here will be interpreted as a directory where all of the files
+  should be saved.
 
 - you need to identify the data you are looking for in the cloud by its *slug*
   which is an alphanumeric identifier that starts with d-- for a device or
@@ -213,10 +225,10 @@ def find_analysis_group(args):
 
     if not args.no_confirm:
         if is_cloud:
-            print("Running report %s against object %s in the cloud" % (args.report, group))
+            print("Running report %s against object %s in the cloud" % (args.template, group))
             print("You will need to provide your iotile.cloud login credentials.")
         else:
-            print("Running report %s against local file %s" % (args.report, group))
+            print("Running report %s against local file %s" % (args.template, group))
 
         resp = input(" - Are you sure you wish to continue (y/n)? ")
         if resp.lower() != 'y':
@@ -345,14 +357,14 @@ def main(argv=None):
 
     setup_logging(args)
 
-    if args.list and args.report is None:
+    if args.list and args.template is None:
         list_known_reports()
         return 0
 
     reports = find_live_reports()
-    report_obj = reports.get(args.report)
+    report_obj = reports.get(args.template)
     if report_obj is None:
-        print("ERROR: could not find report by name: %s\n" % args.report)
+        print("ERROR: could not find report by name: %s\n" % args.template)
         list_known_reports()
         return 1
 
