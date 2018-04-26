@@ -11,7 +11,7 @@ import pkg_resources
 import zipfile
 import shutil
 from future.utils import viewitems
-from iotile_analytics.core.exceptions import UsageError
+from iotile_analytics.core.exceptions import UsageError, AuthenticationError
 from iotile_analytics.core import CloudSession, AnalysisGroup, Environment
 from typedargs.doc_parser import ParsedDocstring
 from typedargs.exceptions import ValidationError, ArgumentError
@@ -217,11 +217,11 @@ def find_analysis_group(args):
     elif os.path.exists(group):
         _name, ext = os.path.splitext(group)
         if ext != '.hdf5':
-            raise ValueError("Only hdf5 formatted local analysis group files are supported")
+            raise UsageError("Only hdf5 formatted local analysis group files are supported")
 
         generator = lambda x: AnalysisGroup.FromSaved(x, 'hdf5')
     else:
-        raise ValueError("Could not find object specified for report source: %s" % group)
+        raise UsageError("Could not find object specified for report source: %s" % group)
 
     if not args.no_confirm:
         if is_cloud:
@@ -372,17 +372,32 @@ def main(argv=None):
         print_report_details(report_obj)
         return 0
 
-    try:
-        report_args = split_args(args.arg)
-        group = find_analysis_group(args)
+    report_args = split_args(args.arg)
+    group = find_analysis_group(args)
 
-        check_arguments(report_obj, report_args, confirm=not args.no_confirm)
+    check_arguments(report_obj, report_args, confirm=not args.no_confirm)
 
-        rendered_paths = perform_analysis(report_obj, group, args.output, args=report_args, bundle=args.bundle, domain=args.domain)
-        if len(rendered_paths) > 0:
-            print("Rendered report to: %s" % rendered_paths[0])
-    except ValueError as exc:
-        print("ERROR: %s" % exc.message)
-        return 1
+    rendered_paths = perform_analysis(report_obj, group, args.output, args=report_args, bundle=args.bundle, domain=args.domain)
+    if len(rendered_paths) > 0:
+        print("Rendered report to: %s" % rendered_paths[0])
+
 
     return 0
+
+
+def cmdline_main(argv=None):
+    """Wrapper around main that catches exceptions and prints them nicely."""
+
+    try:
+        retval = main(argv)
+    except AuthenticationError:
+        print('\nERROR: Could not log in to iotile cloud server using provided username and password.')
+        retval = 1
+    except UsageError as exc:
+        print("\nUSAGE ERROR: %s" % exc.message)
+        for key, val in viewitems(exc.params):
+            print("- %s: %s" % (key, str(val)))
+
+        retval = 2
+
+    return retval
