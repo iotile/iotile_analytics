@@ -1,4 +1,4 @@
-"""A cmdline host for running LiveReports on data from iotile.cloud."""
+"""A cmdline host for running AnalysisTemplates on data from iotile.cloud."""
 
 from __future__ import absolute_import, unicode_literals, print_function
 import sys
