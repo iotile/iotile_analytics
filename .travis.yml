@@ -11,9 +11,9 @@ matrix:
   - python: 3.6
     env: TRAVIS_BUILD_DOCS=1
 install:
-- pip install --upgrade tox-travis -r requirements_build.txt -r requirements_doc.txt
+- pip install --upgrade tox-travis -r requirements_build.txt
 script:
-- if [[ "$TRAVIS_BUILD_DOCS]" != "1" ]]; then tox; fi
+- if [[ "$TRAVIS_BUILD_DOCS" != "1" ]]; then tox; fi
 - if [[ "$TRAVIS_BUILD_DOCS" == "1" ]]; then tox -e docs; fi
 
 deploy:
@@ -27,6 +27,7 @@ deploy:
   - provider: pages
     skip-cleanup: true
     github-token: $GITHUB_TOKEN
+    committer-from-gh: true
     keep-history: true
     local-dir: built_docs
     on:

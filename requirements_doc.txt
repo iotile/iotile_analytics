@@ -1,9 +1,6 @@
 bokeh >= 0.12.5
 sphinx >= 1.7.2
 better-apidoc
-future
-iotile_cloud
-typedargs
 pandas
 scipy
 numpy
