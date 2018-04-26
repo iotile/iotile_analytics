@@ -9,12 +9,12 @@ python:
 matrix:
   include:
   - python: 3.6
-    env: BUILD_DOCS=1
+    env: TRAVIS_BUILD_DOCS=1
 install:
 - pip install --upgrade tox-travis -r requirements_build.txt -r requirements_doc.txt
 script:
-- if [[ "$BUILD_DOCS]" != "1" ]]; then tox; fi
-- if [[ "$BUILD_DOCS" == "1" ]]; then tox -e docs; fi
+- if [[ "$TRAVIS_BUILD_DOCS]" != "1" ]]; then tox; fi
+- if [[ "$TRAVIS_BUILD_DOCS" == "1" ]]; then tox -e docs; fi
 
 deploy:
   - provider: script
@@ -31,7 +31,7 @@ deploy:
     local-dir: built_docs
     on:
       branch: master
-      condition: $BUILD_DOC = "1"
+      condition: $TRAVIS_BUILD_DOCS = "1"
 
 notifications:
   on_success: always
