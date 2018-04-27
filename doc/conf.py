@@ -18,25 +18,9 @@ import os
 # Set environment variables so bokeh plot plugin will work
 os.environ['BOKEH_DOCS_MISSING_API_KEY_OK'] = "1"
 
-ON_RTD = os.environ.get('READTHEDOCS') == 'True'
-if ON_RTD:
-    from unittest.mock import MagicMock
-
-    class _Mock(MagicMock):
-        @classmethod
-        def __getattr__(cls, name):
-            return MagicMock()
-
-    MOCK_MODULES = ['tables']
-    sys.modules.update((mod_name, _Mock()) for mod_name in MOCK_MODULES)
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-
-sys.path.append(os.path.abspath('../iotile_analytics_core'))
-sys.path.append(os.path.abspath('../iotile_analytics_interactive'))
-sys.path.append(os.path.abspath('../iotile_analytics_offline'))
 
 # -- General configuration ------------------------------------------------
 
@@ -138,10 +122,9 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
-if not ON_RTD:  # only import and set the theme if we're building docs locally
-    import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+import sphinx_rtd_theme
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

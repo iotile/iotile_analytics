@@ -4,26 +4,36 @@
 iotile_analytics.interactive.reports package
 ============================================
 
+.. currentmodule:: iotile_analytics.interactive.reports
+
 .. automodule:: iotile_analytics.interactive.reports
+    
+Key Functions and Classes
+-------------------------
+
+.. autosummary::
+    :nosignatures:
+
+    ~iotile_analytics.interactive.reports.branded_report.BrandedReport
+    ~iotile_analytics.interactive.reports.report.LiveReport
     
 
 
-    Submodules:
+Submodules
+----------
 
-    .. toctree::
-       :maxdepth: 1
+.. autosummary::
+    :nosignatures:
+    :toctree:
 
-       iotile_analytics.interactive.reports.analysis_template
-       iotile_analytics.interactive.reports.branded_report
-       iotile_analytics.interactive.reports.info_report
-       iotile_analytics.interactive.reports.report
-       iotile_analytics.interactive.reports.stream_report
-
-
-
-
+    ~iotile_analytics.interactive.reports.analysis_template
+    ~iotile_analytics.interactive.reports.branded_report
+    ~iotile_analytics.interactive.reports.info_report
+    ~iotile_analytics.interactive.reports.report
+    ~iotile_analytics.interactive.reports.stream_report
 
 
-    ``__all__``: :class:`BrandedReport <iotile_analytics.interactive.reports.branded_report.BrandedReport>`, :class:`LiveReport <iotile_analytics.interactive.reports.report.LiveReport>`
+
+
 
 

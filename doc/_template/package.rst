@@ -4,31 +4,51 @@
 {{ fullname }} package
 {% for item in range(8 + fullname|length) -%}={%- endfor %}
 
+.. currentmodule:: {{ fullname }}
+
 .. automodule:: {{ fullname }}
     {% if members -%}
     :members: {{ members|join(", ") }}
     :undoc-members:
     :show-inheritance:
-    {%- endif %}
+    {%- endif -%}
+
+{% if all_refs %}
+Key Functions and Classes
+-------------------------
+
+.. autosummary::
+    :nosignatures:
+
+    {% for ref in all_refs -%}
+    {% set ref_name1 = ref.split('<') -%}
+    {% set ref_name2 = ref_name1[1].split('>') -%}
+    ~{{ ref_name2[0] }}
+    {% endfor -%}
+{%- endif %}
 
 {% if submodules %}
-    Submodules:
+Submodules
+----------
 
-    .. toctree::
-       :maxdepth: 1
+.. autosummary::
+    :nosignatures:
+    :toctree:
 {% for item in submodules %}
-       {{ fullname }}.{{ item }}
-       {%- endfor %}
+    ~{{ fullname }}.{{ item }}
+    {%- endfor %}
     {%- endif %}
 
 {% if subpackages %}
-    Subpackages:
+Subpackages
+-----------
 
-    .. toctree::
-       :maxdepth: 1
+.. autosummary::
+    :nosignatures:
+    :toctree:
 {% for item in subpackages %}
-       {{ fullname }}.{{ item }}
-       {%- endfor %}
+    ~{{ fullname }}.{{ item }}
+    {%- endfor %}
     {%- endif %}
 
 {% if members %}
@@ -79,10 +99,6 @@
         {{ item }}
 {%- endfor %}
     {%- endif %}
-
-{% if all_refs %}
-    ``__all__``: {{ all_refs|join(", ") }}
-{%- endif %}
 
 
 {% if members %}

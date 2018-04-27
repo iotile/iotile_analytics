@@ -4,24 +4,36 @@
 iotile_analytics.core.utilities package
 =======================================
 
+.. currentmodule:: iotile_analytics.core.utilities
+
 .. automodule:: iotile_analytics.core.utilities
+    
+Key Functions and Classes
+-------------------------
+
+.. autosummary::
+    :nosignatures:
+
+    ~iotile_analytics.core.utilities.aggregator.TimeseriesSelector
+    ~iotile_analytics.core.utilities.domain.combine_domains
+    ~iotile_analytics.core.utilities.envelope.envelope
+    ~iotile_analytics.core.utilities.domain.find_domain
     
 
 
-    Submodules:
+Submodules
+----------
 
-    .. toctree::
-       :maxdepth: 1
+.. autosummary::
+    :nosignatures:
+    :toctree:
 
-       iotile_analytics.core.utilities.aggregator
-       iotile_analytics.core.utilities.domain
-       iotile_analytics.core.utilities.envelope
-
-
-
-
+    ~iotile_analytics.core.utilities.aggregator
+    ~iotile_analytics.core.utilities.domain
+    ~iotile_analytics.core.utilities.envelope
 
 
-    ``__all__``: :class:`TimeseriesSelector <iotile_analytics.core.utilities.aggregator.TimeseriesSelector>`, :func:`combine_domains <iotile_analytics.core.utilities.domain.combine_domains>`, :func:`envelope <iotile_analytics.core.utilities.envelope.envelope>`, :func:`find_domain <iotile_analytics.core.utilities.domain.find_domain>`
+
+
 
 

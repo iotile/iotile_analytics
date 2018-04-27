@@ -4,34 +4,48 @@
 iotile_analytics.core package
 =============================
 
+.. currentmodule:: iotile_analytics.core
+
 .. automodule:: iotile_analytics.core
+    
+Key Functions and Classes
+-------------------------
+
+.. autosummary::
+    :nosignatures:
+
+    ~iotile_analytics.core.group.AnalysisGroup
+    ~iotile_analytics.core.session.CloudSession
+    ~iotile_analytics.core.environment.Environment
+    ~iotile_analytics.core.interaction.progress.ProgressBar
     
 
 
-    Submodules:
+Submodules
+----------
 
-    .. toctree::
-       :maxdepth: 1
+.. autosummary::
+    :nosignatures:
+    :toctree:
 
-       iotile_analytics.core.environment
-       iotile_analytics.core.exceptions
-       iotile_analytics.core.group
-       iotile_analytics.core.session
-       iotile_analytics.core.stream_series
-
-
-    Subpackages:
-
-    .. toctree::
-       :maxdepth: 1
-
-       iotile_analytics.core.channels
-       iotile_analytics.core.interaction
-       iotile_analytics.core.utilities
+    ~iotile_analytics.core.environment
+    ~iotile_analytics.core.exceptions
+    ~iotile_analytics.core.group
+    ~iotile_analytics.core.session
+    ~iotile_analytics.core.stream_series
 
 
+Subpackages
+-----------
+
+.. autosummary::
+    :nosignatures:
+    :toctree:
+
+    ~iotile_analytics.core.channels
+    ~iotile_analytics.core.interaction
+    ~iotile_analytics.core.utilities
 
 
-    ``__all__``: :class:`AnalysisGroup <iotile_analytics.core.group.AnalysisGroup>`, :class:`CloudSession <iotile_analytics.core.session.CloudSession>`, :class:`Environment <iotile_analytics.core.environment.Environment>`, :class:`ProgressBar <iotile_analytics.core.interaction.progress.ProgressBar>`
 
 

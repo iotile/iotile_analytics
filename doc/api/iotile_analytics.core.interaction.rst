@@ -4,22 +4,31 @@
 iotile_analytics.core.interaction package
 =========================================
 
+.. currentmodule:: iotile_analytics.core.interaction
+
 .. automodule:: iotile_analytics.core.interaction
+    
+Key Functions and Classes
+-------------------------
+
+.. autosummary::
+    :nosignatures:
+
+    ~iotile_analytics.core.interaction.progress.ProgressBar
     
 
 
-    Submodules:
+Submodules
+----------
 
-    .. toctree::
-       :maxdepth: 1
+.. autosummary::
+    :nosignatures:
+    :toctree:
 
-       iotile_analytics.core.interaction.progress
-
-
-
-
+    ~iotile_analytics.core.interaction.progress
 
 
-    ``__all__``: :class:`ProgressBar <iotile_analytics.core.interaction.progress.ProgressBar>`
+
+
 
 

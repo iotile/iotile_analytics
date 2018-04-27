@@ -4,32 +4,48 @@
 iotile_analytics.interactive package
 ====================================
 
+.. currentmodule:: iotile_analytics.interactive
+
 .. automodule:: iotile_analytics.interactive
+    
+Key Functions and Classes
+-------------------------
+
+.. autosummary::
+    :nosignatures:
+
+    ~iotile_analytics.interactive.app.AnalyticsApplication
+    ~iotile_analytics.interactive.app.AnalyticsObject
+    ~iotile_analytics.interactive.viewer_base.BaseViewer
+    ~iotile_analytics.interactive.viewer_loglog.LogLogViewer
+    ~iotile_analytics.interactive.viewer_timeselect.TimeSelectViewer
+    ~iotile_analytics.interactive.app.show
     
 
 
-    Submodules:
+Submodules
+----------
 
-    .. toctree::
-       :maxdepth: 1
+.. autosummary::
+    :nosignatures:
+    :toctree:
 
-       iotile_analytics.interactive.app
-       iotile_analytics.interactive.viewer_base
-       iotile_analytics.interactive.viewer_loglog
-       iotile_analytics.interactive.viewer_timeselect
-
-
-    Subpackages:
-
-    .. toctree::
-       :maxdepth: 1
-
-       iotile_analytics.interactive.reports
-       iotile_analytics.interactive.scripts
+    ~iotile_analytics.interactive.app
+    ~iotile_analytics.interactive.viewer_base
+    ~iotile_analytics.interactive.viewer_loglog
+    ~iotile_analytics.interactive.viewer_timeselect
 
 
+Subpackages
+-----------
+
+.. autosummary::
+    :nosignatures:
+    :toctree:
+
+    ~iotile_analytics.interactive.reports
+    ~iotile_analytics.interactive.scripts
 
 
-    ``__all__``: :class:`AnalyticsApplication <iotile_analytics.interactive.app.AnalyticsApplication>`, :class:`AnalyticsObject <iotile_analytics.interactive.app.AnalyticsObject>`, :class:`BaseViewer <iotile_analytics.interactive.viewer_base.BaseViewer>`, :class:`LogLogViewer <iotile_analytics.interactive.viewer_loglog.LogLogViewer>`, :class:`TimeSelectViewer <iotile_analytics.interactive.viewer_timeselect.TimeSelectViewer>`, :func:`show <iotile_analytics.interactive.app.show>`
 
 
