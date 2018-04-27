@@ -82,7 +82,7 @@ class SourceInfoReport(AnalysisTemplate):
                 if len(key) > 27:
                     key = key[:27] + '...'
 
-                val = self._group.source_info[key]
+                val = self._group.properties[key]
                 if isinstance(val, basestring):
                     val = val.encode('utf-8').decode('utf-8')
                 else:

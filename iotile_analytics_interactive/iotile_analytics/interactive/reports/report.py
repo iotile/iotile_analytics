@@ -1,7 +1,10 @@
+from __future__ import unicode_literals, absolute_import
+
 import os
 import json
 import zipfile
 import shutil
+from builtins import str
 from io import open
 from datetime import datetime
 from jinja2 import Environment, PackageLoader, contextfunction, Markup
@@ -139,6 +142,10 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
 
         with open(path, "w", encoding='utf-8') as outfile:
             write_data = "{}({});".format(info['func'], json_data)
+
+            if not isinstance(write_data, str):
+                write_data = str(write_data, 'utf-8')
+
             outfile.write(write_data)
 
     @classmethod
@@ -238,7 +245,10 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
             'extra_scripts': self.extra_scripts
         }
 
+        # This does not return unicode on python 2 so we need to massage it
         rendered_html = file_html(self.models, Resources('inline'), self.title, template, template_vars)
+        if not isinstance(rendered_html, str):
+            rendered_html = str(rendered_html, 'utf-8')
 
         with open(html_path, "w", encoding='utf-8') as outfile:
             outfile.write(rendered_html)

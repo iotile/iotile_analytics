@@ -168,3 +168,14 @@ def test_stream_overview_desc():
 
     retval = main(['-t', 'stream_overview', '-l'])
     assert retval == 0
+
+
+def test_rendering_report(water_meter, tmpdir):
+    """Make sure we can render an html report."""
+
+    domain, _cloud = water_meter
+    slug = 'd--0000-0000-0000-00d2'
+    stream = 's--0000-0077--0000-0000-0000-00d2--5001'
+
+    retval = main(['-t', 'stream_overview', slug, '-d', domain, '--no-verify', '-o', str(tmpdir.join('report')), '-c', '-a', 'stream=%s' % stream])
+    assert retval == 0
