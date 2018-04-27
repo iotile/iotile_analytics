@@ -15,12 +15,19 @@ experienced by a package during a trip:
 
 .. important::
 
-	Make sure to check out the `live interactive demo. <_static/shipment-details/index.html>`_
+	Make sure to check out the |demo_link|
 
-	Click around and see the graphs change.  Look for anomalies in the data.  Zoom
-	in and out of the trip timeline.  Generating an interactive report like this
-	just takes a single command with the ``analytics-host`` program included 
-	in ``iotile-analytics-interactive``. 
+	Click around and see the graphs change.  Select data points to pull up
+	detailed accelerometer data.  Look for anomalies in the data.  Zoom in and
+	out of the trip timeline.  
+
+	Generating an interactive report like this just takes a single command
+	with the ``analytics-host`` program included in ``iotile- analytics-
+	interactive``.
+
+	.. |demo_link| raw:: html
+
+		<a href="_static/shipment-details/index.html" target="_blank">live demo.</a>
 
 This section serves as a basic introduction to the fundamental concepts and
 classes of IOTile Analytics as well as some example usage.
