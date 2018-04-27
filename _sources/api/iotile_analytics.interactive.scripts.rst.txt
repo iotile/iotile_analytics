@@ -4,18 +4,20 @@
 iotile_analytics.interactive.scripts package
 ============================================
 
+.. currentmodule:: iotile_analytics.interactive.scripts
+
 .. automodule:: iotile_analytics.interactive.scripts
     
 
 
-    Submodules:
+Submodules
+----------
 
-    .. toctree::
-       :maxdepth: 1
+.. autosummary::
+    :nosignatures:
+    :toctree:
 
-       iotile_analytics.interactive.scripts.analytics_host
-
-
+    ~iotile_analytics.interactive.scripts.analytics_host
 
 
 

@@ -88,14 +88,21 @@
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">5-Minute Quickstart Guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">iotile_analytics.core package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.environment.html">iotile_analytics.core.environment module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.exceptions.html">iotile_analytics.core.exceptions module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.group.html">iotile_analytics.core.group module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.session.html">iotile_analytics.core.session module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.stream_series.html">iotile_analytics.core.stream_series module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.channels.html">iotile_analytics.core.channels package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.interaction.html">iotile_analytics.core.interaction package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.utilities.html">iotile_analytics.core.utilities package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#key-functions-and-classes">Key Functions and Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.core.environment.html">iotile_analytics.core.environment module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.core.exceptions.html">iotile_analytics.core.exceptions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.core.group.html">iotile_analytics.core.group module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.core.session.html">iotile_analytics.core.session module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.core.stream_series.html">iotile_analytics.core.stream_series module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.core.channels.html">iotile_analytics.core.channels package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.core.interaction.html">iotile_analytics.core.interaction package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.core.utilities.html">iotile_analytics.core.utilities package</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iotile_analytics.offline.html">iotile_analytics.offline package</a></li>
@@ -171,25 +178,75 @@
   <div class="section" id="module-iotile_analytics.core">
 <span id="iotile-analytics-core-package"></span><h1>iotile_analytics.core package<a class="headerlink" href="#module-iotile_analytics.core" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference internal" href="#module-iotile_analytics.core" title="iotile_analytics.core"><code class="xref py py-mod docutils literal notranslate"><span class="pre">iotile_analytics.core</span></code></a> - High level entry point for iotile_analytics.core package.</p>
-<p>Submodules:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.core.environment.html">iotile_analytics.core.environment module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.core.exceptions.html">iotile_analytics.core.exceptions module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.core.group.html">iotile_analytics.core.group module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.core.session.html">iotile_analytics.core.session module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.core.stream_series.html">iotile_analytics.core.stream_series module</a></li>
-</ul>
+<div class="section" id="key-functions-and-classes">
+<h2>Key Functions and Classes<a class="headerlink" href="#key-functions-and-classes" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup" title="iotile_analytics.core.group.AnalysisGroup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnalysisGroup</span></code></a></td>
+<td>A top level entry point for selecting and analyzing data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.core.session.html#iotile_analytics.core.session.CloudSession" title="iotile_analytics.core.session.CloudSession"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CloudSession</span></code></a></td>
+<td>A persistent session to IOTile.cloud.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.core.environment.html#iotile_analytics.core.environment.Environment" title="iotile_analytics.core.environment.Environment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Environment</span></code></a></td>
+<td>Configuration class for better interactive computing experience.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.core.interaction.progress.html#iotile_analytics.core.interaction.progress.ProgressBar" title="iotile_analytics.core.interaction.progress.ProgressBar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProgressBar</span></code></a></td>
+<td>A progress bar that automatically chooses the best display method.</td>
+</tr>
+</tbody>
+</table>
 </div>
-<p>Subpackages:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.core.channels.html">iotile_analytics.core.channels package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.core.interaction.html">iotile_analytics.core.interaction package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.core.utilities.html">iotile_analytics.core.utilities package</a></li>
-</ul>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.core.environment.html#module-iotile_analytics.core.environment" title="iotile_analytics.core.environment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">environment</span></code></a></td>
+<td>Basic configuration for interactive vs script environments.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.core.exceptions.html#module-iotile_analytics.core.exceptions" title="iotile_analytics.core.exceptions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exceptions</span></code></a></td>
+<td>Custom exceptions for iotile analytics.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.core.group.html#module-iotile_analytics.core.group" title="iotile_analytics.core.group"><code class="xref py py-obj docutils literal notranslate"><span class="pre">group</span></code></a></td>
+<td>The AnalysisGroup is the main entry point for analyzing data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.core.session.html#module-iotile_analytics.core.session" title="iotile_analytics.core.session"><code class="xref py py-obj docutils literal notranslate"><span class="pre">session</span></code></a></td>
+<td>Simple session management system to save an iotile.cloud token.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.core.stream_series.html#module-iotile_analytics.core.stream_series" title="iotile_analytics.core.stream_series"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stream_series</span></code></a></td>
+<td>A Pandas DataFrame subclass for dealing with TimeSeries data from IOTile.cloud streams.</td>
+</tr>
+</tbody>
+</table>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">__all__</span></code>: <a class="reference internal" href="iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup" title="iotile_analytics.core.group.AnalysisGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalysisGroup</span></code></a>, <a class="reference internal" href="iotile_analytics.core.session.html#iotile_analytics.core.session.CloudSession" title="iotile_analytics.core.session.CloudSession"><code class="xref py py-class docutils literal notranslate"><span class="pre">CloudSession</span></code></a>, <a class="reference internal" href="iotile_analytics.core.environment.html#iotile_analytics.core.environment.Environment" title="iotile_analytics.core.environment.Environment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Environment</span></code></a>, <a class="reference internal" href="iotile_analytics.core.interaction.progress.html#iotile_analytics.core.interaction.progress.ProgressBar" title="iotile_analytics.core.interaction.progress.ProgressBar"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressBar</span></code></a></p>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.core.channels.html#module-iotile_analytics.core.channels" title="iotile_analytics.core.channels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">channels</span></code></a></td>
+<td>All of the supported ways to connect an AnalysisGroup with data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.core.interaction.html#module-iotile_analytics.core.interaction" title="iotile_analytics.core.interaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interaction</span></code></a></td>
+<td>Interactivity primitives that work across environments.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.core.utilities.html#module-iotile_analytics.core.utilities" title="iotile_analytics.core.utilities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">utilities</span></code></a></td>
+<td>A collection of useful numerical utility functions.</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 
 

@@ -4,30 +4,41 @@
 iotile_analytics.offline package
 ================================
 
+.. currentmodule:: iotile_analytics.offline
+
 .. automodule:: iotile_analytics.offline
+    
+Key Functions and Classes
+-------------------------
+
+.. autosummary::
+    :nosignatures:
+
+    ~iotile_analytics.offline.database.OfflineDatabase
     
 
 
-    Submodules:
+Submodules
+----------
 
-    .. toctree::
-       :maxdepth: 1
+.. autosummary::
+    :nosignatures:
+    :toctree:
 
-       iotile_analytics.offline.database
-       iotile_analytics.offline.integration
-       iotile_analytics.offline.report
-
-
-    Subpackages:
-
-    .. toctree::
-       :maxdepth: 1
-
-       iotile_analytics.offline.table_descriptions
+    ~iotile_analytics.offline.database
+    ~iotile_analytics.offline.integration
+    ~iotile_analytics.offline.report
 
 
+Subpackages
+-----------
+
+.. autosummary::
+    :nosignatures:
+    :toctree:
+
+    ~iotile_analytics.offline.table_descriptions
 
 
-    ``__all__``: :class:`OfflineDatabase <iotile_analytics.offline.database.OfflineDatabase>`
 
 

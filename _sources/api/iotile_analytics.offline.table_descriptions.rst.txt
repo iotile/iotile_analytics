@@ -4,25 +4,26 @@
 iotile_analytics.offline.table_descriptions package
 ===================================================
 
+.. currentmodule:: iotile_analytics.offline.table_descriptions
+
 .. automodule:: iotile_analytics.offline.table_descriptions
     
 
 
-    Submodules:
+Submodules
+----------
 
-    .. toctree::
-       :maxdepth: 1
+.. autosummary::
+    :nosignatures:
+    :toctree:
 
-       iotile_analytics.offline.table_descriptions.event_index
-       iotile_analytics.offline.table_descriptions.info
-       iotile_analytics.offline.table_descriptions.properties
-       iotile_analytics.offline.table_descriptions.stream
-
-
-
-
+    ~iotile_analytics.offline.table_descriptions.event_index
+    ~iotile_analytics.offline.table_descriptions.info
+    ~iotile_analytics.offline.table_descriptions.properties
+    ~iotile_analytics.offline.table_descriptions.stream
 
 
-    ``__all__``: :class:`DatabaseInfoTable <tables.description.DatabaseInfoTable>`, :class:`EventIndex <tables.description.EventIndex>`, :class:`PropertyTable <tables.description.PropertyTable>`, :class:`PropertyTypes <iotile_analytics.offline.table_descriptions.properties.PropertyTypes>`, :class:`Stream <tables.description.Stream>`
+
+
 
 

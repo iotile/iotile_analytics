@@ -90,12 +90,19 @@
 <li class="toctree-l2"><a class="reference internal" href="iotile_analytics.core.html">iotile_analytics.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="iotile_analytics.offline.html">iotile_analytics.offline package</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">iotile_analytics.interactive package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.app.html">iotile_analytics.interactive.app module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.viewer_base.html">iotile_analytics.interactive.viewer_base module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.viewer_loglog.html">iotile_analytics.interactive.viewer_loglog module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.viewer_timeselect.html">iotile_analytics.interactive.viewer_timeselect module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.reports.html">iotile_analytics.interactive.reports package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.scripts.html">iotile_analytics.interactive.scripts package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#key-functions-and-classes">Key Functions and Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.interactive.app.html">iotile_analytics.interactive.app module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.interactive.viewer_base.html">iotile_analytics.interactive.viewer_base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.interactive.viewer_loglog.html">iotile_analytics.interactive.viewer_loglog module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.interactive.viewer_timeselect.html">iotile_analytics.interactive.viewer_timeselect module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.interactive.reports.html">iotile_analytics.interactive.reports package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.interactive.scripts.html">iotile_analytics.interactive.scripts package</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -168,23 +175,75 @@
             
   <div class="section" id="module-iotile_analytics.interactive">
 <span id="iotile-analytics-interactive-package"></span><h1>iotile_analytics.interactive package<a class="headerlink" href="#module-iotile_analytics.interactive" title="Permalink to this headline">¶</a></h1>
-<p>Submodules:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.interactive.app.html">iotile_analytics.interactive.app module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.interactive.viewer_base.html">iotile_analytics.interactive.viewer_base module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.interactive.viewer_loglog.html">iotile_analytics.interactive.viewer_loglog module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.interactive.viewer_timeselect.html">iotile_analytics.interactive.viewer_timeselect module</a></li>
-</ul>
+<div class="section" id="key-functions-and-classes">
+<h2>Key Functions and Classes<a class="headerlink" href="#key-functions-and-classes" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.app.html#iotile_analytics.interactive.app.AnalyticsApplication" title="iotile_analytics.interactive.app.AnalyticsApplication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnalyticsApplication</span></code></a></td>
+<td>Base class for Bokeh applications built from iotile_analytics objects.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.app.html#iotile_analytics.interactive.app.AnalyticsObject" title="iotile_analytics.interactive.app.AnalyticsObject"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnalyticsObject</span></code></a></td>
+<td>Base class for all objects that can be added to an AnalyticsApplication.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.viewer_base.html#iotile_analytics.interactive.viewer_base.BaseViewer" title="iotile_analytics.interactive.viewer_base.BaseViewer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseViewer</span></code></a></td>
+<td>A simple interface to plot data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.viewer_loglog.html#iotile_analytics.interactive.viewer_loglog.LogLogViewer" title="iotile_analytics.interactive.viewer_loglog.LogLogViewer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LogLogViewer</span></code></a></td>
+<td>A data series viewer with a logarithmic x and y axis.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.viewer_timeselect.html#iotile_analytics.interactive.viewer_timeselect.TimeSelectViewer" title="iotile_analytics.interactive.viewer_timeselect.TimeSelectViewer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSelectViewer</span></code></a></td>
+<td>A graph showing a high level overview of one or more StreamSeries.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.app.html#iotile_analytics.interactive.app.show" title="iotile_analytics.interactive.app.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a></td>
+<td>Show an application or analytics object in a notebook.</td>
+</tr>
+</tbody>
+</table>
 </div>
-<p>Subpackages:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.interactive.reports.html">iotile_analytics.interactive.reports package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iotile_analytics.interactive.scripts.html">iotile_analytics.interactive.scripts package</a></li>
-</ul>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.app.html#module-iotile_analytics.interactive.app" title="iotile_analytics.interactive.app"><code class="xref py py-obj docutils literal notranslate"><span class="pre">app</span></code></a></td>
+<td>Default implementation for a bokeh application that can show itself in a server or notebook.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.viewer_base.html#module-iotile_analytics.interactive.viewer_base" title="iotile_analytics.interactive.viewer_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewer_base</span></code></a></td>
+<td>Base viewer class for interactive plots.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.viewer_loglog.html#module-iotile_analytics.interactive.viewer_loglog" title="iotile_analytics.interactive.viewer_loglog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewer_loglog</span></code></a></td>
+<td>Helper classes showing interactive timeseries.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.viewer_timeselect.html#module-iotile_analytics.interactive.viewer_timeselect" title="iotile_analytics.interactive.viewer_timeselect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">viewer_timeselect</span></code></a></td>
+<td>A widget showing when in time a StreamSeries has data.</td>
+</tr>
+</tbody>
+</table>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">__all__</span></code>: <a class="reference internal" href="iotile_analytics.interactive.app.html#iotile_analytics.interactive.app.AnalyticsApplication" title="iotile_analytics.interactive.app.AnalyticsApplication"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalyticsApplication</span></code></a>, <a class="reference internal" href="iotile_analytics.interactive.app.html#iotile_analytics.interactive.app.AnalyticsObject" title="iotile_analytics.interactive.app.AnalyticsObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalyticsObject</span></code></a>, <a class="reference internal" href="iotile_analytics.interactive.viewer_base.html#iotile_analytics.interactive.viewer_base.BaseViewer" title="iotile_analytics.interactive.viewer_base.BaseViewer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseViewer</span></code></a>, <a class="reference internal" href="iotile_analytics.interactive.viewer_loglog.html#iotile_analytics.interactive.viewer_loglog.LogLogViewer" title="iotile_analytics.interactive.viewer_loglog.LogLogViewer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogLogViewer</span></code></a>, <a class="reference internal" href="iotile_analytics.interactive.viewer_timeselect.html#iotile_analytics.interactive.viewer_timeselect.TimeSelectViewer" title="iotile_analytics.interactive.viewer_timeselect.TimeSelectViewer"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeSelectViewer</span></code></a>, <a class="reference internal" href="iotile_analytics.interactive.app.html#iotile_analytics.interactive.app.show" title="iotile_analytics.interactive.app.show"><code class="xref py py-func docutils literal notranslate"><span class="pre">show</span></code></a></p>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.html#module-iotile_analytics.interactive.reports" title="iotile_analytics.interactive.reports"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reports</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.scripts.html#module-iotile_analytics.interactive.scripts" title="iotile_analytics.interactive.scripts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scripts</span></code></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 
 

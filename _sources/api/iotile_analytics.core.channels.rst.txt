@@ -4,23 +4,32 @@
 iotile_analytics.core.channels package
 ======================================
 
+.. currentmodule:: iotile_analytics.core.channels
+
 .. automodule:: iotile_analytics.core.channels
+    
+Key Functions and Classes
+-------------------------
+
+.. autosummary::
+    :nosignatures:
+
+    ~iotile_analytics.core.channels.cloud_api.IOTileCloudChannel
     
 
 
-    Submodules:
+Submodules
+----------
 
-    .. toctree::
-       :maxdepth: 1
+.. autosummary::
+    :nosignatures:
+    :toctree:
 
-       iotile_analytics.core.channels.channel
-       iotile_analytics.core.channels.cloud_api
-
-
-
-
+    ~iotile_analytics.core.channels.channel
+    ~iotile_analytics.core.channels.cloud_api
 
 
-    ``__all__``: :class:`IOTileCloudChannel <iotile_analytics.core.channels.cloud_api.IOTileCloudChannel>`
+
+
 
 

@@ -199,20 +199,93 @@ environment.</p>
 </div>
 <p>To check that everything is working, make sure you can access the <code class="docutils literal notranslate"><span class="pre">analytics-host</span></code>
 application.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ analytics-host --help
-usage: analytics-host <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-v<span class="o">]</span> <span class="o">[</span>-u USER<span class="o">]</span> <span class="o">[</span>-n<span class="o">]</span> <span class="o">[</span>-p PASSWORD<span class="o">]</span> <span class="o">[</span>-o OUTPUT<span class="o">]</span>
-                      <span class="o">[</span>-t REPORT<span class="o">]</span> <span class="o">[</span>-l<span class="o">]</span> <span class="o">[</span>-b<span class="o">]</span> <span class="o">[</span>-d DOMAIN<span class="o">]</span>
-                      <span class="o">[</span>analysis_group<span class="o">]</span>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ analytics-host --help
+usage: analytics-host [-h] [-v] [-u USER] [-n] [-p PASSWORD] [-o OUTPUT]
+                      [-t TEMPLATE] [-s] [-a ARG] [-c] [-l] [-b] [-d DOMAIN]
+                      [analysis_group]
 
-Generate a LiveReport from data stored locally or in iotile.cloud.
+Run precreated analysis templates against devices or archives stored locally or in iotile.cloud.
+
+analytics-host is designed to let people quickly run precreated analysis
+operatation on their data. An example would be creating a summary report that
+shows high level information about all data received from a given device or
+inside of a particular archive.
+
+You do not need to have an internet connection to use analytics-host.  While
+it can automatically pull your information from iotile.cloud using your login
+credentials, it can also run most analyses locally using predownloaded data
+that you have on your computer.
+
+The most up-to-date reference information is always available online at:
+http://iotile-analytics.readthedocs.io/en/latest/
+
+Most of the analysis templates included with analytics-host create interactive
+html web pages that embed graphs, controls and tables showing the results of
+the analysis performed.  These html files are designed to be opened in any
+modern web browser and typically do not need an internet connection.
+
+basic usage:
+
+- analytics-host will ask you to confirm everything before you do it unless
+  you pass the -c flag indicating that you don&#39;t want this behavior.
+
+- you typically need to specify an output path for where the results of your
+  analysis should be saved.  You do this using the -o,--output &lt;path&gt; flag.
+  Some simple analysis templates can just print their output to the screen
+  but most require a file.  Some analysis template generate many files so the
+  path you pass here will be interpreted as a directory where all of the files
+  should be saved.
+
+- you need to identify the data you are looking for in the cloud by its *slug*
+  which is an alphanumeric identifier that starts with d-- for a device or
+  b-- for an archive.
+
+  For example, &quot;d--0000-0000-0000-0123&quot; or &quot;b--0001-0000-0000-0100&quot;.
+
+- if your analysis generates multiple files you can have analytics-host bundle
+  them into a zip file for you by using the `-b` flag.
+
+examples:
+
+To see what types of analysis you have installed run:
+$ analytics-host -l
+
+To see help information about a specific AnalysisTemplate, pass it by name
+using -t along with -l:
+$ analytics-host -l -t basic_info
+
+To see this help information do:
+$ analytics-host -h
+
+If you have the package iotile-analytics-offline installed, you can download
+all data from a specific device for offline access using:
+$ analytics-host -t save_hdf5 &lt;device slug&gt; -o &lt;output_path&gt; -c
+
+advanced usage:
+
+Some analysis templates are configurable and require that you pass them
+arguments.  You can see if any arguments are accepted by running:
+$ analytics-host -l -t &lt;template name&gt;
+
+If you do need to pass arguments, you must pass them using the `-a, --arg`
+option in the form of `name=value` where name is the parameter name
+shown in the above command and value is the value you want to pass.
+
+For example, if you had a template named &quot;excited_report&quot; that took a
+parameter named title as a string and show_bold as a boolean, you would
+invoke it using:
+$ analytics-host -t excited_report -a &quot;title=Your Title&quot; -a show_bold=true
+
+Note that you need to use quote around your first argument since it contains a
+space.  Quotes around an argument not containing a space are optional.
 
 positional arguments:
-  analysis_group        The slug or path of the object you want to generate a
-                        report on
+  analysis_group        The slug or path of the object you want to perform
+                        analysis on
 
 optional arguments:
-  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
-  -v, --verbose         Increase logging level <span class="o">(</span>goes error, warn, info, debug<span class="o">)</span>
+  -h, --help            show this help message and exit
+  -v, --verbose         Increase logging level (goes error, warn, info, debug)
   -u USER, --user USER  Your iotile.cloud user name.
   -n, --no-verify       Do not verify the SSL certificate of iotile.cloud
   -p PASSWORD, --password PASSWORD
@@ -220,12 +293,19 @@ optional arguments:
                         be prompted when needed.
   -o OUTPUT, --output OUTPUT
                         The output path that you wish to save the report at.
-  -t REPORT, --report REPORT
-                        The name of the report to generate
-  -l, --list            List all known report types without running one
+  -t TEMPLATE, --template TEMPLATE
+                        The name of the analysis template to run
+  -s, --include-system  Also include hidden system streams. This only affects
+                        reports created from device objects, not projects or
+                        datablocks/archives
+  -a ARG, --arg ARG     Pass an argument to the template you are running,
+                        should be in the form name=value
+  -c, --no-confirm      Do not confirm the analysis that you are about to
+                        perforn and prompt for parameters
+  -l, --list            List all known analysis types without running one
   -b, --bundle          Bundle the rendered output into a zip file
   -d DOMAIN, --domain DOMAIN
-                        Domain to use <span class="k">for</span> remote queries, defaults to
+                        Domain to use for remote queries, defaults to
                         https://iotile.cloud
 </pre></div>
 </div>
