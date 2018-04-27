@@ -5,6 +5,21 @@ IOTile Analytics is a python package that is designed for interacting with data
 stored in IOTile.cloud using standard Data Science tools like numpy, pandas,
 bokeh, matplotlib etc.
 
+You can use it to quickly generate beautiful interactive data visualizations
+that are just normal html files and can be shared with anyone and used offline.
+
+For example, here's a complex visualization of the shocks and vibrations
+experienced by a package during a trip:
+
+.. image:: images/shipment_overview.png
+
+.. important::
+
+	Make sure to check out the `live interactive demo. <_static/shipment-details/index.html>`_
+
+	Click around and see the graphs change.  Look for anomalies in the data.  Zoom
+	in and out of the trip timeline.
+
 This section serves as a basic introduction to the fundamental concepts and
 classes of IOTile Analytics as well as some example usage.
 

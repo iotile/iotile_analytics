@@ -362,16 +362,6 @@ do choose to override the units, you must specify a units name that has a known
 conversion from the internal stream units.
 
 Parameters:
- - stream (str):
-   A unique identifier for the stream that we wish to download and display.
-   This can be anything that could be passed to AnalysisGroup.fetch_stream
-   including a 4-character variable ID, a partial string that matches the label
-   of the stream, etc.
- - mdo (list(float)):
-   An optional MDO to use to convert the data stored in this stream.  If passed
-   this must be 3 float values that define a linear transformation of the data
-   stored in the stream. The values are interpreted as m/d*value + o where the
-   argument is specified as [m, d, o].
  - window (str):
    The aggregation period for showing when there is data in a stream.  You can
    pass a value like &#39;days&#39;, &#39;hours&#39;, &#39;weeks&#39;, &#39;months&#39;.  This will be given to
@@ -382,6 +372,16 @@ Parameters:
    an available output unit on the stream.  If not passed, the default is to use
    whatever the internal units are of the stream.  You can see what output unit
    options are by passing a random string here and looking at the error message.
+ - mdo (list(float)):
+   An optional MDO to use to convert the data stored in this stream.  If passed
+   this must be 3 float values that define a linear transformation of the data
+   stored in the stream. The values are interpreted as m/d*value + o where the
+   argument is specified as [m, d, o].
+ - stream (str):
+   A unique identifier for the stream that we wish to download and display.
+   This can be anything that could be passed to AnalysisGroup.fetch_stream
+   including a 4-character variable ID, a partial string that matches the label
+   of the stream, etc.
 </pre></div>
 </div>
 <p>There are two components of the help information for a LiveReport.  The first
