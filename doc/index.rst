@@ -18,7 +18,9 @@ experienced by a package during a trip:
 	Make sure to check out the `live interactive demo. <_static/shipment-details/index.html>`_
 
 	Click around and see the graphs change.  Look for anomalies in the data.  Zoom
-	in and out of the trip timeline.
+	in and out of the trip timeline.  Generating an interactive report like this
+	just takes a single command with the ``analytics-host`` program included 
+	in ``iotile-analytics-interactive``. 
 
 This section serves as a basic introduction to the fundamental concepts and
 classes of IOTile Analytics as well as some example usage.
