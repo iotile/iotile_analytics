@@ -1,5 +1,12 @@
 # Release Notes
 
+## HEAD
+
+- Add support for uploading created files to iotile.cloud and linking them
+  with a device or archive.
+- Add options to analytics_host to upload files and attach them to a device that
+  the user has access to.
+
 ## 0.3.0
 
 - Add support for stream_overview report that shows detailed information about

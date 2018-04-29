@@ -1,0 +1,216 @@
+"""Helper class that manages uploading a series of report files to iotile.cloud."""
+
+from __future__ import unicode_literals, print_function, absolute_import
+import logging
+import os
+import json
+import string
+import random
+import urllib2
+from iotile_analytics.core import CloudSession
+from iotile_analytics.core.exceptions import UsageError, CloudError
+from typedargs.exceptions import ArgumentError
+
+
+class ReportUploader(object):
+    """Upload a series of files to S3 using signed URLs.
+
+    Args:
+        domain (str): The iotile.cloud instance that we should use. If
+            not passed, this defaults to https://iotile.cloud
+    """
+
+    def __init__(self, domain=None):
+        self._session = CloudSession(domain=domain)
+        self._api = self._session._api
+        self._logger = logging.getLogger(__name__)
+
+    def upload_report(self, label, files, group=None, slug=None, org=None):
+        """Upload a report to iotile.cloud to attach to a device or archive.
+
+        The report will be attached to the given AnalysisGroup, or you can
+        specify the slug of the object (and its org) to attach the report to
+        explicitly.  You must specify EITHER group OR (slug and org) and the
+        currently logged in user must have permission to upload reports for
+        the given org.
+
+        You must give the report a human readable label that will be shown
+        in lists where users may select to view the report.
+
+        Args:
+            label (str): The human readable label for the report that you
+                are uploading.
+            files (list of str): A list of all of the files that should
+                be uploaded for this report including the main entrypoint
+                file that should be listed first.
+            group (AnalysisGroup): The analysis group that was used to generate
+                this report.  If this is not specified then you must explicitly
+                specify the slug of the object used to generate the report and
+                the slug of the organization that it should be uploaded for.
+
+
+        Returns:
+            str: A URL where the uploaded report can be accessed.
+        """
+
+        if group is not None:
+            slug = group.source_info.get('slug')
+            org = group.source_info.get('org')
+
+            if slug is None or org is None:
+                raise ArgumentError("The group provided did not have org or source slug information in its source_info", slug=slug, org=org)
+        elif org is None or slug is None:
+            raise UsageError("If you do not specify an AnalysisGroup you must pass an org and a slug to this function", org=org, slug=slug)
+
+        report_id = self._create_report(label, slug, org)
+        self._logger.debug("Created report id: %s", report_id)
+
+        keys = self._clean_file_paths(files)
+
+        urls, fields = self._get_signed_urls(report_id, keys)
+        self._upload_files_to_s3(urls, fields, keys, files)
+        self._notify_upload_success(report_id, keys[0])
+
+    def _clean_file_paths(self, files):
+        """Return a suitable s3 keys for all files."""
+
+        first = files[0]
+        basedir = os.path.dirname(first)
+        if basedir is not None:
+            keys = [os.path.relpath(x, basedir) for x in files]
+        else:
+            keys = [x for x in files]
+
+        keys = [x.replace('\\', '/') for x in keys]
+        return keys
+
+    def _create_report(self, label, slug, org):
+        payload = {
+            'org': org,
+            'label': label,
+            'source_ref': slug
+        }
+
+        resp = self._api.report.generated.post(payload)
+        self._logger.debug("Create generated report record api response: %s", resp)
+
+        report_id = resp.get('id')
+        if report_id is None:
+            raise CloudError("No report id returned by cloud", response=resp)
+
+        return report_id
+
+    def _get_signed_urls(self, report_id, files):
+        url_infos = [self._get_signature_url_payload(report_id, x, i > 0) for i, x in enumerate(files)]
+
+        urls = [x[0] for x in url_infos]
+        payloads = [x[1] for x in url_infos]
+
+        resp_list = self._session.post_multiple(urls, payloads, message="Getting file upload authorization", include_auth=True)
+        decoded_resps = [json.loads(resp.decode('utf-8')) for resp in resp_list]
+        urls = [x['url'] for x in decoded_resps]
+        fields = [x['fields'] for x in decoded_resps]
+        return urls, fields
+
+    def _get_signature_url_payload(self, report_id, file_name, public=True):
+
+        payload = {
+            'name': file_name,
+            'acl': 'public-read' if public is True else 'private'
+        }
+
+        resource = self._api.report.generated(report_id).uploadurl
+
+        return resource.url(), payload
+
+    def _upload_files_to_s3(self, urls, fields, keys, files):
+        bodies = []
+        headers = []
+        for key, field, file_path in zip(keys, fields, files):
+            with open(file_path, "rb") as infile:
+                file_data = infile.read()
+
+            file_info = {
+                'filename': key,
+                'mimetype': 'text/plain',
+                'content': file_data
+            }
+
+            body, header = encode_multipart(field, {'file': file_info})
+            bodies.append(body)
+            headers.append(header)
+
+        try:
+            self._session.post_multiple(urls, bodies, headers, message="Uploading report files", include_auth=False)
+        except urllib2.HTTPError as err:
+            data = err.read().decode('utf-8')
+            self._logger.exception("Exception posting S3 file: code=%d, message=%s", err.code, data)
+            raise CloudError("Error posting files to S3", error_code=err.code, message=data)
+
+    def _notify_upload_success(self, report_id, file_path):
+        payload = {
+            'name': file_path
+        }
+
+        resp = self._api.report.generated(report_id).uploadsuccess.post(payload)
+        self._logger.info("Successfully uploaded report: id=%s, main_file=%s", report_id, file_path)
+        self._logger.info("Upload success signed url: %s", resp.get('url'))
+
+        return resp.get('url')
+
+
+_BOUNDARY_CHARS = string.digits + string.ascii_letters
+
+
+def encode_multipart(fields, files, boundary=None):
+    """Standalone multipart form encoder.
+
+    Taken from:
+    http://code.activestate.com/recipes/578668-encode-multipart-form-data-for-uploading-files-via/
+
+    Licensed under MIT, Written by: Ben Hoyt
+    """
+
+    def _escape_quote(indata):
+        return indata.replace('"', '\\"')
+
+    if boundary is None:
+        boundary = ''.join(random.choice(_BOUNDARY_CHARS) for i in range(30))
+    lines = []
+
+    for name, value in fields.items():
+        lines.extend((
+            '--{0}'.format(boundary),
+            'Content-Disposition: form-data; name="{0}"'.format(_escape_quote(name)),
+            '',
+            str(value),
+        ))
+
+    for name, value in files.items():
+        filename = value['filename']
+        mimetype = value.get('mimetype', 'application/octet-stream')
+        lines.extend((
+            '--{0}'.format(boundary),
+            'Content-Disposition: form-data; name="{0}"; filename="{1}"'.format(_escape_quote(name), _escape_quote(filename)),
+            'Content-Type: {0}'.format(mimetype),
+            'Content-Transfer-Encoding: binary',
+            '',
+            value['content'],
+        ))
+
+    lines.extend((
+        '--{0}--'.format(boundary),
+        '',
+    ))
+
+    for i, line in enumerate(lines):
+        if not isinstance(line, bytes):
+            lines[i] = line.encode('utf-8')
+
+    body = b'\r\n'.join(lines)
+
+    headers = {
+        b'Content-Type': b'multipart/form-data; boundary={0}'.format(boundary.encode('utf-8'))
+    }
+
+    return (body, headers)

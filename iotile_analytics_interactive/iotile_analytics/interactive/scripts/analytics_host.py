@@ -13,6 +13,7 @@ import pkg_resources
 from future.utils import viewitems
 from iotile_analytics.core.exceptions import UsageError, AuthenticationError
 from iotile_analytics.core import CloudSession, AnalysisGroup, Environment
+from iotile_analytics.interactive.reports import ReportUploader
 from typedargs.doc_parser import ParsedDocstring
 from typedargs.exceptions import ValidationError, ArgumentError
 from typedargs.metadata import AnnotatedMetadata
@@ -113,6 +114,9 @@ def build_args():
     parser.add_argument('-c', '--no-confirm', action="store_true", help="Do not confirm the analysis that you are about to perforn and prompt for parameters")
     parser.add_argument('-l', '--list', action="store_true", help="List all known analysis types without running one")
     parser.add_argument('-b', '--bundle', action="store_true", help="Bundle the rendered output into a zip file")
+    parser.add_argument('-w', '--web-push', type=str, default=None, help="Push the resulting report to iotile.cloud with this given label")
+    parser.add_argument('--web-push-org', type=str, default=None, help="Override the org given in the analysisgroup and force it to be this")
+    parser.add_argument('--web-push-slug', type=str, default=None, help="Override the source slug given in the analysisgroup and force it to be this")
     parser.add_argument('-d', '--domain', default=DOMAIN_NAME, help="Domain to use for remote queries, defaults to https://iotile.cloud")
     parser.add_argument('analysis_group', default=None, nargs='?', help="The slug or path of the object you want to perform analysis on")
 
@@ -160,6 +164,20 @@ def setup_logging(args):
         root.addHandler(handler)
     else:
         root.addHandler(logging.NullHandler())
+
+
+def upload_report(domain, files, label=None, group=None, org=None, slug=None):
+    """Upload a report to iotile.cloud."""
+
+    print("Uploading report to iotile.cloud server")
+    if label is None:
+        label = input("Enter a label for the report: ")
+
+    if org is not None or slug is not None:
+        group = None
+
+    uploader = ReportUploader(domain=domain)
+    uploader.upload_report(label, files, group=group, org=org, slug=slug)
 
 
 def list_known_reports():
@@ -389,6 +407,8 @@ def main(argv=None):
     if len(rendered_paths) > 0:
         print("Rendered report to: %s" % rendered_paths[0])
 
+    if args.web_push is not None:
+        upload_report(args.domain, rendered_paths, args.web_push, group=group, org=args.web_push_org, slug=args.web_push_slug)
 
     return 0
 

@@ -1,7 +1,15 @@
 """Simple session management system to save an iotile.cloud token."""
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
-from builtins import str, range
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from builtins import range
+
+import getpass
+import math
+import json
+import ssl
+import logging
+from threading import Lock
+from multiprocessing.pool import ThreadPool
 
 # For some reason using the future input = raw_input patch in builtins
 # does not work on jupyter so fall back to this manual patch.
@@ -9,11 +17,6 @@ try:
     input = raw_input
 except NameError:
     pass
-
-import getpass
-import math
-import json
-import ssl
 
 try:
     #python2
@@ -26,8 +29,6 @@ except ImportError:
     from urllib.parse import urlencode
     import requests.packages.urllib3 as urllib3
 
-from threading import Lock
-from multiprocessing.pool import ThreadPool
 from typedargs.exceptions import ArgumentError
 from iotile_cloud.api.connection import Api, DOMAIN_NAME
 from iotile_cloud.api.exceptions import HttpNotFoundError, HttpClientError, RestHttpBaseException, HttpCouldNotVerifyServerError
@@ -61,8 +62,6 @@ class CloudSession(object):
         password (str): The user's password
         domain (str): The complete domain name of the iotile.cloud instance to login to.
             This defaults to https://iotile.cloud
-        concurrence (int): The maximum number of simultaneous requests to send to iotile.cloud
-            when we are requesting multiple resources at a time.  Default: CloudSession.MAX_CONCURRENCY
         verify (bool): If set to false, do not verify the SSL certificate of the remote
             iotile.cloud server.  This option is **NOT RECOMMENDED** but sometimes required
             if you are behind a corporate firewall that terminates SSL connections at the
@@ -77,13 +76,15 @@ class CloudSession(object):
 
     MAX_CONCURRENCY = 10
     _login_cache = {}
+    pool = None
 
     #pytest: disable=R0913; These arguments are all necessary and appropriate, with sane defaults
-    def __init__(self, user=None, password=None, domain=DOMAIN_NAME, concurrency=None, verify=None, token=None):
-        if concurrency is None:
-            concurrency = CloudSession.MAX_CONCURRENCY
-
-        self.pool = ThreadPool(concurrency)
+    def __init__(self, user=None, password=None, domain=DOMAIN_NAME, verify=None, token=None):
+        self.logger = logging.getLogger(__name__)
+        if CloudSession.pool is None:
+            self.logger.debug("Creating thread pool with %d threads", CloudSession.MAX_CONCURRENCY)
+            CloudSession.pool = ThreadPool(CloudSession.MAX_CONCURRENCY)
+            self.logger.debug("Finished creating thread pool.")
 
         if domain not in CloudSession._login_cache:
             CloudSession._login_cache[domain] = {'requests': {}, 'request_lock': Lock()}
@@ -207,6 +208,67 @@ class CloudSession(object):
         except RestHttpBaseException as err:
             raise self._translate_error(err, msg="Error fetching resources in parallel from IOTile.cloud")
 
+    def post_multiple(self, urls, datas, headers=None, message=None, include_auth=True):
+        """Make multiple parallel posts to urls with the contents as given by datas.
+
+        Requests will be mapped to the underlying thread pool and made in
+        batches according to the pool size.  If you need to attach headers to
+        the requests, you can pass a dictionary in headers, which will be
+        copied and used for all requests, or you can pass a list of dicts that
+        will be used one per url in urls.
+
+        Args:
+            urls (list of str): A list of the urls that should be called including any
+                query strings that they might have.  These will be passed unmodified
+                to urlopen().
+            datas (list of str, dict or bytes): A list of the actual payloads that should be
+                included in each url post.  If this is a dict then it is encoded as a json
+                string in utf-8 and the appropriate content-type header is added to each
+                request.
+            headers (dict or list of dicts): Either a single dict of headers that will
+                be included in every call or a list of dicts that will be used individually
+                for each call.
+            include_auth (bool): Whether to include an Authorization token in the headers
+                for every request.
+            message (str): A user-facing message that will be shown in the ProgressBar
+                indicating progress for this operation.
+
+        Returns:
+            list of bytes: A list of the actual responses to each post.
+        """
+
+        if headers is None:
+            headers = {}
+
+        if isinstance(headers, dict):
+            headers = [headers.copy()]*len(urls)
+        elif isinstance(headers, list) and len(headers) != len(urls):
+            raise ArgumentError("Number of passed headers does not agree with number of urls",
+                                url_count=len(urls), header_count=len(headers))
+
+        if len(datas) != len(urls):
+            raise ArgumentError("Number of passed payloads does not agree with number of urls",
+                                url_count=len(urls), payload_count=len(datas))
+
+        for i, (in_data, in_headers) in enumerate(zip(datas, headers)):
+            if isinstance(in_data, dict):
+                json_data = json.dumps(in_data).encode('utf-8')
+                datas[i] = json_data
+                in_headers[b'Content-type'] = b"application/json"
+
+            if include_auth:
+                in_headers[b'Authorization'] = '{} {}'.format(self.token_type, self.token).encode('utf-8')
+
+        with ProgressBar(total=len(urls), leave=False, message=message) as progbar:
+            args = zip(urls, datas, headers, [progbar]*len(urls))
+            wrapped_results = self.pool.map(self._generic_url_poster, args)
+
+        failed = [err for _result, err in wrapped_results if err is not None]
+        if len(failed) > 0:
+            raise failed[0]
+
+        return [x for x, _y in wrapped_results]
+
     def fetch_all(self, resource, page_size=100, message=None, **kwargs):
         """Fetch and concatenate all pages of a given resource.
 
@@ -294,6 +356,33 @@ class CloudSession(object):
             progress.update(1)
             return result, None
         except Exception as err:  # pylint:disable=W0703; we do the exception processing in the calling function
+            return None, err
+
+    def _generic_url_poster(self, args):
+        """Method for posting to an arbitrary URL with data."""
+
+        url, data, headers, progress = args
+
+        try:
+            # We must encode the URL to bytes rather than unicode otherwise:
+            # https://stackoverflow.com/a/8715815 will cause a unicode decode
+            # error on our *data*
+            req = Request(url.encode('utf-8'), data, headers=headers)
+
+            if self.verify is False:
+                context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+                context.options |= ssl.OP_NO_SSLv2
+                context.options |= ssl.OP_NO_SSLv3
+
+                resp = urlopen(req, context=context)
+            else:
+                resp = urlopen(req)
+
+            resp_data = resp.read().decode('utf-8')
+            progress.update(1)
+            return resp_data, None
+        except Exception as err:  # pylint:disable=W0703; we do the exception processing in the calling function
+            self.logger.exception("Error posting to url %s, headers=%s", url, headers)
             return None, err
 
     def _url_fetcher(self, args):

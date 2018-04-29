@@ -1,5 +1,11 @@
 # Release Notes
 
+## HEAD
+
+- Add support for posting files to s3 and making post requests to iotile.cloud
+  rest APIs.
+- Refactor thread pool to not create a new pool for every CloudSession instance.
+
 ## 0.4.0
 
 - Allow downloading system data as well as user data.
