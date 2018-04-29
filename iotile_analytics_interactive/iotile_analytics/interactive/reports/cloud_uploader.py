@@ -6,7 +6,6 @@ import os
 import json
 import string
 import random
-import urllib2
 from iotile_analytics.core import CloudSession
 from iotile_analytics.core.exceptions import UsageError, CloudError
 from typedargs.exceptions import ArgumentError
@@ -140,12 +139,7 @@ class ReportUploader(object):
             bodies.append(body)
             headers.append(header)
 
-        try:
-            self._session.post_multiple(urls, bodies, headers, message="Uploading report files", include_auth=False)
-        except urllib2.HTTPError as err:
-            data = err.read().decode('utf-8')
-            self._logger.exception("Exception posting S3 file: code=%d, message=%s", err.code, data)
-            raise CloudError("Error posting files to S3", error_code=err.code, message=data)
+        self._session.post_multiple(urls, bodies, headers, message="Uploading report files", include_auth=False)
 
     def _notify_upload_success(self, report_id, file_path):
         payload = {
