@@ -114,7 +114,8 @@ def build_args():
     parser.add_argument('-c', '--no-confirm', action="store_true", help="Do not confirm the analysis that you are about to perforn and prompt for parameters")
     parser.add_argument('-l', '--list', action="store_true", help="List all known analysis types without running one")
     parser.add_argument('-b', '--bundle', action="store_true", help="Bundle the rendered output into a zip file")
-    parser.add_argument('-w', '--web-push', type=str, default=None, help="Push the resulting report to iotile.cloud with this given label")
+    parser.add_argument('-w', '--web-push', action="store_true", help="Push the resulting report to iotile.cloud.")
+    parser.add_argument('--web-push-label', type=str, default=None, help="Set the label used when pushing a report to iotile.cloud")
     parser.add_argument('--web-push-org', type=str, default=None, help="Override the org given in the analysisgroup and force it to be this")
     parser.add_argument('--web-push-slug', type=str, default=None, help="Override the source slug given in the analysisgroup and force it to be this")
     parser.add_argument('-d', '--domain', default=DOMAIN_NAME, help="Domain to use for remote queries, defaults to https://iotile.cloud")
@@ -407,8 +408,8 @@ def main(argv=None):
     if len(rendered_paths) > 0:
         print("Rendered report to: %s" % rendered_paths[0])
 
-    if args.web_push is not None:
-        upload_report(args.domain, rendered_paths, args.web_push, group=group, org=args.web_push_org, slug=args.web_push_slug)
+    if args.web_push:
+        upload_report(args.domain, rendered_paths, label=args.web_push_label, group=group, org=args.web_push_org, slug=args.web_push_slug)
 
     return 0
 

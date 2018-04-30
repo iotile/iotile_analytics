@@ -115,12 +115,34 @@ class ReportUploader(object):
 
         payload = {
             'name': file_name,
-            'acl': 'public-read' if public is True else 'private'
+            'acl': 'public-read' if public is True else 'private',
+            'content_type': self._get_mime_type(file_name)
         }
 
         resource = self._api.report.generated(report_id).uploadurl
 
         return resource.url(), payload
+
+    @classmethod
+    def _get_mime_type(cls, filename):
+        _name, ext = os.path.splitext(filename)
+
+        if ext == "":
+            return 'application/octet-stream'
+
+        # Remove the .
+        ext = ext[1:]
+
+        if ext in ('jsonp', 'js'):
+            return "application/javascript"
+        elif ext in ('html', 'htm'):
+            return "text/html"
+        elif ext in ('csv',):
+            return "text/csv"
+        elif ext in ('json',):
+            return "application/json"
+
+        return "application/octet-stream"
 
     def _upload_files_to_s3(self, urls, fields, keys, files):
         bodies = []
@@ -131,7 +153,7 @@ class ReportUploader(object):
 
             file_info = {
                 'filename': key,
-                'mimetype': 'text/plain',
+                'mimetype': self._get_mime_type(key),
                 'content': file_data
             }
 
