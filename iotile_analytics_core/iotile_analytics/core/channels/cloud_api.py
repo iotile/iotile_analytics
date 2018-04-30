@@ -6,7 +6,6 @@ from builtins import *
 from future.utils import viewitems
 
 import pandas as pd
-from iotile_cloud.stream.data import StreamData
 from iotile_cloud.api.exceptions import RestHttpBaseException
 from typedargs.exceptions import ArgumentError
 from .channel import AnalysisGroupChannel
