@@ -180,12 +180,12 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
     def _count_generic_streams(self, slugs):
         resources = [self._api.stream(x).data for x in slugs]
-        ts_results = self._session.fetch_multiple(resources, message='Counting Events in Streams', page_size=1)
+        ts_results = self._session.fetch_multiple(resources, message='Counting Data in Streams', page_size=1)
 
         event_resources = [self._api.event for x in slugs]
         event_args = [{"filter": x} for x in slugs]
 
-        event_results = self._session.fetch_multiple(event_resources, event_args, message='Counting Data in Streams', page_size=1)
+        event_results = self._session.fetch_multiple(event_resources, event_args, message='Counting Events in Streams', page_size=1)
         return {slug: {'points': ts['count'], 'events': event['count']} for slug, ts, event in zip(slugs, ts_results, event_results)}
 
     def fetch_variable_types(self, slugs):
