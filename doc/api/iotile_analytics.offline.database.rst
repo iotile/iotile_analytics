@@ -7,7 +7,7 @@ iotile_analytics.offline.database module
 .. currentmodule:: iotile_analytics.offline.database
 
 .. automodule:: iotile_analytics.offline.database
-    :members: CompatibleObjectAtom, OfflineDatabase
+    :members: OfflineDatabase
     :undoc-members:
     :show-inheritance:
     :member-order: bysource
@@ -20,7 +20,6 @@ iotile_analytics.offline.database module
     .. autosummary::
         :nosignatures:
 
-        CompatibleObjectAtom
         OfflineDatabase
 
 
