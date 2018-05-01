@@ -1,5 +1,16 @@
 # Release Notes
 
+## 0.4.0
+
+- Add support for uploading created files to iotile.cloud and linking them
+  with a device or archive.
+- Add options to analytics_host to upload files and attach them to a device that
+  the user has access to.
+- Add LiveReport class that includes support for "Action Tables" which are lists
+  of links that can be customized by subclasses and are designed to function like
+  macros for iotile.cloud, where you specify a list of possible next steps for
+  a user and 
+
 ## 0.3.0
 
 - Add support for stream_overview report that shows detailed information about

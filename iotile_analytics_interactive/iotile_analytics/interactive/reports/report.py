@@ -210,6 +210,9 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
                 extension or the addition of a subdirectory.
         """
 
+        # Allow subclasses to finish any preparations before we render.
+        self.prepare_render()
+
         all_files = []
 
         if output_path is None:
@@ -260,11 +263,16 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
             for filename, fileinfo in viewitems(self.external_files):
                 file_path = os.path.join(datadir, filename)
 
-                all_files.append(file_path)
-
                 if self.target == self.UNHOSTED:
-                    self.render_jsonp(file_path + ".jsonp", fileinfo)
+                    file_path += ".jsonp"
+                    self.render_jsonp(file_path, fileinfo)
                 else:
                     raise UsageError("HOSTED mode for LiveReports is not yet supported")
 
+                all_files.append(file_path)
+
         return all_files
+
+    def prepare_render(self):
+        """Hook for any subclass that needs to setup before rendering."""
+        pass

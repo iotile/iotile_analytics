@@ -23,7 +23,96 @@ li {
 
 .arch-logo {
   width: 9em;
-  height: auto;
+  height: 2.96em; /* Needs a fixed height because of bug on ie 11 with height:auto */
+}
+
+table.action-table {
+  border-spacing: 0px;
+  border-collapse: collapse;
+  border-style: solid;
+  border-width: 0px 0 2px 0;
+  border-color: black;
+  text-align: left;
+  table-layout: fixed;
+  margin: auto;
+  width:100%;
+
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+tr:first-child {
+  width: 200px;
+}
+
+tr.action-table-header th {
+  border-style: solid;
+  border-width: 0px 0 2px 0;
+  border-color: black;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+tr.action-table-row th {
+  font-weight: normal;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.action-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    font-weight: bold;
+}
+
+/* Tooltip text */
+.action-tooltip .tooltiptext {
+    visibility: hidden;
+    text-align: left;
+    padding: 8px;
+    border-radius: 6px;
+     
+    font-weight: normal;
+    font-size: 11pt;
+ 
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+
+    /* Border and background info */
+    background-color: #ddd;
+    opacity: 0.95;
+    border-color: #ccc;
+    border-width: 1px;
+    border-style: solid;
+    color: #000;
+    
+    width: 480px;
+    top: 100%;
+    left: 50%;
+    margin-top: 6px;
+    margin-left: -26px; /* Use half of the width (120/2 = 60), to center the tooltip */
+}
+
+table.action-table tbody tr th div {
+  display: inline-block;
+}
+
+.action-tooltip .tooltiptext::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%;  /* At the top of the tooltip */
+    left: 5%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #ccc transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.action-tooltip:hover .tooltiptext {
+    visibility: visible;
 }
 
 .outercontainer {
@@ -99,10 +188,11 @@ li {
 
 .before-content .arrow-right {
   width: 15px;
+  height: 13px;
   margin-left: 5px;
   margin-right: 5px;
   position: relative;
-  top: 3px;
+  top: 1px;
 }
 
 .content-chart {
@@ -146,7 +236,7 @@ li {
 }
 
 .arch-systems svg {
-  width: auto;
+  width: 165px;
   height: 25px;
   padding: 0 5px;
 }
