@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.2.2
+
+- Adjust offline save format to allow loading files between python major versions.
+
 ## 0.2.1
 
 - Fix bug when saving streams that do not have metadata associated with them.

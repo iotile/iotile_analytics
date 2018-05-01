@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division,
 import uuid
 from builtins import int
 import os.path
+import json
 from past.builtins import basestring
 import tables
 import pandas as pd
@@ -13,29 +14,6 @@ from future.utils import viewitems
 from iotile_analytics.core.stream_series import StreamSeries
 from typedargs.exceptions import ArgumentError
 from .table_descriptions import Stream, EventIndex, PropertyTable, DatabaseInfoTable, PropertyTypes
-
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
-
-class CompatibleObjectAtom(tables.ObjectAtom):
-    """An object atom with a lower cpickle protocol.
-
-    This enables sharing hdf5 files between python 2 and python 3.
-    """
-
-    def _tobuffer(self, object_):
-        return pickle.dumps(object_, 2)
-
-    def fromarray(self, array):
-        # We have to check for an empty array because of a possible
-        # bug in HDF5 which makes it claim that a dataset has one
-        # record when in fact it is empty.
-        if array.size == 0:
-            return None
-        return pickle.loads(array.tostring())
 
 
 class OfflineDatabase(object):
@@ -54,6 +32,8 @@ class OfflineDatabase(object):
             lost when the program is exited.
     """
 
+    VERSION = (2, 0, 0)
+
     def __init__(self, path=None):
         if path is None:
             self._file = tables.open_file(str(uuid.uuid4()), "w", driver="H5FD_CORE", driver_core_backing_store=0)
@@ -67,6 +47,8 @@ class OfflineDatabase(object):
         if os.path.isfile(path):
             self._file = tables.open_file(path, mode="r")
             self.read_only = True
+
+            self._check_version()
         else:
             self._file = tables.open_file(path, mode="w")
             self._initialize_database()
@@ -85,23 +67,44 @@ class OfflineDatabase(object):
         self._file.create_group(root, 'streams')
 
         meta = self._file.create_group(root, 'meta')
-        self._file.create_vlarray(meta, 'archive_definitions', CompatibleObjectAtom())
-        self._file.create_vlarray(meta, 'device_definitions', CompatibleObjectAtom())
-        self._file.create_vlarray(meta, 'vartype_definitions', CompatibleObjectAtom())
+        self._file.create_vlarray(meta, 'archive_definitions', tables.VLStringAtom())
+        self._file.create_vlarray(meta, 'device_definitions', tables.VLStringAtom())
+        self._file.create_vlarray(meta, 'vartype_definitions', tables.VLStringAtom())
         self._file.create_table(meta, 'source_info', PropertyTable)
         self._file.create_table(meta, 'properties', PropertyTable)
         self._file.create_table(meta, 'info', DatabaseInfoTable)
 
         self._populate_db_info()
 
+    def _check_version(self):
+        """Make sure the embedded version string is readable."""
+
+        emb_version = self._get_version()
+        if emb_version[0] != self.VERSION[0]:
+            raise ArgumentError("Saved file has a major version that we cannot read", embedded_version=emb_version, our_version=self.VERSION)
+
+    def _get_version(self):
+        version = self._file.root.meta.info.read()[0]
+        return version
+
     def _populate_db_info(self):
         table = self._file.root.meta.info
 
         entry = table.row
-        entry['major_version'] = 1
-        entry['minor_version'] = 0
-        entry['patch_version'] = 0
+        entry['major_version'] = self.VERSION[0]
+        entry['minor_version'] = self.VERSION[1]
+        entry['patch_version'] = self.VERSION[2]
         entry.append()
+
+    @classmethod
+    def _encode_json(cls, obj):
+        """Encode a dictionary as a json object."""
+
+        return json.dumps(obj).encode('utf-8')
+
+    @classmethod
+    def _decode_json(cls, data):
+        return json.loads(data.decode('utf-8'))
 
     def save_stream(self, slug, definition, data=None, events=None, raw_events=None):
         """Save a stream with timeseries and event data.
@@ -136,13 +139,13 @@ class OfflineDatabase(object):
 
         group = self._file.create_group('/streams', slug)
 
-        arr_def = self._file.create_vlarray(group, 'definition', CompatibleObjectAtom(), filters=filters)
-        arr_events = self._file.create_vlarray(group, 'events', CompatibleObjectAtom(), filters=filters)
-        arr_rawevents = self._file.create_vlarray(group, 'raw_events', CompatibleObjectAtom(), filters=filters)
+        arr_def = self._file.create_vlarray(group, 'definition', tables.VLStringAtom(), filters=filters)
+        arr_events = self._file.create_vlarray(group, 'events', tables.VLStringAtom(), filters=filters)
+        arr_rawevents = self._file.create_vlarray(group, 'raw_events', tables.VLStringAtom(), filters=filters)
         table_data = self._file.create_table(group, 'data', Stream)
         table_events = self._file.create_table(group, 'event_index', EventIndex)
 
-        arr_def.append(definition)
+        arr_def.append(self._encode_json(definition))
 
         row = table_events.row
 
@@ -154,10 +157,10 @@ class OfflineDatabase(object):
 
                 row.append()
 
-                arr_events.append(event)
+                arr_events.append(self._encode_json(event.to_dict()))
 
                 if has_raw_events:
-                    arr_rawevents.append(raw_events.iloc[i].to_dict())
+                    arr_rawevents.append(self._encode_json(raw_events.iloc[i].to_dict()))
 
             table_events.flush()
 
@@ -183,7 +186,7 @@ class OfflineDatabase(object):
             raise ArgumentError("Attempted to save variable type in read only file")
 
         table = self._file.root.meta.vartype_definitions
-        table.append(vartype)
+        table.append(self._encode_json(vartype))
 
     def save_source_info(self, info, properties):
         """Save analysis group source metadata including properties if set.
@@ -281,7 +284,9 @@ class OfflineDatabase(object):
 
         for node in self._file.root.streams._f_iter_nodes():
             slug = node._v_name.replace('_', '-')
-            info_obj = node.definition[0]
+            enc_info_obj = node.definition[0]
+
+            info_obj = self._decode_json(enc_info_obj)
 
             if info_obj is None:
                 streams.append(slug)
@@ -309,7 +314,8 @@ class OfflineDatabase(object):
             raise ArgumentError("Stream slug not found in OfflineDatabase", slug=slug)
 
         group = getattr(self._file.root.streams, name)
-        return group.definition[0]
+        info_obj = self._decode_json(group.definition[0])
+        return info_obj
 
     def fetch_datapoints(self, slug):
         """Get all timeseries data for a stream.
@@ -359,7 +365,8 @@ class OfflineDatabase(object):
 
         events = self._get_event_index(name)
 
-        event_data = getattr(self._file.root.streams, name).events.read()
+        enc_event_data = getattr(self._file.root.streams, name).events.read()
+        event_data = [self._decode_json(x) for x in enc_event_data]
 
         index = pd.to_datetime([x['timestamp'] for x in events], unit='ns')
         return pd.DataFrame(event_data, index=index)
@@ -399,7 +406,8 @@ class OfflineDatabase(object):
 
         events = self._get_event_index(name)
 
-        event_data = getattr(self._file.root.streams, name).raw_events.read()
+        enc_event_data = getattr(self._file.root.streams, name).raw_events.read()
+        event_data = [self._decode_json(x) for x in enc_event_data]
 
         index = pd.to_datetime([x['timestamp'] for x in events], unit='ns')
         return pd.DataFrame(event_data, index=index)
@@ -429,8 +437,9 @@ class OfflineDatabase(object):
         """
 
         slugs = set(slugs)
-        vartypes = self._file.root.meta.vartype_definitions.read()
+        enc_vartypes = self._file.root.meta.vartype_definitions.read()
 
+        vartypes = [self._decode_json(x) for x in enc_vartypes]
         return {x['slug']: x for x in vartypes if x['slug'] in slugs}
 
 
