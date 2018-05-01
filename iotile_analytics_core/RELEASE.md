@@ -1,5 +1,11 @@
 # Release Notes
 
+## 0.4.2
+
+- Fix password prompt in python 3 that requires a unicode string.
+- Preemptively fix username prompt in python 2 and 3 to use native string
+  objects in both settings.
+
 ## 0.4.1
 
 - Add support for posting files to s3 and making post requests to iotile.cloud

@@ -14,8 +14,10 @@ Key Functions and Classes
 .. autosummary::
     :nosignatures:
 
+    ~iotile_analytics.interactive.reports.action_report.ActionReport
     ~iotile_analytics.interactive.reports.branded_report.BrandedReport
     ~iotile_analytics.interactive.reports.report.LiveReport
+    ~iotile_analytics.interactive.reports.cloud_uploader.ReportUploader
     
 
 
@@ -26,8 +28,10 @@ Submodules
     :nosignatures:
     :toctree:
 
+    ~iotile_analytics.interactive.reports.action_report
     ~iotile_analytics.interactive.reports.analysis_template
     ~iotile_analytics.interactive.reports.branded_report
+    ~iotile_analytics.interactive.reports.cloud_uploader
     ~iotile_analytics.interactive.reports.info_report
     ~iotile_analytics.interactive.reports.report
     ~iotile_analytics.interactive.reports.stream_report

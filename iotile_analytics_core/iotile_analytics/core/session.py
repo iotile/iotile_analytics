@@ -7,6 +7,7 @@ import getpass
 import math
 import json
 import ssl
+import sys
 import logging
 from threading import Lock
 from multiprocessing.pool import ThreadPool
@@ -131,10 +132,19 @@ class CloudSession(object):
             return
 
         if user is None:
-            user = input("Please enter your IOTile.cloud email: ".encode('utf-8'))
+            # Both python 2 and 3 require native strings to be passed into getpass
+            prompt_str = "Please enter your IOTile.cloud email: "
+            if sys.version_info.major < 3:
+                prompt_str = prompt_str.encode('utf-8')
+
+            user = input(prompt_str)
 
         if password is None:
-            password = getpass.getpass("Please enter your IOTile.cloud password: ".encode('utf-8'))
+            # Both python 2 and 3 require native strings to be passed into getpass
+            prompt_str = "Please enter your IOTile.cloud password: "
+            if sys.version_info.major < 3:
+                prompt_str = prompt_str.encode('utf-8')
+            password = getpass.getpass(prompt_str)
 
         if self.verify is False:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -155,7 +165,6 @@ class CloudSession(object):
             cache['token'] = self.token
             cache['token_type'] = self.token_type
             cache['verify'] = self.verify
-
 
     def _check_token(self):
         """Verify that we're able to log in to IOTile.cloud with our token."""
