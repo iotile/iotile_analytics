@@ -194,7 +194,7 @@
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="iotile_analytics.core.session.CloudSession">
-<em class="property">class </em><code class="descclassname">iotile_analytics.core.session.</code><code class="descname">CloudSession</code><span class="sig-paren">(</span><em>user=None</em>, <em>password=None</em>, <em>domain='https://iotile.cloud'</em>, <em>concurrency=None</em>, <em>verify=None</em>, <em>token=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/session.html#CloudSession"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.session.CloudSession" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">iotile_analytics.core.session.</code><code class="descname">CloudSession</code><span class="sig-paren">(</span><em>user=None</em>, <em>password=None</em>, <em>domain='https://iotile.cloud'</em>, <em>verify=None</em>, <em>token=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/session.html#CloudSession"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.session.CloudSession" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A persistent session to IOTile.cloud.</p>
 <p>CloudSession internally caches results and information from iotile.cloud
@@ -218,8 +218,6 @@ CloudSession()</p>
 <li><strong>password</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The user’s password</li>
 <li><strong>domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The complete domain name of the iotile.cloud instance to login to.
 This defaults to <a class="reference external" href="https://iotile.cloud">https://iotile.cloud</a></li>
-<li><strong>concurrence</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The maximum number of simultaneous requests to send to iotile.cloud
-when we are requesting multiple resources at a time.  Default: CloudSession.MAX_CONCURRENCY</li>
 <li><strong>verify</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If set to false, do not verify the SSL certificate of the remote
 iotile.cloud server.  This option is <strong>NOT RECOMMENDED</strong> but sometimes required
 if you are behind a corporate firewall that terminates SSL connections at the
@@ -238,6 +236,11 @@ If valid, bypasses the user+password login, then proceeds as usual</li>
 <dl class="attribute">
 <dt id="iotile_analytics.core.session.CloudSession.MAX_CONCURRENCY">
 <code class="descname">MAX_CONCURRENCY</code><em class="property"> = 10</em><a class="headerlink" href="#iotile_analytics.core.session.CloudSession.MAX_CONCURRENCY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="iotile_analytics.core.session.CloudSession.pool">
+<code class="descname">pool</code><em class="property"> = None</em><a class="headerlink" href="#iotile_analytics.core.session.CloudSession.pool" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -265,6 +268,47 @@ the query string in the get request.</li>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>[]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.session.CloudSession.post_multiple">
+<code class="descname">post_multiple</code><span class="sig-paren">(</span><em>urls</em>, <em>datas</em>, <em>headers=None</em>, <em>message=None</em>, <em>include_auth=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/session.html#CloudSession.post_multiple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.session.CloudSession.post_multiple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make multiple parallel posts to urls with the contents as given by datas.</p>
+<p>Requests will be mapped to the underlying thread pool and made in
+batches according to the pool size.  If you need to attach headers to
+the requests, you can pass a dictionary in headers, which will be
+copied and used for all requests, or you can pass a list of dicts that
+will be used one per url in urls.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>urls</strong> (<em>list of str</em>) – A list of the urls that should be called including any
+query strings that they might have.  These will be passed unmodified
+to urlopen().</li>
+<li><strong>datas</strong> (<em>list of str</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – A list of the actual payloads that should be
+included in each url post.  If this is a dict then it is encoded as a json
+string in utf-8 and the appropriate content-type header is added to each
+request.</li>
+<li><strong>headers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em> or </em><em>list of dicts</em>) – Either a single dict of headers that will
+be included in every call or a list of dicts that will be used individually
+for each call.</li>
+<li><strong>include_auth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to include an Authorization token in the headers
+for every request.</li>
+<li><strong>message</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A user-facing message that will be shown in the ProgressBar
+indicating progress for this operation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list of the actual responses to each post.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of bytes</p>
 </td>
 </tr>
 </tbody>

@@ -163,6 +163,7 @@
 <span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">viewitems</span>
 <span class="kn">from</span> <span class="nn">iotile_analytics.core.exceptions</span> <span class="k">import</span> <span class="n">UsageError</span><span class="p">,</span> <span class="n">AuthenticationError</span>
 <span class="kn">from</span> <span class="nn">iotile_analytics.core</span> <span class="k">import</span> <span class="n">CloudSession</span><span class="p">,</span> <span class="n">AnalysisGroup</span><span class="p">,</span> <span class="n">Environment</span>
+<span class="kn">from</span> <span class="nn">iotile_analytics.interactive.reports</span> <span class="k">import</span> <span class="n">ReportUploader</span>
 <span class="kn">from</span> <span class="nn">typedargs.doc_parser</span> <span class="k">import</span> <span class="n">ParsedDocstring</span>
 <span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">ValidationError</span><span class="p">,</span> <span class="n">ArgumentError</span>
 <span class="kn">from</span> <span class="nn">typedargs.metadata</span> <span class="k">import</span> <span class="n">AnnotatedMetadata</span>
@@ -263,6 +264,9 @@
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--no-confirm&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Do not confirm the analysis that you are about to perforn and prompt for parameters&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-l&#39;</span><span class="p">,</span> <span class="s1">&#39;--list&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;List all known analysis types without running one&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="s1">&#39;--bundle&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Bundle the rendered output into a zip file&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-w&#39;</span><span class="p">,</span> <span class="s1">&#39;--web-push&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Push the resulting report to iotile.cloud.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--web-push-label&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set the label used when pushing a report to iotile.cloud (otherwise you are prompted for it)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--web-push-slug&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Override the source slug given in the analysisgroup and force it to be this&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--domain&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">DOMAIN_NAME</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Domain to use for remote queries, defaults to https://iotile.cloud&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;analysis_group&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The slug or path of the object you want to perform analysis on&quot;</span><span class="p">)</span>
 
@@ -310,6 +314,20 @@
         <span class="n">root</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">root</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span></div>
+
+
+<span class="k">def</span> <span class="nf">upload_report</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Upload a report to iotile.cloud.&quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Uploading report to iotile.cloud server&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Enter a label for the report: &quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">slug</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">uploader</span> <span class="o">=</span> <span class="n">ReportUploader</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
+    <span class="n">uploader</span><span class="o">.</span><span class="n">upload_report</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="list_known_reports"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.list_known_reports">[docs]</a><span class="k">def</span> <span class="nf">list_known_reports</span><span class="p">():</span>
@@ -396,7 +414,7 @@
     <span class="k">if</span> <span class="n">is_cloud</span><span class="p">:</span>
         <span class="n">CloudSession</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_verify</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">generator</span><span class="p">(</span><span class="n">group</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">is_cloud</span><span class="p">,</span> <span class="n">generator</span><span class="p">(</span><span class="n">group</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="check_arguments"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.check_arguments">[docs]</a><span class="k">def</span> <span class="nf">check_arguments</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">confirm</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -531,7 +549,7 @@
         <span class="k">return</span> <span class="mi">0</span>
 
     <span class="n">report_args</span> <span class="o">=</span> <span class="n">split_args</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">arg</span><span class="p">)</span>
-    <span class="n">group</span> <span class="o">=</span> <span class="n">find_analysis_group</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">logged_in</span><span class="p">,</span> <span class="n">group</span> <span class="o">=</span> <span class="n">find_analysis_group</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
     <span class="n">check_arguments</span><span class="p">(</span><span class="n">report_obj</span><span class="p">,</span> <span class="n">report_args</span><span class="p">,</span> <span class="n">confirm</span><span class="o">=</span><span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_confirm</span><span class="p">)</span>
 
@@ -539,6 +557,13 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rendered_paths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Rendered report to: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rendered_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
+    <span class="c1"># Make sure we create a cloud session now to capture the user&#39;s password</span>
+    <span class="c1"># if they gave us a username and we haven&#39;t already logged in</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">logged_in</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">CloudSession</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_verify</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">web_push</span><span class="p">:</span>
+        <span class="n">upload_report</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">rendered_paths</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">web_push_label</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">web_push_slug</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="mi">0</span></div>
 

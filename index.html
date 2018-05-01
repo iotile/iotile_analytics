@@ -216,7 +216,9 @@ environment.</p>
 application.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ analytics-host --help
 usage: analytics-host [-h] [-v] [-u USER] [-n] [-p PASSWORD] [-o OUTPUT]
-                      [-t TEMPLATE] [-s] [-a ARG] [-c] [-l] [-b] [-d DOMAIN]
+                      [-t TEMPLATE] [-s] [-a ARG] [-c] [-l] [-b] [-w]
+                      [--web-push-label WEB_PUSH_LABEL]
+                      [--web-push-slug WEB_PUSH_SLUG] [-d DOMAIN]
                       [analysis_group]
 
 Run precreated analysis templates against devices or archives stored locally or in iotile.cloud.
@@ -319,6 +321,13 @@ optional arguments:
                         perforn and prompt for parameters
   -l, --list            List all known analysis types without running one
   -b, --bundle          Bundle the rendered output into a zip file
+  -w, --web-push        Push the resulting report to iotile.cloud.
+  --web-push-label WEB_PUSH_LABEL
+                        Set the label used when pushing a report to
+                        iotile.cloud (otherwise you are prompted for it)
+  --web-push-slug WEB_PUSH_SLUG
+                        Override the source slug given in the analysisgroup
+                        and force it to be this
   -d DOMAIN, --domain DOMAIN
                         Domain to use for remote queries, defaults to
                         https://iotile.cloud

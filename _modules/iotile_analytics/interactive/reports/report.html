@@ -360,6 +360,9 @@
 <span class="sd">                extension or the addition of a subdirectory.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="c1"># Allow subclasses to finish any preparations before we render.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_render</span><span class="p">()</span>
+
         <span class="n">all_files</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -410,14 +413,19 @@
             <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">fileinfo</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_files</span><span class="p">):</span>
                 <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
 
-                <span class="n">all_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
-
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNHOSTED</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">render_jsonp</span><span class="p">(</span><span class="n">file_path</span> <span class="o">+</span> <span class="s2">&quot;.jsonp&quot;</span><span class="p">,</span> <span class="n">fileinfo</span><span class="p">)</span>
+                    <span class="n">file_path</span> <span class="o">+=</span> <span class="s2">&quot;.jsonp&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">render_jsonp</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">fileinfo</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;HOSTED mode for LiveReports is not yet supported&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">all_files</span></div></div>
+                <span class="n">all_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">all_files</span></div>
+
+<div class="viewcode-block" id="LiveReport.prepare_render"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport.prepare_render">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Hook for any subclass that needs to setup before rendering.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
 </pre></div>
 
            </div>
