@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="iotile_analytics.interactive.reports.analysis_template module" href="iotile_analytics.interactive.reports.analysis_template.html" />
+    <link rel="next" title="iotile_analytics.interactive.reports.action_report module" href="iotile_analytics.interactive.reports.action_report.html" />
     <link rel="prev" title="iotile_analytics.interactive.viewer_timeselect module" href="iotile_analytics.interactive.viewer_timeselect.html" /> 
 
   
@@ -179,11 +179,17 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.branded_report.html#iotile_analytics.interactive.reports.branded_report.BrandedReport" title="iotile_analytics.interactive.reports.branded_report.BrandedReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BrandedReport</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.action_report.html#iotile_analytics.interactive.reports.action_report.ActionReport" title="iotile_analytics.interactive.reports.action_report.ActionReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActionReport</span></code></a></td>
+<td>A branded live report with a table of action links.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.reports.branded_report.html#iotile_analytics.interactive.reports.branded_report.BrandedReport" title="iotile_analytics.interactive.reports.branded_report.BrandedReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BrandedReport</span></code></a></td>
 <td>LiveReport base class with fancy header and footer.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport" title="iotile_analytics.interactive.reports.report.LiveReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LiveReport</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport" title="iotile_analytics.interactive.reports.report.LiveReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LiveReport</span></code></a></td>
 <td>Base class for all dynamic html documents that can be exported.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.reports.cloud_uploader.html#iotile_analytics.interactive.reports.cloud_uploader.ReportUploader" title="iotile_analytics.interactive.reports.cloud_uploader.ReportUploader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReportUploader</span></code></a></td>
+<td>Upload a series of files to S3 using signed URLs.</td>
 </tr>
 </tbody>
 </table>
@@ -196,11 +202,17 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.analysis_template.html#module-iotile_analytics.interactive.reports.analysis_template" title="iotile_analytics.interactive.reports.analysis_template"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analysis_template</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.action_report.html#module-iotile_analytics.interactive.reports.action_report" title="iotile_analytics.interactive.reports.action_report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">action_report</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.reports.analysis_template.html#module-iotile_analytics.interactive.reports.analysis_template" title="iotile_analytics.interactive.reports.analysis_template"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analysis_template</span></code></a></td>
 <td>Base class for all analysis operations that can be called from analytics-host.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.reports.branded_report.html#module-iotile_analytics.interactive.reports.branded_report" title="iotile_analytics.interactive.reports.branded_report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">branded_report</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.branded_report.html#module-iotile_analytics.interactive.reports.branded_report" title="iotile_analytics.interactive.reports.branded_report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">branded_report</span></code></a></td>
 <td>A base class for reports that include a nice Arch header and footer.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.reports.cloud_uploader.html#module-iotile_analytics.interactive.reports.cloud_uploader" title="iotile_analytics.interactive.reports.cloud_uploader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cloud_uploader</span></code></a></td>
+<td>Helper class that manages uploading a series of report files to iotile.cloud.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.info_report.html#module-iotile_analytics.interactive.reports.info_report" title="iotile_analytics.interactive.reports.info_report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">info_report</span></code></a></td>
 <td>Basic LiveReport that just prints information about an AnalysisGroup as a txt file.</td>
@@ -224,7 +236,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="iotile_analytics.interactive.reports.analysis_template.html" class="btn btn-neutral float-right" title="iotile_analytics.interactive.reports.analysis_template module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="iotile_analytics.interactive.reports.action_report.html" class="btn btn-neutral float-right" title="iotile_analytics.interactive.reports.action_report module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="iotile_analytics.interactive.viewer_timeselect.html" class="btn btn-neutral" title="iotile_analytics.interactive.viewer_timeselect module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

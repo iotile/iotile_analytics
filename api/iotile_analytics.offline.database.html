@@ -182,10 +182,7 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.offline.database.CompatibleObjectAtom" title="iotile_analytics.offline.database.CompatibleObjectAtom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompatibleObjectAtom</span></code></a></td>
-<td>An object atom with a lower cpickle protocol.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#iotile_analytics.offline.database.OfflineDatabase" title="iotile_analytics.offline.database.OfflineDatabase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OfflineDatabase</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.offline.database.OfflineDatabase" title="iotile_analytics.offline.database.OfflineDatabase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OfflineDatabase</span></code></a></td>
 <td>An offline database.</td>
 </tr>
 </tbody>
@@ -193,20 +190,6 @@
 </div>
 <div class="section" id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="iotile_analytics.offline.database.CompatibleObjectAtom">
-<em class="property">class </em><code class="descclassname">iotile_analytics.offline.database.</code><code class="descname">CompatibleObjectAtom</code><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#CompatibleObjectAtom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.CompatibleObjectAtom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tables.atom.ObjectAtom</span></code></p>
-<p>An object atom with a lower cpickle protocol.</p>
-<p>This enables sharing hdf5 files between python 2 and python 3.</p>
-<dl class="method">
-<dt id="iotile_analytics.offline.database.CompatibleObjectAtom.fromarray">
-<code class="descname">fromarray</code><span class="sig-paren">(</span><em>array</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#CompatibleObjectAtom.fromarray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.CompatibleObjectAtom.fromarray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert an <cite>array</cite> of base atoms into an object.</p>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="class">
 <dt id="iotile_analytics.offline.database.OfflineDatabase">
 <em class="property">class </em><code class="descclassname">iotile_analytics.offline.database.</code><code class="descname">OfflineDatabase</code><span class="sig-paren">(</span><em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase" title="Permalink to this definition">¶</a></dt>
@@ -228,6 +211,11 @@ lost when the program is exited.</td>
 </tr>
 </tbody>
 </table>
+<dl class="attribute">
+<dt id="iotile_analytics.offline.database.OfflineDatabase.VERSION">
+<code class="descname">VERSION</code><em class="property"> = (2, 0, 0)</em><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="iotile_analytics.offline.database.OfflineDatabase.save_stream">
 <code class="descname">save_stream</code><span class="sig-paren">(</span><em>slug</em>, <em>definition</em>, <em>data=None</em>, <em>events=None</em>, <em>raw_events=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/offline/database.html#OfflineDatabase.save_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.offline.database.OfflineDatabase.save_stream" title="Permalink to this definition">¶</a></dt>

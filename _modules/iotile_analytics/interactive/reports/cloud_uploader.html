@@ -1,0 +1,463 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.interactive.reports.cloud_uploader &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.interactive.reports.cloud_uploader</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.interactive.reports.cloud_uploader</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Helper class that manages uploading a series of report files to iotile.cloud.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">iotile_analytics.core</span> <span class="k">import</span> <span class="n">CloudSession</span>
+<span class="kn">from</span> <span class="nn">iotile_analytics.core.exceptions</span> <span class="k">import</span> <span class="n">UsageError</span><span class="p">,</span> <span class="n">CloudError</span>
+<span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">ArgumentError</span>
+
+
+<div class="viewcode-block" id="ReportUploader"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.cloud_uploader.html#iotile_analytics.interactive.reports.cloud_uploader.ReportUploader">[docs]</a><span class="k">class</span> <span class="nc">ReportUploader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Upload a series of files to S3 using signed URLs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        domain (str): The iotile.cloud instance that we should use. If</span>
+<span class="sd">            not passed, this defaults to https://iotile.cloud</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">CloudSession</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_api</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">_api</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ReportUploader.upload_report"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.cloud_uploader.html#iotile_analytics.interactive.reports.cloud_uploader.ReportUploader.upload_report">[docs]</a>    <span class="k">def</span> <span class="nf">upload_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Upload a report to iotile.cloud to attach to a device or archive.</span>
+
+<span class="sd">        The report will be attached to the given AnalysisGroup, or you can</span>
+<span class="sd">        specify the slug of the object to attach the report to explicitly. You</span>
+<span class="sd">        must specify EITHER group OR slug and the currently logged in user</span>
+<span class="sd">        must have permission to upload reports for org that owns the object</span>
+<span class="sd">        that you are attaching the report to.</span>
+
+<span class="sd">        You must give the report a human readable label that will be shown</span>
+<span class="sd">        in lists where users may select to view the report.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            label (str): The human readable label for the report that you</span>
+<span class="sd">                are uploading.</span>
+<span class="sd">            files (list of str): A list of all of the files that should</span>
+<span class="sd">                be uploaded for this report including the main entrypoint</span>
+<span class="sd">                file that should be listed first.</span>
+<span class="sd">            group (AnalysisGroup): The analysis group that was used to generate</span>
+<span class="sd">                this report.  If this is not specified then you must explicitly</span>
+<span class="sd">                specify the slug of the object used to generate the report and</span>
+<span class="sd">                the slug of the organization that it should be uploaded for.</span>
+
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A URL where the uploaded report can be accessed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">slug</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">source_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;slug&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">slug</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;The group provided did not have source slug information in its source_info&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">slug</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;If you do not specify an AnalysisGroup you must pass an org and a slug to this function&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+
+        <span class="n">org</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_org_slug</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+        <span class="n">report_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_report</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">org</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created report id: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">report_id</span><span class="p">)</span>
+
+        <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_file_paths</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+
+        <span class="n">urls</span><span class="p">,</span> <span class="n">fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_signed_urls</span><span class="p">(</span><span class="n">report_id</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_upload_files_to_s3</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">files</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_notify_upload_success</span><span class="p">(</span><span class="n">report_id</span><span class="p">,</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_org_slug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dev_or_block_slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Look up the org for a device or block.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">dev_or_block_slug</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;b--&#39;</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">block</span><span class="p">(</span><span class="n">dev_or_block_slug</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">dev_or_block_slug</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;d--&#39;</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">dev_or_block_slug</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;You can only attach reports to devices or archives, unknown slug type passed&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">dev_or_block_slug</span><span class="p">)</span>
+
+        <span class="n">org</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;org&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">org</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Could not obtain org information from passed slug&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">dev_or_block_slug</span><span class="p">,</span> <span class="n">retrieved_object</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">org</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_clean_file_paths</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a suitable s3 keys for all files.&quot;&quot;&quot;</span>
+
+        <span class="n">first</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">basedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">first</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">basedir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">basedir</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">keys</span>
+
+    <span class="k">def</span> <span class="nf">_create_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">org</span><span class="p">):</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;org&#39;</span><span class="p">:</span> <span class="n">org</span><span class="p">,</span>
+            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
+            <span class="s1">&#39;source_ref&#39;</span><span class="p">:</span> <span class="n">slug</span>
+        <span class="p">}</span>
+
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">generated</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Create generated report record api response: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="p">)</span>
+
+        <span class="n">report_id</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">report_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CloudError</span><span class="p">(</span><span class="s2">&quot;No report id returned by cloud&quot;</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">resp</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">report_id</span>
+
+    <span class="k">def</span> <span class="nf">_get_signed_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report_id</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
+        <span class="n">url_infos</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_signature_url_payload</span><span class="p">(</span><span class="n">report_id</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">files</span><span class="p">)]</span>
+
+        <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">url_infos</span><span class="p">]</span>
+        <span class="n">payloads</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">url_infos</span><span class="p">]</span>
+
+        <span class="n">resp_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">post_multiple</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">payloads</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Getting file upload authorization&quot;</span><span class="p">,</span> <span class="n">include_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">decoded_resps</span> <span class="o">=</span> <span class="p">[</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">resp</span> <span class="ow">in</span> <span class="n">resp_list</span><span class="p">]</span>
+        <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">decoded_resps</span><span class="p">]</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;fields&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">decoded_resps</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">urls</span><span class="p">,</span> <span class="n">fields</span>
+
+    <span class="k">def</span> <span class="nf">_get_signature_url_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report_id</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">file_name</span><span class="p">,</span>
+            <span class="s1">&#39;acl&#39;</span><span class="p">:</span> <span class="s1">&#39;public-read&#39;</span> <span class="k">if</span> <span class="n">public</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="s1">&#39;private&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;content_type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_mime_type</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="n">resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">generated</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span><span class="o">.</span><span class="n">uploadurl</span>
+
+        <span class="k">return</span> <span class="n">resource</span><span class="o">.</span><span class="n">url</span><span class="p">(),</span> <span class="n">payload</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_mime_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;application/octet-stream&#39;</span>
+
+        <span class="c1"># Remove the .</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+        <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;jsonp&#39;</span><span class="p">,</span> <span class="s1">&#39;js&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;application/javascript&quot;</span>
+        <span class="k">elif</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;html&#39;</span><span class="p">,</span> <span class="s1">&#39;htm&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;text/html&quot;</span>
+        <span class="k">elif</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;csv&#39;</span><span class="p">,):</span>
+            <span class="k">return</span> <span class="s2">&quot;text/csv&quot;</span>
+        <span class="k">elif</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">,):</span>
+            <span class="k">return</span> <span class="s2">&quot;application/json&quot;</span>
+
+        <span class="k">return</span> <span class="s2">&quot;application/octet-stream&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_upload_files_to_s3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urls</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
+        <span class="n">bodies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">file_data</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+            <span class="n">file_info</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
+                <span class="s1">&#39;mimetype&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_mime_type</span><span class="p">(</span><span class="n">key</span><span class="p">),</span>
+                <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">file_data</span>
+            <span class="p">}</span>
+
+            <span class="n">body</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="n">encode_multipart</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="n">file_info</span><span class="p">})</span>
+            <span class="n">bodies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">post_multiple</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">bodies</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Uploading report files&quot;</span><span class="p">,</span> <span class="n">include_auth</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_notify_upload_success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report_id</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">file_path</span>
+        <span class="p">}</span>
+
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">generated</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span><span class="o">.</span><span class="n">uploadsuccess</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Successfully uploaded report: id=</span><span class="si">%s</span><span class="s2">, main_file=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">report_id</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Upload success signed url: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">)</span></div>
+
+
+<span class="n">_BOUNDARY_CHARS</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span>
+
+
+<div class="viewcode-block" id="encode_multipart"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.cloud_uploader.html#iotile_analytics.interactive.reports.cloud_uploader.encode_multipart">[docs]</a><span class="k">def</span> <span class="nf">encode_multipart</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">boundary</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Standalone multipart form encoder.</span>
+
+<span class="sd">    Taken from:</span>
+<span class="sd">    http://code.activestate.com/recipes/578668-encode-multipart-form-data-for-uploading-files-via/</span>
+
+<span class="sd">    Licensed under MIT, Written by: Ben Hoyt</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_escape_quote</span><span class="p">(</span><span class="n">indata</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">indata</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">boundary</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">boundary</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">_BOUNDARY_CHARS</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span>
+            <span class="s1">&#39;--</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">boundary</span><span class="p">),</span>
+            <span class="s1">&#39;Content-Disposition: form-data; name=&quot;</span><span class="si">{0}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_escape_quote</span><span class="p">(</span><span class="n">name</span><span class="p">)),</span>
+            <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
+        <span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
+        <span class="n">mimetype</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mimetype&#39;</span><span class="p">,</span> <span class="s1">&#39;application/octet-stream&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span>
+            <span class="s1">&#39;--</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">boundary</span><span class="p">),</span>
+            <span class="s1">&#39;Content-Disposition: form-data; name=&quot;</span><span class="si">{0}</span><span class="s1">&quot;; filename=&quot;</span><span class="si">{1}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_escape_quote</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">_escape_quote</span><span class="p">(</span><span class="n">filename</span><span class="p">)),</span>
+            <span class="s1">&#39;Content-Type: </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mimetype</span><span class="p">),</span>
+            <span class="s1">&#39;Content-Transfer-Encoding: binary&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">value</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">],</span>
+        <span class="p">))</span>
+
+    <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span>
+        <span class="s1">&#39;--</span><span class="si">{0}</span><span class="s1">--&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">boundary</span><span class="p">),</span>
+        <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+    <span class="n">body</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="sa">b</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;multipart/form-data; boundary=</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">boundary</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

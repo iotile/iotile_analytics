@@ -316,7 +316,7 @@
         <span class="n">root</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span></div>
 
 
-<span class="k">def</span> <span class="nf">upload_report</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="upload_report"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.upload_report">[docs]</a><span class="k">def</span> <span class="nf">upload_report</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Upload a report to iotile.cloud.&quot;&quot;&quot;</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Uploading report to iotile.cloud server&quot;</span><span class="p">)</span>
@@ -327,7 +327,7 @@
         <span class="n">group</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="n">uploader</span> <span class="o">=</span> <span class="n">ReportUploader</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
-    <span class="n">uploader</span><span class="o">.</span><span class="n">upload_report</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+    <span class="n">uploader</span><span class="o">.</span><span class="n">upload_report</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="list_known_reports"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.scripts.analytics_host.html#iotile_analytics.interactive.scripts.analytics_host.list_known_reports">[docs]</a><span class="k">def</span> <span class="nf">list_known_reports</span><span class="p">():</span>

@@ -1,0 +1,327 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.interactive.reports.action_report &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.interactive.reports.action_report</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.interactive.reports.action_report</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="k">import</span> <span class="n">Environment</span>
+<span class="kn">from</span> <span class="nn">.branded_report</span> <span class="k">import</span> <span class="n">BrandedReport</span><span class="p">,</span> <span class="n">APP_IOTILE_CLOUD</span>
+
+
+<span class="n">ActionLink</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;ActionLink&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">,</span> <span class="s2">&quot;link_text&quot;</span><span class="p">,</span> <span class="s2">&quot;short_desc&quot;</span><span class="p">,</span> <span class="s2">&quot;help_text&quot;</span><span class="p">])</span>
+
+
+<span class="n">BEFORE_CONTENT</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">&lt;div class=&quot;before-content&quot;&gt;</span>
+<span class="s2">    {{ before_table }}</span>
+<span class="s2">    {</span><span class="si">% i</span><span class="s2">f actions | length &gt; 0 %}</span>
+<span class="s2">    &lt;table class=&quot;action-table&quot;&gt;</span>
+<span class="s2">      &lt;col width=&quot;30%&quot; /&gt;</span>
+<span class="s2">      &lt;col width=&quot;70%&quot; /&gt;</span>
+<span class="s2">      &lt;tr class=&quot;action-table-header&quot;&gt;</span>
+<span class="s2">            &lt;th&gt;</span>
+<span class="s2">                Action</span>
+<span class="s2">            &lt;/th&gt;</span>
+<span class="s2">            &lt;th&gt;</span>
+<span class="s2">                Description</span>
+<span class="s2">            &lt;/th&gt;</span>
+<span class="s2">        &lt;/tr&gt;</span>
+<span class="s2">        &lt;tbody&gt;</span>
+<span class="s2">        {</span><span class="si">% f</span><span class="s2">or action in actions %}</span>
+<span class="s2">          &lt;tr class=&quot;action-table-row&quot;&gt;</span>
+<span class="s2">            &lt;th&gt;</span>
+<span class="s2">            &lt;div&gt;</span>
+<span class="s2">             &lt;a href=&quot;{{action.link}}&quot;&gt;{{ action.link_text }}&lt;/a&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+<span class="s2">            {</span><span class="si">% i</span><span class="s2">f action.help_text is not none %}</span>
+<span class="s2">              &lt;div class=&quot;action-tooltip&quot;&gt;</span>
+<span class="s2">                ?</span>
+<span class="s2">                &lt;span class=&quot;tooltiptext&quot;&gt;{{ action.help_text }}&lt;/span&gt;</span>
+<span class="s2">              &lt;/div&gt;</span>
+<span class="s2">            {</span><span class="si">% e</span><span class="s2">ndif %}</span>
+<span class="s2">            &lt;/th&gt;</span>
+<span class="s2">            &lt;th&gt;</span>
+<span class="s2">                {{ action.short_desc }}</span>
+<span class="s2">            &lt;/th&gt;</span>
+<span class="s2">          &lt;/tr&gt;</span>
+<span class="s2">        {</span><span class="si">% e</span><span class="s2">ndfor %}</span>
+<span class="s2">        &lt;/tbody&gt;</span>
+<span class="s2">    &lt;/table&gt;</span>
+<span class="s2">    {</span><span class="si">% e</span><span class="s2">ndif %}</span>
+<span class="s2">    {{ after_table }}</span>
+<span class="s2">&lt;/div&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ActionReport"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.action_report.html#iotile_analytics.interactive.reports.action_report.ActionReport">[docs]</a><span class="k">class</span> <span class="nc">ActionReport</span><span class="p">(</span><span class="n">BrandedReport</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A branded live report with a table of action links.</span>
+
+<span class="sd">    The action links are rendered in a nice table format with a link, a short</span>
+<span class="sd">    description and a longer description available as a tooltip on hover.</span>
+
+<span class="sd">    This report class is suitable for generating reports that contain</span>
+<span class="sd">    links to specific next-steps, such as archiving a trip or resetting</span>
+<span class="sd">    a device.</span>
+
+<span class="sd">    By default, only a table is shown.  You can customize what comes before</span>
+<span class="sd">    and after the table by assigning to the ``before_table`` and ``after_table``</span>
+<span class="sd">    members.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        target (int): Whether we are targetting a hosted or unhosted environment</span>
+<span class="sd">            so that we generate the appropriate content.</span>
+<span class="sd">        source_info (dict): A dictionary of source information obtained from an</span>
+<span class="sd">            analysis group that allows us to setup the correct header and footer</span>
+<span class="sd">            information.</span>
+<span class="sd">        link_url (str): An optional direct link to the object that we are showing</span>
+<span class="sd">            a report about in app.iotile.cloud.  If not passed it defaults to</span>
+<span class="sd">            the generic start page of app.iotile.cloud.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">source_info</span><span class="p">,</span> <span class="n">link_url</span><span class="o">=</span><span class="n">APP_IOTILE_CLOUD</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ActionReport</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">source_info</span><span class="p">,</span> <span class="n">link_url</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">before_table</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">after_table</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="ActionReport.add_action"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.action_report.html#iotile_analytics.interactive.reports.action_report.ActionReport.add_action">[docs]</a>    <span class="k">def</span> <span class="nf">add_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add an action to the action table.</span>
+
+<span class="sd">        The action will be shown as a row in the table with the link</span>
+<span class="sd">        and the short description.  The help text will be available by</span>
+<span class="sd">        hovering over a ? icon after the link as a tooltip.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            link (str): The text that should be shown in the link.</span>
+<span class="sd">            target (str): The link target href.</span>
+<span class="sd">            desc (str): A short one line description</span>
+<span class="sd">            help_text (str): A longer description that will be shown in a</span>
+<span class="sd">                tooltip when the user hovers.  If you do not specify any</span>
+<span class="sd">                help text, no tool tip will be shown.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">action</span> <span class="o">=</span> <span class="n">ActionLink</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">help_text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">action</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ActionReport.prepare_render"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.action_report.html#iotile_analytics.interactive.reports.action_report.ActionReport.prepare_render">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create the action table before we render the rest of the document.&quot;&quot;&quot;</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;actions&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="p">,</span>
+            <span class="s2">&quot;before_table&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">before_table</span><span class="p">,</span>
+            <span class="s2">&quot;after_table&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">after_table</span>
+        <span class="p">}</span>
+
+        <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">BEFORE_CONTENT</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">before_content</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -155,6 +155,7 @@
 <span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">int</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">past.builtins</span> <span class="k">import</span> <span class="n">basestring</span>
 <span class="kn">import</span> <span class="nn">tables</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -163,29 +164,6 @@
 <span class="kn">from</span> <span class="nn">iotile_analytics.core.stream_series</span> <span class="k">import</span> <span class="n">StreamSeries</span>
 <span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">ArgumentError</span>
 <span class="kn">from</span> <span class="nn">.table_descriptions</span> <span class="k">import</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">EventIndex</span><span class="p">,</span> <span class="n">PropertyTable</span><span class="p">,</span> <span class="n">DatabaseInfoTable</span><span class="p">,</span> <span class="n">PropertyTypes</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pickle</span>
-
-
-<div class="viewcode-block" id="CompatibleObjectAtom"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.CompatibleObjectAtom">[docs]</a><span class="k">class</span> <span class="nc">CompatibleObjectAtom</span><span class="p">(</span><span class="n">tables</span><span class="o">.</span><span class="n">ObjectAtom</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;An object atom with a lower cpickle protocol.</span>
-
-<span class="sd">    This enables sharing hdf5 files between python 2 and python 3.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">_tobuffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">object_</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-
-<div class="viewcode-block" id="CompatibleObjectAtom.fromarray"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.CompatibleObjectAtom.fromarray">[docs]</a>    <span class="k">def</span> <span class="nf">fromarray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
-        <span class="c1"># We have to check for an empty array because of a possible</span>
-        <span class="c1"># bug in HDF5 which makes it claim that a dataset has one</span>
-        <span class="c1"># record when in fact it is empty.</span>
-        <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span></div></div>
 
 
 <div class="viewcode-block" id="OfflineDatabase"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase">[docs]</a><span class="k">class</span> <span class="nc">OfflineDatabase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -204,6 +182,8 @@
 <span class="sd">            lost when the program is exited.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">VERSION</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">tables</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;H5FD_CORE&quot;</span><span class="p">,</span> <span class="n">driver_core_backing_store</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -217,6 +197,8 @@
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">tables</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">read_only</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_version</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">tables</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_database</span><span class="p">()</span>
@@ -235,23 +217,44 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;streams&#39;</span><span class="p">)</span>
 
         <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;meta&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;archive_definitions&#39;</span><span class="p">,</span> <span class="n">CompatibleObjectAtom</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;device_definitions&#39;</span><span class="p">,</span> <span class="n">CompatibleObjectAtom</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;vartype_definitions&#39;</span><span class="p">,</span> <span class="n">CompatibleObjectAtom</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;archive_definitions&#39;</span><span class="p">,</span> <span class="n">tables</span><span class="o">.</span><span class="n">VLStringAtom</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;device_definitions&#39;</span><span class="p">,</span> <span class="n">tables</span><span class="o">.</span><span class="n">VLStringAtom</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;vartype_definitions&#39;</span><span class="p">,</span> <span class="n">tables</span><span class="o">.</span><span class="n">VLStringAtom</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;source_info&#39;</span><span class="p">,</span> <span class="n">PropertyTable</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;properties&#39;</span><span class="p">,</span> <span class="n">PropertyTable</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">DatabaseInfoTable</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_populate_db_info</span><span class="p">()</span>
 
+    <span class="k">def</span> <span class="nf">_check_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make sure the embedded version string is readable.&quot;&quot;&quot;</span>
+
+        <span class="n">emb_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_version</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">emb_version</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VERSION</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Saved file has a major version that we cannot read&quot;</span><span class="p">,</span> <span class="n">embedded_version</span><span class="o">=</span><span class="n">emb_version</span><span class="p">,</span> <span class="n">our_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">VERSION</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">read</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">version</span>
+
     <span class="k">def</span> <span class="nf">_populate_db_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">info</span>
 
         <span class="n">entry</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">row</span>
-        <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;major_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;minor_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;patch_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;major_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VERSION</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;minor_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VERSION</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;patch_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VERSION</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">entry</span><span class="o">.</span><span class="n">append</span><span class="p">()</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_encode_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Encode a dictionary as a json object.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_decode_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
 
 <div class="viewcode-block" id="OfflineDatabase.save_stream"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.save_stream">[docs]</a>    <span class="k">def</span> <span class="nf">save_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raw_events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Save a stream with timeseries and event data.</span>
@@ -286,13 +289,13 @@
 
         <span class="n">group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;/streams&#39;</span><span class="p">,</span> <span class="n">slug</span><span class="p">)</span>
 
-        <span class="n">arr_def</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;definition&#39;</span><span class="p">,</span> <span class="n">CompatibleObjectAtom</span><span class="p">(),</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
-        <span class="n">arr_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;events&#39;</span><span class="p">,</span> <span class="n">CompatibleObjectAtom</span><span class="p">(),</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
-        <span class="n">arr_rawevents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;raw_events&#39;</span><span class="p">,</span> <span class="n">CompatibleObjectAtom</span><span class="p">(),</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
+        <span class="n">arr_def</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;definition&#39;</span><span class="p">,</span> <span class="n">tables</span><span class="o">.</span><span class="n">VLStringAtom</span><span class="p">(),</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
+        <span class="n">arr_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;events&#39;</span><span class="p">,</span> <span class="n">tables</span><span class="o">.</span><span class="n">VLStringAtom</span><span class="p">(),</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
+        <span class="n">arr_rawevents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_vlarray</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;raw_events&#39;</span><span class="p">,</span> <span class="n">tables</span><span class="o">.</span><span class="n">VLStringAtom</span><span class="p">(),</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
         <span class="n">table_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="n">Stream</span><span class="p">)</span>
         <span class="n">table_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="s1">&#39;event_index&#39;</span><span class="p">,</span> <span class="n">EventIndex</span><span class="p">)</span>
 
-        <span class="n">arr_def</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">definition</span><span class="p">)</span>
+        <span class="n">arr_def</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encode_json</span><span class="p">(</span><span class="n">definition</span><span class="p">))</span>
 
         <span class="n">row</span> <span class="o">=</span> <span class="n">table_events</span><span class="o">.</span><span class="n">row</span>
 
@@ -304,10 +307,10 @@
 
                 <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">()</span>
 
-                <span class="n">arr_events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+                <span class="n">arr_events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encode_json</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()))</span>
 
                 <span class="k">if</span> <span class="n">has_raw_events</span><span class="p">:</span>
-                    <span class="n">arr_rawevents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">raw_events</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+                    <span class="n">arr_rawevents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encode_json</span><span class="p">(</span><span class="n">raw_events</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()))</span>
 
             <span class="n">table_events</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
@@ -333,7 +336,7 @@
             <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Attempted to save variable type in read only file&quot;</span><span class="p">)</span>
 
         <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">vartype_definitions</span>
-        <span class="n">table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vartype</span><span class="p">)</span></div>
+        <span class="n">table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encode_json</span><span class="p">(</span><span class="n">vartype</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="OfflineDatabase.save_source_info"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.save_source_info">[docs]</a>    <span class="k">def</span> <span class="nf">save_source_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Save analysis group source metadata including properties if set.</span>
@@ -431,7 +434,9 @@
 
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">_f_iter_nodes</span><span class="p">():</span>
             <span class="n">slug</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">_v_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
-            <span class="n">info_obj</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">enc_info_obj</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">info_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decode_json</span><span class="p">(</span><span class="n">enc_info_obj</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">info_obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">streams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
@@ -459,7 +464,8 @@
             <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Stream slug not found in OfflineDatabase&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
 
         <span class="n">group</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">group</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+        <span class="n">info_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decode_json</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">info_obj</span></div>
 
 <div class="viewcode-block" id="OfflineDatabase.fetch_datapoints"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.fetch_datapoints">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_datapoints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get all timeseries data for a stream.</span>
@@ -509,7 +515,8 @@
 
         <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event_index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-        <span class="n">event_data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">enc_event_data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">event_data</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_decode_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">enc_event_data</span><span class="p">]</span>
 
         <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">events</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">event_data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span></div>
@@ -549,7 +556,8 @@
 
         <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event_index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-        <span class="n">event_data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">raw_events</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">enc_event_data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">raw_events</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">event_data</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_decode_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">enc_event_data</span><span class="p">]</span>
 
         <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">events</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">event_data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span></div>
@@ -579,8 +587,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">slugs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">slugs</span><span class="p">)</span>
-        <span class="n">vartypes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">vartype_definitions</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">enc_vartypes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">vartype_definitions</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
+        <span class="n">vartypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_decode_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">enc_vartypes</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">vartypes</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">slugs</span><span class="p">}</span></div></div>
 
 
