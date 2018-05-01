@@ -24,14 +24,14 @@ class ReportUploader(object):
         self._api = self._session._api
         self._logger = logging.getLogger(__name__)
 
-    def upload_report(self, label, files, group=None, slug=None, org=None):
+    def upload_report(self, label, files, group=None, slug=None):
         """Upload a report to iotile.cloud to attach to a device or archive.
 
         The report will be attached to the given AnalysisGroup, or you can
-        specify the slug of the object (and its org) to attach the report to
-        explicitly.  You must specify EITHER group OR (slug and org) and the
-        currently logged in user must have permission to upload reports for
-        the given org.
+        specify the slug of the object to attach the report to explicitly. You
+        must specify EITHER group OR slug and the currently logged in user
+        must have permission to upload reports for org that owns the object
+        that you are attaching the report to.
 
         You must give the report a human readable label that will be shown
         in lists where users may select to view the report.
@@ -54,13 +54,13 @@ class ReportUploader(object):
 
         if group is not None:
             slug = group.source_info.get('slug')
-            org = group.source_info.get('org')
 
-            if slug is None or org is None:
-                raise ArgumentError("The group provided did not have org or source slug information in its source_info", slug=slug, org=org)
-        elif org is None or slug is None:
-            raise UsageError("If you do not specify an AnalysisGroup you must pass an org and a slug to this function", org=org, slug=slug)
+            if slug is None:
+                raise ArgumentError("The group provided did not have source slug information in its source_info", slug=slug)
+        elif slug is None:
+            raise UsageError("If you do not specify an AnalysisGroup you must pass an org and a slug to this function", slug=slug)
 
+        org = self._get_org_slug(slug)
         report_id = self._create_report(label, slug, org)
         self._logger.debug("Created report id: %s", report_id)
 
@@ -70,7 +70,24 @@ class ReportUploader(object):
         self._upload_files_to_s3(urls, fields, keys, files)
         self._notify_upload_success(report_id, keys[0])
 
-    def _clean_file_paths(self, files):
+    def _get_org_slug(self, dev_or_block_slug):
+        """Look up the org for a device or block."""
+
+        if dev_or_block_slug.startswith('b--'):
+            obj = self._api.block(dev_or_block_slug).get()
+        elif dev_or_block_slug.startswith('d--'):
+            obj = self._api.device(dev_or_block_slug).get()
+        else:
+            raise UsageError("You can only attach reports to devices or archives, unknown slug type passed", slug=dev_or_block_slug)
+
+        org = obj.get('org', None)
+        if org is None:
+            raise ArgumentError("Could not obtain org information from passed slug", slug=dev_or_block_slug, retrieved_object=obj)
+
+        return org
+
+    @classmethod
+    def _clean_file_paths(cls, files):
         """Return a suitable s3 keys for all files."""
 
         first = files[0]

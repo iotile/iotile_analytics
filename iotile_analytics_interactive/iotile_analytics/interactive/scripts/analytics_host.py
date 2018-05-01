@@ -115,8 +115,7 @@ def build_args():
     parser.add_argument('-l', '--list', action="store_true", help="List all known analysis types without running one")
     parser.add_argument('-b', '--bundle', action="store_true", help="Bundle the rendered output into a zip file")
     parser.add_argument('-w', '--web-push', action="store_true", help="Push the resulting report to iotile.cloud.")
-    parser.add_argument('--web-push-label', type=str, default=None, help="Set the label used when pushing a report to iotile.cloud")
-    parser.add_argument('--web-push-org', type=str, default=None, help="Override the org given in the analysisgroup and force it to be this")
+    parser.add_argument('--web-push-label', type=str, default=None, help="Set the label used when pushing a report to iotile.cloud (otherwise you are prompted for it)")
     parser.add_argument('--web-push-slug', type=str, default=None, help="Override the source slug given in the analysisgroup and force it to be this")
     parser.add_argument('-d', '--domain', default=DOMAIN_NAME, help="Domain to use for remote queries, defaults to https://iotile.cloud")
     parser.add_argument('analysis_group', default=None, nargs='?', help="The slug or path of the object you want to perform analysis on")
@@ -167,18 +166,18 @@ def setup_logging(args):
         root.addHandler(logging.NullHandler())
 
 
-def upload_report(domain, files, label=None, group=None, org=None, slug=None):
+def upload_report(domain, files, label=None, group=None, slug=None):
     """Upload a report to iotile.cloud."""
 
     print("Uploading report to iotile.cloud server")
     if label is None:
         label = input("Enter a label for the report: ")
 
-    if org is not None or slug is not None:
+    if slug is not None:
         group = None
 
     uploader = ReportUploader(domain=domain)
-    uploader.upload_report(label, files, group=group, org=org, slug=slug)
+    uploader.upload_report(label, files, group=group, slug=slug)
 
 
 def list_known_reports():
@@ -265,7 +264,7 @@ def find_analysis_group(args):
     if is_cloud:
         CloudSession(user=args.user, password=args.password, domain=args.domain, verify=not args.no_verify)
 
-    return generator(group)
+    return is_cloud, generator(group)
 
 
 def check_arguments(report, args, confirm=False):
@@ -400,7 +399,7 @@ def main(argv=None):
         return 0
 
     report_args = split_args(args.arg)
-    group = find_analysis_group(args)
+    logged_in, group = find_analysis_group(args)
 
     check_arguments(report_obj, report_args, confirm=not args.no_confirm)
 
@@ -408,8 +407,13 @@ def main(argv=None):
     if len(rendered_paths) > 0:
         print("Rendered report to: %s" % rendered_paths[0])
 
+    # Make sure we create a cloud session now to capture the user's password
+    # if they gave us a username and we haven't already logged in
+    if not logged_in and args.user is not None:
+        CloudSession(user=args.user, password=args.password, domain=args.domain, verify=not args.no_verify)
+
     if args.web_push:
-        upload_report(args.domain, rendered_paths, label=args.web_push_label, group=group, org=args.web_push_org, slug=args.web_push_slug)
+        upload_report(args.domain, rendered_paths, label=args.web_push_label, group=group, slug=args.web_push_slug)
 
     return 0
 

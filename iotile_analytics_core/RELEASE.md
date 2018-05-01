@@ -1,6 +1,6 @@
 # Release Notes
 
-## HEAD
+## 0.4.1
 
 - Add support for posting files to s3 and making post requests to iotile.cloud
   rest APIs.
