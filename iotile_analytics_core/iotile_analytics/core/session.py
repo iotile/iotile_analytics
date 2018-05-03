@@ -226,6 +226,21 @@ class CloudSession(object):
         copied and used for all requests, or you can pass a list of dicts that
         will be used one per url in urls.
 
+        The specific encoding behavior of this function depends on what kind of object
+        you pass in for each member of datas.  The following table lays out what happens
+        in each case:
+
+        - dict: The dictionary is dumped to a string using json.dumps and that string is
+            encoded into bytes via the utf-8 encoding.  A content-type: application/json
+            header is added.
+        - str (on python 3), unicode (on python 2): The string is encoded into a bytes
+            object using utf-8.  No content-type headers are added.
+        - bytes (on python 3), str or bytes (on python 2): Nothing is done and the data
+            is sent exactly as passed.
+
+        This encoding happens on a per-item basis for datas so you can mix and match
+        the three types to different urls in urls.
+
         Args:
             urls (list of str): A list of the urls that should be called including any
                 query strings that they might have.  These will be passed unmodified
@@ -233,7 +248,8 @@ class CloudSession(object):
             datas (list of str, dict or bytes): A list of the actual payloads that should be
                 included in each url post.  If this is a dict then it is encoded as a json
                 string in utf-8 and the appropriate content-type header is added to each
-                request.
+                request.  If it is a string, it is encoded as utf-8 bytes and no header is
+                added.
             headers (dict or list of dicts): Either a single dict of headers that will
                 be included in every call or a list of dicts that will be used individually
                 for each call.
@@ -264,6 +280,8 @@ class CloudSession(object):
                 json_data = json.dumps(in_data).encode('utf-8')
                 datas[i] = json_data
                 in_headers[b'Content-type'] = b"application/json"
+            elif not isinstance(in_data, bytes):
+                datas[i] = in_data.encode('utf-8')
 
             if include_auth:
                 in_headers[b'Authorization'] = '{} {}'.format(self.token_type, self.token).encode('utf-8')
@@ -376,7 +394,12 @@ class CloudSession(object):
             # We must encode the URL to bytes rather than unicode otherwise:
             # https://stackoverflow.com/a/8715815 will cause a unicode decode
             # error on our *data*
-            req = Request(url.encode('utf-8'), data, headers=headers)
+            # However, we must pass a normal string on python 3
+            # See: https://github.com/iotile/iotile_analytics/issues/47
+            if sys.version_info.major < 3:
+                url = url.encode('utf-8')
+
+            req = Request(url, data, headers=headers)
 
             if self.verify is False:
                 context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
