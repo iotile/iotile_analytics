@@ -376,6 +376,21 @@
 <span class="sd">        copied and used for all requests, or you can pass a list of dicts that</span>
 <span class="sd">        will be used one per url in urls.</span>
 
+<span class="sd">        The specific encoding behavior of this function depends on what kind of object</span>
+<span class="sd">        you pass in for each member of datas.  The following table lays out what happens</span>
+<span class="sd">        in each case:</span>
+
+<span class="sd">        - dict: The dictionary is dumped to a string using json.dumps and that string is</span>
+<span class="sd">            encoded into bytes via the utf-8 encoding.  A content-type: application/json</span>
+<span class="sd">            header is added.</span>
+<span class="sd">        - str (on python 3), unicode (on python 2): The string is encoded into a bytes</span>
+<span class="sd">            object using utf-8.  No content-type headers are added.</span>
+<span class="sd">        - bytes (on python 3), str or bytes (on python 2): Nothing is done and the data</span>
+<span class="sd">            is sent exactly as passed.</span>
+
+<span class="sd">        This encoding happens on a per-item basis for datas so you can mix and match</span>
+<span class="sd">        the three types to different urls in urls.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            urls (list of str): A list of the urls that should be called including any</span>
 <span class="sd">                query strings that they might have.  These will be passed unmodified</span>
@@ -383,7 +398,8 @@
 <span class="sd">            datas (list of str, dict or bytes): A list of the actual payloads that should be</span>
 <span class="sd">                included in each url post.  If this is a dict then it is encoded as a json</span>
 <span class="sd">                string in utf-8 and the appropriate content-type header is added to each</span>
-<span class="sd">                request.</span>
+<span class="sd">                request.  If it is a string, it is encoded as utf-8 bytes and no header is</span>
+<span class="sd">                added.</span>
 <span class="sd">            headers (dict or list of dicts): Either a single dict of headers that will</span>
 <span class="sd">                be included in every call or a list of dicts that will be used individually</span>
 <span class="sd">                for each call.</span>
@@ -414,6 +430,8 @@
                 <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">in_data</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
                 <span class="n">datas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">json_data</span>
                 <span class="n">in_headers</span><span class="p">[</span><span class="sa">b</span><span class="s1">&#39;Content-type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;application/json&quot;</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_data</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                <span class="n">datas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">include_auth</span><span class="p">:</span>
                 <span class="n">in_headers</span><span class="p">[</span><span class="sa">b</span><span class="s1">&#39;Authorization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">token_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
@@ -526,7 +544,12 @@
             <span class="c1"># We must encode the URL to bytes rather than unicode otherwise:</span>
             <span class="c1"># https://stackoverflow.com/a/8715815 will cause a unicode decode</span>
             <span class="c1"># error on our *data*</span>
-            <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="c1"># However, we must pass a normal string on python 3</span>
+            <span class="c1"># See: https://github.com/iotile/iotile_analytics/issues/47</span>
+            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+            <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verify</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="n">context</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">SSLContext</span><span class="p">(</span><span class="n">ssl</span><span class="o">.</span><span class="n">PROTOCOL_SSLv23</span><span class="p">)</span>

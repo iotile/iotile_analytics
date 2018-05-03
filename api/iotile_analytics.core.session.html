@@ -283,6 +283,29 @@ batches according to the pool size.  If you need to attach headers to
 the requests, you can pass a dictionary in headers, which will be
 copied and used for all requests, or you can pass a list of dicts that
 will be used one per url in urls.</p>
+<p>The specific encoding behavior of this function depends on what kind of object
+you pass in for each member of datas.  The following table lays out what happens
+in each case:</p>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt>dict: The dictionary is dumped to a string using json.dumps and that string is</dt>
+<dd>encoded into bytes via the utf-8 encoding.  A content-type: application/json
+header is added.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>str (on python 3), unicode (on python 2): The string is encoded into a bytes</dt>
+<dd>object using utf-8.  No content-type headers are added.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>bytes (on python 3), str or bytes (on python 2): Nothing is done and the data</dt>
+<dd>is sent exactly as passed.</dd>
+</dl>
+</li>
+</ul>
+<p>This encoding happens on a per-item basis for datas so you can mix and match
+the three types to different urls in urls.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -294,7 +317,8 @@ to urlopen().</li>
 <li><strong>datas</strong> (<em>list of str</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – A list of the actual payloads that should be
 included in each url post.  If this is a dict then it is encoded as a json
 string in utf-8 and the appropriate content-type header is added to each
-request.</li>
+request.  If it is a string, it is encoded as utf-8 bytes and no header is
+added.</li>
 <li><strong>headers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em> or </em><em>list of dicts</em>) – Either a single dict of headers that will
 be included in every call or a list of dicts that will be used individually
 for each call.</li>
