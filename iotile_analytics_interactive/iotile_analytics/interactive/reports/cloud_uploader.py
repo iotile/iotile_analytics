@@ -74,7 +74,7 @@ class ReportUploader(object):
         """Look up the org for a device or block."""
 
         if dev_or_block_slug.startswith('b--'):
-            obj = self._api.block(dev_or_block_slug).get()
+            obj = self._api.datablock(dev_or_block_slug).get()
         elif dev_or_block_slug.startswith('d--'):
             obj = self._api.device(dev_or_block_slug).get()
         else:
