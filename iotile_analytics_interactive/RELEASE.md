@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.4.1
+
+- Fix bug when generating reports from archives
+
 ## 0.4.0
 
 - Add support for uploading created files to iotile.cloud and linking them
