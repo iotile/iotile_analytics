@@ -1,5 +1,11 @@
 # Release Notes
 
+## 0.4.3
+
+- Fix url posting on python 3 to use correct string object in the url and
+  increase test coverage of CloudSession low-level methods.  Fix related bug
+  that prevented passing a string on python 3 as payload.
+
 ## 0.4.2
 
 - Fix password prompt in python 3 that requires a unicode string.
