@@ -11,6 +11,7 @@ import sys
 import logging
 from threading import Lock
 from multiprocessing.pool import ThreadPool
+from future.utils import iteritems
 
 # For some reason using the future input = raw_input patch in builtins
 # does not work on jupyter so fall back to this manual patch.
@@ -398,6 +399,8 @@ class CloudSession(object):
             # See: https://github.com/iotile/iotile_analytics/issues/47
             if sys.version_info.major < 3:
                 url = url.encode('utf-8')
+            else:
+                headers = {key.decode('utf-8'): val.decode('utf-8') for key, val in iteritems(headers)}
 
             req = Request(url, data, headers=headers)
 

@@ -123,7 +123,7 @@ class ReportUploader(object):
         payloads = [x[1] for x in url_infos]
 
         resp_list = self._session.post_multiple(urls, payloads, message="Getting file upload authorization", include_auth=True)
-        decoded_resps = [json.loads(resp.decode('utf-8')) for resp in resp_list]
+        decoded_resps = [json.loads(resp) for resp in resp_list]
         urls = [x['url'] for x in decoded_resps]
         fields = [x['fields'] for x in decoded_resps]
         return urls, fields
@@ -243,7 +243,7 @@ def encode_multipart(fields, files, boundary=None):
     body = b'\r\n'.join(lines)
 
     headers = {
-        b'Content-Type': b'multipart/form-data; boundary={0}'.format(boundary.encode('utf-8'))
+        b'Content-Type': 'multipart/form-data; boundary={0}'.format(boundary).encode('utf-8')
     }
 
     return (body, headers)
