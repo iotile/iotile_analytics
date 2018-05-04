@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.4.2
+
+- Fix issue with jquery being escaped.
+
 ## 0.4.1
 
 - Fix bug when generating reports from archives
