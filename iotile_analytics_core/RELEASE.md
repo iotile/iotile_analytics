@@ -1,5 +1,10 @@
 # Release Notes
 
+## 0.4.4
+
+- Fix another issue uploading reports on python 3.  Makes sure to use
+  native str objects on both python 2 and python 3.
+
 ## 0.4.3
 
 - Fix url posting on python 3 to use correct string object in the url and
