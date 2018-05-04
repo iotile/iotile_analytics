@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.4.3
+
+- Resolve issue with uploading reports on python 3.
+
 ## 0.4.2
 
 - Fix issue with jquery being escaped.
