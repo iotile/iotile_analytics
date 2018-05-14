@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.4.4
+
+- Support uploading generated reports to an existing report record on the cloud
+
 ## 0.4.3
 
 - Resolve issue with uploading reports on python 3.

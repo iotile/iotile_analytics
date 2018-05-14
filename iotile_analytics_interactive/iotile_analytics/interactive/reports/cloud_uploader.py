@@ -24,7 +24,7 @@ class ReportUploader(object):
         self._api = self._session._api
         self._logger = logging.getLogger(__name__)
 
-    def upload_report(self, label, files, group=None, slug=None):
+    def upload_report(self, label, files, report_id=None, group=None, slug=None):
         """Upload a report to iotile.cloud to attach to a device or archive.
 
         The report will be attached to the given AnalysisGroup, or you can
@@ -39,6 +39,9 @@ class ReportUploader(object):
         Args:
             label (str): The human readable label for the report that you
                 are uploading.
+            report_id (int): The ID of a GeneratedUserReport instance, if one
+                was given. Report files will be attached to this existing report.
+                If this is not specified, a new report record will be created.
             files (list of str): A list of all of the files that should
                 be uploaded for this report including the main entrypoint
                 file that should be listed first.
@@ -52,17 +55,23 @@ class ReportUploader(object):
             str: A URL where the uploaded report can be accessed.
         """
 
-        if group is not None:
-            slug = group.source_info.get('slug')
+        if report_id == None:
+            if group is not None:
+                slug = group.source_info.get('slug')
 
-            if slug is None:
-                raise ArgumentError("The group provided did not have source slug information in its source_info", slug=slug)
-        elif slug is None:
-            raise UsageError("If you do not specify an AnalysisGroup you must pass an org and a slug to this function", slug=slug)
+                if slug is None:
+                    raise ArgumentError("The group provided did not have source slug information in its source_info",
+                                        slug=slug)
+            elif slug is None:
+                raise UsageError(
+                    "If you do not specify an AnalysisGroup you must pass an org and a slug to this function",
+                    slug=slug)
 
-        org = self._get_org_slug(slug)
-        report_id = self._create_report(label, slug, org)
-        self._logger.debug("Created report id: %s", report_id)
+            org = self._get_org_slug(slug)
+            report_id = self._create_report(label, slug, org)
+            self._logger.debug("Created report id: %s", report_id)
+        else:
+            self._logger.debug("Reusing report id: %s", report_id)
 
         keys = self._clean_file_paths(files)
 
