@@ -219,7 +219,7 @@ not passed, this defaults to <a class="reference external" href="https://iotile.
 </table>
 <dl class="method">
 <dt id="iotile_analytics.interactive.reports.cloud_uploader.ReportUploader.upload_report">
-<code class="descname">upload_report</code><span class="sig-paren">(</span><em>label</em>, <em>files</em>, <em>group=None</em>, <em>slug=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/cloud_uploader.html#ReportUploader.upload_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.cloud_uploader.ReportUploader.upload_report" title="Permalink to this definition">¶</a></dt>
+<code class="descname">upload_report</code><span class="sig-paren">(</span><em>label</em>, <em>files</em>, <em>report_id=None</em>, <em>group=None</em>, <em>slug=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/cloud_uploader.html#ReportUploader.upload_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.cloud_uploader.ReportUploader.upload_report" title="Permalink to this definition">¶</a></dt>
 <dd><p>Upload a report to iotile.cloud to attach to a device or archive.</p>
 <p>The report will be attached to the given AnalysisGroup, or you can
 specify the slug of the object to attach the report to explicitly. You
@@ -235,6 +235,9 @@ in lists where users may select to view the report.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The human readable label for the report that you
 are uploading.</li>
+<li><strong>report_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The ID of a GeneratedUserReport instance, if one
+was given. Report files will be attached to this existing report.
+If this is not specified, a new report record will be created.</li>
 <li><strong>files</strong> (<em>list of str</em>) – A list of all of the files that should
 be uploaded for this report including the main entrypoint
 file that should be listed first.</li>

@@ -174,7 +174,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_api</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">_api</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ReportUploader.upload_report"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.cloud_uploader.html#iotile_analytics.interactive.reports.cloud_uploader.ReportUploader.upload_report">[docs]</a>    <span class="k">def</span> <span class="nf">upload_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ReportUploader.upload_report"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.cloud_uploader.html#iotile_analytics.interactive.reports.cloud_uploader.ReportUploader.upload_report">[docs]</a>    <span class="k">def</span> <span class="nf">upload_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">report_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Upload a report to iotile.cloud to attach to a device or archive.</span>
 
 <span class="sd">        The report will be attached to the given AnalysisGroup, or you can</span>
@@ -189,6 +189,9 @@
 <span class="sd">        Args:</span>
 <span class="sd">            label (str): The human readable label for the report that you</span>
 <span class="sd">                are uploading.</span>
+<span class="sd">            report_id (int): The ID of a GeneratedUserReport instance, if one</span>
+<span class="sd">                was given. Report files will be attached to this existing report.</span>
+<span class="sd">                If this is not specified, a new report record will be created.</span>
 <span class="sd">            files (list of str): A list of all of the files that should</span>
 <span class="sd">                be uploaded for this report including the main entrypoint</span>
 <span class="sd">                file that should be listed first.</span>
@@ -202,17 +205,23 @@
 <span class="sd">            str: A URL where the uploaded report can be accessed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">slug</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">source_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;slug&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">report_id</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">slug</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">source_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;slug&#39;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">slug</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;The group provided did not have source slug information in its source_info&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">slug</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;If you do not specify an AnalysisGroup you must pass an org and a slug to this function&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">slug</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;The group provided did not have source slug information in its source_info&quot;</span><span class="p">,</span>
+                                        <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">slug</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span>
+                    <span class="s2">&quot;If you do not specify an AnalysisGroup you must pass an org and a slug to this function&quot;</span><span class="p">,</span>
+                    <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
 
-        <span class="n">org</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_org_slug</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
-        <span class="n">report_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_report</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">org</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created report id: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">report_id</span><span class="p">)</span>
+            <span class="n">org</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_org_slug</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+            <span class="n">report_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_report</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">org</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created report id: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">report_id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Reusing report id: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">report_id</span><span class="p">)</span>
 
         <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_file_paths</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
 
