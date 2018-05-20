@@ -44,3 +44,27 @@ def test_url_posting(cloud_session):
     for result in results:
         data = json.loads(result)
         assert data == {"username": "test@arch-iot.com", "jwt": "JWT_USER"}
+
+
+def test_post_behavior(cloud_session, httpserver):
+    """Make sure we send identical headers/content on python 2/3."""
+
+    url = httpserver.url
+    json_data = {
+        'email': "test@arch-iot.com",
+        'password': "test"
+    }
+
+    session, _domain = cloud_session
+
+    str_data = json.dumps(json_data)
+    bytes_data = json.dumps(json_data)
+
+    header = {b'Content-type': b'application/json'}
+
+    results = session.post_multiple([url], [json_data],
+                                    [{}], include_auth=False)
+
+    req1 = httpserver.requests[0]
+    print(req1.headers)
+    assert False

@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.4.5
+
+- Fix label of branded archive reports to properly find archive label.
+
 ## 0.4.4
 
 - Support uploading generated reports to an existing report record on the cloud
