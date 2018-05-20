@@ -66,5 +66,4 @@ def test_post_behavior(cloud_session, httpserver):
                                     [{}], include_auth=False)
 
     req1 = httpserver.requests[0]
-    print(req1.headers)
-    assert False
+
