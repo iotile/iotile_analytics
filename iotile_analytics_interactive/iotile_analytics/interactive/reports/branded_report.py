@@ -37,7 +37,7 @@ class BrandedReport(LiveReport):
 
         args = {
             "org_slug": source_info.get('org', "unknown"),
-            "label": source_info.get('label'),
+            "label": label,
             "link_url": link_url,
             "source": source_info
         }
