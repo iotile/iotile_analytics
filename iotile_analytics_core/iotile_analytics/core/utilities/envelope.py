@@ -55,6 +55,10 @@ def envelope(*arrays, **kwargs):
     else:
         bins = np.geomspace(d_min, d_max, num_bins+1)
 
+    # Make sure there are no roundoff errors so that every element in the
+    # envelope domain is contained inside the bins.
+    bins[0] = d_min
+    bins[-1] = d_max
 
     env_min = np.zeros_like(bins[1:])
     env_max = np.zeros_like(bins[1:])
