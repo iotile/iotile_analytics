@@ -1,5 +1,10 @@
 # Release Notes
 
+## 0.4.5
+
+- Fix envelope calculation function to not have numerical instability when
+  working with logarithmic bin spacing.
+
 ## 0.4.4
 
 - Fix another issue uploading reports on python 3.  Makes sure to use
