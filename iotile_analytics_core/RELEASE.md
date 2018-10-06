@@ -1,5 +1,11 @@
 # Release Notes
 
+## 0.4.6
+
+- Add support for Device Data Masks. If user sets a device mask on IOTile Cloud,
+  any analysis will automatically respect that mask and not get any data outside
+  the mask's datetime range.
+
 ## 0.4.5
 
 - Fix envelope calculation function to not have numerical instability when

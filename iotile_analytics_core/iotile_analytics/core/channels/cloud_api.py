@@ -219,7 +219,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
         try:
             resource = self._api.event
-            data = self._session.fetch_all(resource, page_size=1000, message="Downloading Events", filter=slug)
+            data = self._session.fetch_all(resource, page_size=1000, message="Downloading Events", filter=slug, mask=1)
 
             dt_index = pd.to_datetime([x['timestamp'] for x in data])
             extra_data = [x['extra_data'] for x in data]
@@ -306,7 +306,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             return StreamSeries([float(x[1]) for x in data], index=dt_index)
 
         resource = self._api.data
-        raw_json = self._session.fetch_all(resource, page_size=10000, message="Downloading Data", filter=slug)
+        raw_json = self._session.fetch_all(resource, page_size=10000, message="Downloading Data", filter=slug, mask=1)
 
         dt_index = pd.to_datetime([x['timestamp'] for x in raw_json])
         data = [x['int_value'] for x in raw_json]
