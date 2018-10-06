@@ -4,6 +4,7 @@
 
 - Core Package: [![PyPI](https://img.shields.io/pypi/v/iotile_analytics_core.svg?style=plastic)](https://pypi.python.org/pypi/iotile-analytics-core) [![PyPI](https://img.shields.io/pypi/pyversions/iotile_analytics_core.svg?style=plastic)](https://github.com/iotile/iotile_analytics)
 - Interactive Widgets: [![PyPI](https://img.shields.io/pypi/v/iotile_analytics_interactive.svg?style=plastic)](https://pypi.python.org/pypi/iotile-analytics-interactive) [![PyPI](https://img.shields.io/pypi/pyversions/iotile_analytics_interactive.svg?style=plastic)](https://github.com/iotile/iotile_analytics)
+- Offline Host: [![PyPI](https://img.shields.io/pypi/v/iotile_analytics_offline.svg?style=plastic)](https://pypi.python.org/pypi/iotile-analytics-offline) [![PyPI](https://img.shields.io/pypi/pyversions/iotile_analytics_offline.svg?style=plastic)](https://github.com/iotile/iotile_analytics)
 
 An open-source data science package for interacting with data stored on
 iotile.cloud.  
