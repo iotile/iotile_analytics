@@ -1,4 +1,4 @@
-"""Helper classes showing interactive timeseries."""
+"""Helper classes showing interactive histogram."""
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from builtins import *
@@ -16,15 +16,7 @@ class HistogramViewer(BaseViewer):
     are passed through to BaseViewer.
 
     Args:
-        left
-        x_decade_mantissa (list): The mantissa values to use for the x_axis.  If
-            not specified this defaults to ticks on 1, 2 and 5 mantiss values.
-        x_sciformat (bool): Whether to display the x tick values in 10^X format
-            or in normal decimal.  Defaults to scientific.
-        y_decade_mantissa (list): The mantissa values to use for the y_axis.  If
-            not specified this defaults to ticks on 1, 2 and 5 mantiss values.
-        y_sciformat (bool): Whether to display the y tick values in 10^X format
-            or in normal decimal.  Defaults to scientific.
+
     """
 
     def __init__(self, **kwargs):
