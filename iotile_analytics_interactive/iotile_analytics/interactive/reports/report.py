@@ -226,7 +226,7 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
     def _save_file(self, path, contents):
         """Save a file to disk."""
 
-        basedir = os.path.dirname(path)
+        basedir = os.path.dirname(os.path.abspath(path))
 
         if os.path.exists(basedir) and not os.path.isdir(basedir):
             raise UsageError("Cannot create directory %s, it already exists and is not a directory.  Trying to save %s", basedir, path)
