@@ -24,7 +24,7 @@ class AnalysisTemplate(object):
     standalone = True
     """Whether running this AnalysisTemplate produces a single or multiple files."""
 
-    def run(self, output_path):
+    def run(self, output_path, file_handler=None):
         """Run whatever analysis this class implements.
 
         The analysis should be saved in the location specified by output_path.
@@ -48,6 +48,18 @@ class AnalysisTemplate(object):
         Args:
             output_path (str): A location specifying where we should save the
                 output of the analysis.
+            file_handler (callable): A function that will be given a bytes
+                object for each file that this report generates as well as
+                the relative path to that file.  If you override this function,
+                it is your responsibility to save all of these files, otherwise
+                no output will be generated.  The purpose of this argument is
+                to allow for streaming these files to a remote server or some
+                other action that is not just saving the data to a local disk.
+
+                The default behavior is to just save to local disk, which happens
+                if file_handler is None (the default value).  The signature
+                of file_handler should be file_handler(path, contents) where
+                contents is a bytes object.
 
         Returns:
             list(str): A list of all of the files generated during the running of this analysis.

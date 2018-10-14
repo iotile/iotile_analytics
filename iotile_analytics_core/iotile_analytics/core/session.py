@@ -99,6 +99,7 @@ class CloudSession(object):
                 CloudSession._login_cache[domain] = {'requests': {}, 'request_lock': Lock()}
 
         self.domain = domain
+        self.enable_cache = True
 
         if verify is not None:
             self.verify = verify
@@ -180,7 +181,7 @@ class CloudSession(object):
         except HttpClientError:
             return False
 
-    def fetch_multiple(self, resources, per_call_kw=None, message=None, **kwargs):
+    def fetch_multiple(self, resources, per_call_kw=None, postprocess=None, message=None, **kwargs):
         """Fetch multiple resources in parallel.
 
         Up to concurrency max calls are in flight at a given time.  The results
@@ -207,7 +208,7 @@ class CloudSession(object):
 
         try:
             with ProgressBar(total=len(resources), message=message, leave=False) as progbar:
-                args = [(x, _merge_dicts(per_call_kw[i], kwargs), progbar) for i, x in enumerate(resources)]
+                args = [(x, _merge_dicts(per_call_kw[i], kwargs), progbar, postprocess, i) for i, x in enumerate(resources)]
                 wrapped_results = self.pool.map(self._resource_fetcher, args)
 
                 failed = [err for result, err in wrapped_results if err is not None]
@@ -355,7 +356,7 @@ class CloudSession(object):
             raise self._translate_error(err, msg="Error fetching resource from IOTile.cloud", url=resource.url())
 
     def _resource_fetcher(self, args):
-        resource, kwargs, progress = args
+        resource, kwargs, progress, postprocess, i = args
 
         try:
             url = resource.url()
@@ -379,11 +380,16 @@ class CloudSession(object):
 
                 data = resp.read()
                 result = json.loads(data.decode('utf-8'))
+
+                if postprocess is not None:
+                    result = postprocess(i, result)
+
                 self._cache_result(cache_key, result)
 
             progress.update(1)
             return result, None
         except Exception as err:  # pylint:disable=W0703; we do the exception processing in the calling function
+            self.logger.exception("Error fetching resource")
             return None, err
 
     def _generic_url_poster(self, args):
@@ -459,12 +465,18 @@ class CloudSession(object):
             return None, err
 
     def _cache_result(self, query, response):
+        if not self.enable_cache:
+            return
+
         cache = self._login_cache[self.domain]
 
         with cache['request_lock']:
             cache['requests'][query] = response
 
     def _check_cache(self, key):
+        if not self.enable_cache:
+            return None
+
         cache = self._login_cache[self.domain]
 
         with cache['request_lock']:

@@ -13,6 +13,7 @@ import pkg_resources
 from future.utils import viewitems
 from iotile_analytics.core.exceptions import UsageError, AuthenticationError
 from iotile_analytics.core import CloudSession, AnalysisGroup, Environment
+from iotile_analytics.core.channels import ChannelCaching
 from iotile_analytics.interactive.reports import ReportUploader
 from typedargs.doc_parser import ParsedDocstring
 from typedargs.exceptions import ValidationError, ArgumentError
@@ -264,6 +265,13 @@ def find_analysis_group(args):
     if is_cloud:
         CloudSession(user=args.user, password=args.password, domain=args.domain, verify=not args.no_verify)
 
+    group_obj = generator(group)
+
+    try:
+        group_obj.set_caching(ChannelCaching.NONE)
+    except NotImplementedError:
+        pass
+
     return is_cloud, generator(group)
 
 
@@ -409,7 +417,7 @@ def main(argv=None):
 
     # Make sure we create a cloud session now to capture the user's password
     # if they gave us a username and we haven't already logged in
-    if not logged_in and args.user is not None:
+    if not logged_in and args.user is not None and args.web_push:
         CloudSession(user=args.user, password=args.password, domain=args.domain, verify=not args.no_verify)
 
     if args.web_push:

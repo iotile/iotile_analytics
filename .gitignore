@@ -67,3 +67,4 @@ target/
 
 built_docs
 .pytest_cache
+notebooks
