@@ -7,7 +7,7 @@ iotile_analytics.interactive.scripts.analytics_host module
 .. currentmodule:: iotile_analytics.interactive.scripts.analytics_host
 
 .. automodule:: iotile_analytics.interactive.scripts.analytics_host
-    :members: build_args, check_arguments, cmdline_main, find_analysis_group, find_live_reports, list_known_reports, main, perform_analysis, print_report_details, setup_logging, split_args, upload_report
+    :members: build_args, build_file_handler, check_arguments, check_output_settings, cmdline_main, find_analysis_group, find_live_reports, list_known_reports, main, perform_analysis, print_report_details, setup_logging, split_args
     :undoc-members:
     :show-inheritance:
     :member-order: bysource
@@ -21,7 +21,9 @@ iotile_analytics.interactive.scripts.analytics_host module
         :nosignatures:
 
         build_args
+        build_file_handler
         check_arguments
+        check_output_settings
         cmdline_main
         find_analysis_group
         find_live_reports
@@ -31,7 +33,6 @@ iotile_analytics.interactive.scripts.analytics_host module
         print_report_details
         setup_logging
         split_args
-        upload_report
 
 
 

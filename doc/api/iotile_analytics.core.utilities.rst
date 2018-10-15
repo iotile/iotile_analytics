@@ -17,6 +17,9 @@ Key Functions and Classes
     ~iotile_analytics.core.utilities.aggregator.TimeseriesSelector
     ~iotile_analytics.core.utilities.domain.combine_domains
     ~iotile_analytics.core.utilities.envelope.envelope
+    ~iotile_analytics.core.utilities.envelope.envelope_create
+    ~iotile_analytics.core.utilities.envelope.envelope_finish
+    ~iotile_analytics.core.utilities.envelope.envelope_update
     ~iotile_analytics.core.utilities.domain.find_domain
     
 

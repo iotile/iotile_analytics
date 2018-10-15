@@ -7,7 +7,7 @@ iotile_analytics.core.utilities.envelope module
 .. currentmodule:: iotile_analytics.core.utilities.envelope
 
 .. automodule:: iotile_analytics.core.utilities.envelope
-    :members: envelope
+    :members: EnvelopeState, envelope, envelope_create, envelope_finish, envelope_update
     :undoc-members:
     :show-inheritance:
     :member-order: bysource
@@ -15,12 +15,22 @@ iotile_analytics.core.utilities.envelope module
     Summary
     -------
 
+    Classes:
+
+    .. autosummary::
+        :nosignatures:
+
+        EnvelopeState
+
     Functions:
 
     .. autosummary::
         :nosignatures:
 
         envelope
+        envelope_create
+        envelope_finish
+        envelope_update
 
 
 
