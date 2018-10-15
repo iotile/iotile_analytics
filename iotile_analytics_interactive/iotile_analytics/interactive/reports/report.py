@@ -88,11 +88,6 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
 
         return column(*self.models)
 
-    @property
-    def standalone(self):
-        """Whether this report creates a single file or multiple files."""
-        return len(self.external_files) == 0
-
     def mark_loadable_source(self, source, loadable_options, columns):
         """Mark a ColumnDataSource as externally loadable.
 
@@ -111,6 +106,9 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
         export the files immediately as you call mark_loadable_source in
         order to keep the minimum amount of information in memory.
         """
+
+        if self.standalone:
+            raise UsageError("You cannot call mark_loadable_source in a standalone report because that would not produce a single standalone file")
 
         if self._file_handler is None:
             raise UsageError("mark_loadable_source called at invalid time, must be called from prepare_render with a valid file_handler")

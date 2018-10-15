@@ -7,14 +7,13 @@ from builtins import input, str
 import argparse
 import logging
 import inspect
-import zipfile
-import shutil
 import pkg_resources
 from future.utils import viewitems
 from iotile_analytics.core.exceptions import UsageError, AuthenticationError
 from iotile_analytics.core import CloudSession, AnalysisGroup, Environment
 from iotile_analytics.core.channels import ChannelCaching
 from iotile_analytics.interactive.reports import ReportUploader
+from iotile_analytics.interactive.reports.handlers import StandardOutHandler, ZipHandler, LocalDiskHandler, WebPushHandler
 from typedargs.doc_parser import ParsedDocstring
 from typedargs.exceptions import ValidationError, ArgumentError
 from typedargs.metadata import AnnotatedMetadata
@@ -167,20 +166,6 @@ def setup_logging(args):
         root.addHandler(logging.NullHandler())
 
 
-def upload_report(domain, files, label=None, group=None, slug=None):
-    """Upload a report to iotile.cloud."""
-
-    print("Uploading report to iotile.cloud server")
-    if label is None:
-        label = input("Enter a label for the report: ")
-
-    if slug is not None:
-        group = None
-
-    uploader = ReportUploader(domain=domain)
-    uploader.upload_report(label, files, group=group, slug=slug)
-
-
 def list_known_reports():
     """Print a table of all known analysis report types."""
 
@@ -318,6 +303,51 @@ def check_arguments(report, args, confirm=False):
         sys.exit(1)
 
 
+def check_output_settings(report_class, output_path, bundle, web_push):
+    """Verify that the combination of output settings is valid."""
+
+    if bundle and web_push:
+        raise UsageError("You cannot currently bundle and push a report.")
+
+    if bundle and output_path is None:
+        raise UsageError("You must specify an output path using -o for the bundle (-b)")
+
+    if not report_class.standalone and output_path is None and not web_push:
+        raise UsageError("The chosen AnalysisTemplate produces more than one file, you must specify an output path using -o if you are not pushing diretly to the cloud")
+
+
+def build_file_handler(output_path, standalone, bundle, web_push, label, group, slug, domain):
+    """Build the appropriate file handler for the AnalysisTemplate's output."""
+
+    if output_path is None and web_push is False:
+        return None, StandardOutHandler()
+
+    if bundle:
+        if standalone:
+            return os.path.basename(output_path), ZipHandler(output_path)
+
+        return None, ZipHandler(output_path, output_path)
+
+    if web_push is False:
+        return output_path, LocalDiskHandler()
+
+    # Otherwise we are pushing directly to the web
+    print("Uploading report to iotile.cloud server after completion")
+    if label is None:
+        label = input("Enter a label for the report: ")
+
+    if slug is None and group is not None:
+        slug = group.source_info.get('slug')
+
+    if slug is None:
+        raise ArgumentError("The group provided did not have source slug information in its source_info", source_info=group.source_info)
+
+    if output_path is None:
+        raise UsageError("Streaming web upload not yet supported") #return None, StreamingWebPushHandler(label, slug, domain)
+
+    return output_path, WebPushHandler(label, slug, domain)
+
+
 def split_args(args):
     """Split name=value in a dictionary."""
 
@@ -330,7 +360,7 @@ def split_args(args):
     return split_args
 
 
-def perform_analysis(report_class, group, output_path=None, args=None, bundle=False, domain=None):
+def perform_analysis(report_class, group, output_path=None, handler=None, args=None, domain=None):
     """Save the results of an AnalysisTemplate to an output path or the console."""
 
     if args is None:
@@ -348,31 +378,9 @@ def perform_analysis(report_class, group, output_path=None, args=None, bundle=Fa
     conv_args = {name: metadata.convert_argument(name, val) for name, val in viewitems(args)}
 
     report_obj = report_class(group, **conv_args)
-
-    if not report_obj.standalone and output_path is None:
-        raise UsageError("You must specify an output path for this AnalysisTemplate type.")
-
-    paths = report_obj.run(output_path)
+    paths = report_obj.run(output_path, handler)
     if paths is None:
         paths = []
-
-    if bundle and len(paths) == 0:
-        raise UsageError("The report did not produce any output files so there is nothing to bundle.")
-
-    if bundle:
-        output_name = os.path.splitext(output_path)[0]
-        bundle_path = output_name + ".zip"
-        if report_obj.standalone:
-            main_path = paths[0]
-
-            zip_obj = zipfile.ZipFile(bundle_path, 'w', zipfile.ZIP_DEFLATED)
-            zip_obj.write(main_path, os.path.basename(main_path))
-            os.remove(main_path)
-        else:
-            shutil.make_archive(output_path, "zip", os.path.join(output_path, '..'), os.path.relpath(output_path, start=os.path.join(output_path, '..')))
-            shutil.rmtree(output_path)
-
-        return [bundle_path]
 
     return paths
 
@@ -409,19 +417,20 @@ def main(argv=None):
     report_args = split_args(args.arg)
     logged_in, group = find_analysis_group(args)
 
-    check_arguments(report_obj, report_args, confirm=not args.no_confirm)
 
-    rendered_paths = perform_analysis(report_obj, group, args.output, args=report_args, bundle=args.bundle, domain=args.domain)
-    if len(rendered_paths) > 0:
-        print("Rendered report to: %s" % rendered_paths[0])
+    check_arguments(report_obj, report_args, confirm=not args.no_confirm)
+    check_output_settings(report_obj, args.output, args.bundle, args.web_push)
 
     # Make sure we create a cloud session now to capture the user's password
     # if they gave us a username and we haven't already logged in
     if not logged_in and args.user is not None and args.web_push:
         CloudSession(user=args.user, password=args.password, domain=args.domain, verify=not args.no_verify)
 
-    if args.web_push:
-        upload_report(args.domain, rendered_paths, label=args.web_push_label, group=group, slug=args.web_push_slug)
+    output_path, handler = build_file_handler(args.output, report_obj.standalone, args.bundle, args.web_push, label=args.web_push_label, group=group, slug=args.web_push_slug, domain=args.domain)
+
+    handler.start()
+    rendered_paths = perform_analysis(report_obj, group, output_path, handler=handler.handle_file, args=report_args, domain=args.domain)
+    handler.finish(rendered_paths)
 
     return 0
 
