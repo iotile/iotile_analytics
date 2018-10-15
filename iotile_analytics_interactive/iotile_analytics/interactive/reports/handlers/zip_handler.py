@@ -27,5 +27,5 @@ class ZipHandler(FileHandler):
 
         self._zip_file.writestr(path, file_contents)
 
-    def finish(self):
+    def finish(self, paths):
         self._zip_file.close()

@@ -23,7 +23,7 @@ class LocalDiskHandler(object):
         """Perform any necessary actions before the AnalysisTemplate starts."""
         pass
 
-    def finish(self):
+    def finish(self, paths):
         """Perform any necessary actions after the AnalysisTemplate has finished."""
         pass
 
