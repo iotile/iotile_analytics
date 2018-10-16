@@ -15,6 +15,9 @@ class FileHandler(object):
     def finish(self, paths):
         """Perform any necessary actions after the AnalysisTemplate has finished.
 
+        This method will be called after run() returns on the AnalysisTemplate
+        and the paths argument will contain whatever run() returned.
+
         Args:
             paths (list of str): The list of strings returned from the call to
                 run().
