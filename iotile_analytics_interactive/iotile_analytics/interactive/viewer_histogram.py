@@ -18,7 +18,6 @@ class HistogramViewer(BaseViewer):
     Args:
 
     """
-
     def __init__(self, **kwargs):
 
         if 'x_type' not in kwargs:
