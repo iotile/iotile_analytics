@@ -146,6 +146,7 @@ def post_url(request_info, data, progress=None):
     # See: https://github.com/iotile/iotile_analytics/issues/47
     if sys.version_info.major < 3:
         url = url.encode('utf-8')
+        headers = request_info.headers
     else:
         headers = {key.decode('utf-8'): val.decode('utf-8') for key, val in iteritems(request_info.headers)}
 
