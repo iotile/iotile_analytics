@@ -51,3 +51,20 @@ class Environment(object):
             raise MissingPackageError("Missing required package tqdm", package="tqdm", suggestion="pip install tqdm")
 
         cls._settings['interactivity'] = Environment.Script
+
+    @classmethod
+    def SetupUnattended(cls):
+        """Configure iotile_analytics to run in an unattended script.
+
+        Unattended scripts are those that are run on a server producing a log
+        and not watched interactively on a tty.  Choosing Unattended mode
+        causes progress bars not to dynamically update and instead just prints
+        a message with the total runtime of each step.
+        """
+
+        try:
+            import tqdm  # pylint:disable=W0612; We just want to test importability
+        except ImportError:
+            raise MissingPackageError("Missing required package tqdm", package="tqdm", suggestion="pip install tqdm")
+
+        cls._settings['interactivity'] = Environment.Unattended

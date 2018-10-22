@@ -1,5 +1,10 @@
 """Methods by which AnalysisGroup objects can find and download streams."""
 
+class ChannelCaching(object):
+    UNLIMITED = 0
+    LRU = 1
+    NONE = 2
+
 
 class AnalysisGroupChannel(object):
     """A delegate object that can find and download streams.
@@ -66,7 +71,7 @@ class AnalysisGroupChannel(object):
 
         raise NotImplementedError()
 
-    def fetch_raw_events(self, slug):
+    def fetch_raw_events(self, slug, postprocess=None):
         """Fetch all raw event data for this stream.
 
         These are the raw json dictionaries that are stored for
@@ -75,6 +80,9 @@ class AnalysisGroupChannel(object):
         Args:
             slug (str): The slug of the stream that we should fetch
                 raw events for.
+            postprocess (callable): Function that should be applied to each
+                raw event before adding to the dataframe.  This should
+                take in a dict and return a dict.
 
         Returns:
             pd.DataFrame: All of the raw events.
@@ -116,6 +124,17 @@ class AnalysisGroupChannel(object):
         Returns:
             StreamSeries: A data fame with internal value as floating
                 point data.
+        """
+
+        raise NotImplementedError()
+
+    def set_caching(self, policy, param=None):
+        """Configure how this channel handling caching data that has been fetched.
+
+        Args:
+            policy (int): One of UNLIMITED_CACHE, LRU_CACHE or NO_CACHE.
+            param (object): Optional parameter that can configure the behavior of
+                the caching mode chosen.
         """
 
         raise NotImplementedError()

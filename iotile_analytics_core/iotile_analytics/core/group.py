@@ -262,25 +262,23 @@ class AnalysisGroup(object):
             subkey (str): Only include a single key of the event.  This is usefuly for complex
                 events where you want to just focus on a portion of them.
             postprocess (callable): (Optional) function to call on each raw event before
-                adding it to the dataframe.
+                adding it to the dataframe.  The function will be called as:
+                postprocess(i, data), where i is the index of the row in the final dataframe
+                and data is the raw data (or data[subkey] if subkey is not None) fetched.
 
         Returns:
             pd.DataFrame: The raw event object data fetched from iotile.cloud.
         """
 
-        slug = self.find_stream(slug_or_name)
-
-        raw_events = self._channel.fetch_raw_events(slug)
-
         if postprocess is None:
-            return raw_events
+            postprocess = lambda i, x: x
 
+        combined_postprocess = postprocess
         if subkey is not None:
-            data = [postprocess(x[subkey]) for _i, x in raw_events.iterrows()]
-        else:
-            data = [postprocess(x) for _i, x in raw_events.iterrows()]
+            combined_postprocess = lambda i, x: postprocess(i, x[subkey])
 
-        return pd.DataFrame(data, index=raw_events.index)
+        slug = self.find_stream(slug_or_name)
+        return self._channel.fetch_raw_events(slug, postprocess=combined_postprocess)
 
     @classmethod
     def _parse_stream_list(cls, stream_list):
@@ -432,3 +430,14 @@ class AnalysisGroup(object):
         """
 
         return [x.name for x in pkg_resources.iter_entry_points('iotile_analytics.save_format')]
+
+    def set_caching(self, policy, param=None):
+        """Configure how this channel handling caching data that has been fetched.
+
+        Args:
+            policy (int): One of UNLIMITED_CACHE, LRU_CACHE or NO_CACHE.
+            param (object): Optional parameter that can configure the behavior of
+                the caching mode chosen.
+        """
+
+        self._channel.set_caching(policy, param)
