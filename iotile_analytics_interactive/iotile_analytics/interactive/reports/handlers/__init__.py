@@ -10,5 +10,6 @@ from .stdout_handler import StandardOutHandler
 from .zip_handler import ZipHandler
 from .file_handler import LocalDiskHandler
 from .web_push_handler import WebPushHandler
+from .streaming_web_push_handler import StreamingWebPushHandler
 
-__all__ = ['FileHandler', 'StandardOutHandler', 'ZipHandler', 'LocalDiskHandler', 'WebPushHandler']
+__all__ = ['FileHandler', 'StandardOutHandler', 'ZipHandler', 'LocalDiskHandler', 'WebPushHandler', 'StreamingWebPushHandler']

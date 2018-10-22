@@ -13,7 +13,7 @@ from iotile_analytics.core.exceptions import UsageError, AuthenticationError
 from iotile_analytics.core import CloudSession, AnalysisGroup, Environment
 from iotile_analytics.core.channels import ChannelCaching
 from iotile_analytics.interactive.reports import ReportUploader
-from iotile_analytics.interactive.reports.handlers import StandardOutHandler, ZipHandler, LocalDiskHandler, WebPushHandler
+from iotile_analytics.interactive.reports.handlers import StandardOutHandler, ZipHandler, LocalDiskHandler, WebPushHandler, StreamingWebPushHandler
 from typedargs.doc_parser import ParsedDocstring
 from typedargs.exceptions import ValidationError, ArgumentError
 from typedargs.metadata import AnnotatedMetadata
@@ -115,6 +115,7 @@ def build_args():
     parser.add_argument('-l', '--list', action="store_true", help="List all known analysis types without running one")
     parser.add_argument('-b', '--bundle', action="store_true", help="Bundle the rendered output into a zip file")
     parser.add_argument('-w', '--web-push', action="store_true", help="Push the resulting report to iotile.cloud.")
+    parser.add_argument('--unattended', action="store_true", help="Hint that we are running as an unattended script to not print dynamic progress bars")
     parser.add_argument('--web-push-label', type=str, default=None, help="Set the label used when pushing a report to iotile.cloud (otherwise you are prompted for it)")
     parser.add_argument('--web-push-slug', type=str, default=None, help="Override the source slug given in the analysisgroup and force it to be this")
     parser.add_argument('-d', '--domain', default=DOMAIN_NAME, help="Domain to use for remote queries, defaults to https://iotile.cloud")
@@ -214,8 +215,6 @@ def print_report_details(report):
 
 def find_analysis_group(args):
     """Find an analysis group by name."""
-
-    Environment.SetupScript()
 
     group = args.analysis_group
     is_cloud = False
@@ -343,7 +342,7 @@ def build_file_handler(output_path, standalone, bundle, web_push, label, group, 
         raise ArgumentError("The group provided did not have source slug information in its source_info", source_info=group.source_info)
 
     if output_path is None:
-        raise UsageError("Streaming web upload not yet supported") #return None, StreamingWebPushHandler(label, slug, domain)
+        return None, StreamingWebPushHandler(label, slug, domain)
 
     return output_path, WebPushHandler(label, slug, domain)
 
@@ -398,6 +397,12 @@ def main(argv=None):
     args = parser.parse_args(args=argv)
 
     setup_logging(args)
+
+    if args.unattended:
+        print("Configuring unattended mode for status reporting")
+        Environment.SetupUnattended()
+    else:
+        Environment.SetupScript()
 
     if args.list and args.template is None:
         list_known_reports()

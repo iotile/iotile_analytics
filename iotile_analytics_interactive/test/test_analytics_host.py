@@ -1,7 +1,6 @@
 """Tests to make sure analytics_host works."""
 
 from __future__ import unicode_literals
-import json
 import os
 import zipfile
 from iotile_analytics.interactive.scripts.analytics_host import main
