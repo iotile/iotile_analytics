@@ -34,6 +34,7 @@ Submodules
     ~iotile_analytics.core.utilities.aggregator
     ~iotile_analytics.core.utilities.domain
     ~iotile_analytics.core.utilities.envelope
+    ~iotile_analytics.core.utilities.url_routines
 
 
 

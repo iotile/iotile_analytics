@@ -17,6 +17,7 @@ Key Functions and Classes
     ~iotile_analytics.interactive.reports.handlers.base_handler.FileHandler
     ~iotile_analytics.interactive.reports.handlers.file_handler.LocalDiskHandler
     ~iotile_analytics.interactive.reports.handlers.stdout_handler.StandardOutHandler
+    ~iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.StreamingWebPushHandler
     ~iotile_analytics.interactive.reports.handlers.web_push_handler.WebPushHandler
     ~iotile_analytics.interactive.reports.handlers.zip_handler.ZipHandler
     
@@ -32,6 +33,7 @@ Submodules
     ~iotile_analytics.interactive.reports.handlers.base_handler
     ~iotile_analytics.interactive.reports.handlers.file_handler
     ~iotile_analytics.interactive.reports.handlers.stdout_handler
+    ~iotile_analytics.interactive.reports.handlers.streaming_web_push_handler
     ~iotile_analytics.interactive.reports.handlers.web_push_handler
     ~iotile_analytics.interactive.reports.handlers.zip_handler
 
