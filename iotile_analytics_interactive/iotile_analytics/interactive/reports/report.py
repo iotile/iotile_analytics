@@ -3,10 +3,12 @@ from __future__ import unicode_literals, absolute_import
 import os
 import json
 import zipfile
+import logging
 import shutil
 from builtins import str
 from io import open
 from datetime import datetime
+from future.utils import viewvalues
 from jinja2 import Environment, PackageLoader, contextfunction, Markup
 from iotile_analytics.core.exceptions import UsageError
 from future.utils import viewitems
@@ -41,7 +43,7 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
     of the LiveReport class.  The primary difference between a LiveReport and
     a standard embedded Bokeh document is the method by which a LiveReport is
     able to reference a tree of local files and load them into
-    ColumnDataSource objects without needing a web browser.
+    ColumnDataSource objects without needing a web server.
 
     Args:
         target (int): Whether we are targetting a hosted or unhosted environment
@@ -59,6 +61,10 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
         self.loadable_models = {}
         self.target = target
         self._relative_dir = "data"
+
+        self._logger = logging.getLogger(__name__)
+        self._output_path = None
+        self._file_handler = None
 
         # Internal template variables that subclasses can override to insert details into the
         # template.
@@ -82,11 +88,6 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
 
         return column(*self.models)
 
-    @property
-    def standalone(self):
-        """Whether this report creates a single file or multiple files."""
-        return len(self.external_files) == 0
-
     def mark_loadable_source(self, source, loadable_options, columns):
         """Mark a ColumnDataSource as externally loadable.
 
@@ -94,7 +95,23 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
         single argument and loads the passed data source with one of the
         loadable options given its dictionary key which should be string or
         an integer that will be formated in decimal and used as a file name.
+
+        It is safe to call this function multiple times with the same source
+        value.  You may want to call this function multiple times if you have
+        many different options for a given source and don't want to keep them
+        all in memory at the same time.
+
+        Note: this function should only be called during the render process
+        from either the run() function or from prepare_render().  It will
+        export the files immediately as you call mark_loadable_source in
+        order to keep the minimum amount of information in memory.
         """
+
+        if self.standalone:
+            raise UsageError("You cannot call mark_loadable_source in a standalone report because that would not produce a single standalone file")
+
+        if self._file_handler is None:
+            raise UsageError("mark_loadable_source called at invalid time, must be called from prepare_render with a valid file_handler")
 
         ref = source.ref
         model_id = ref['id']
@@ -103,18 +120,35 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
         func_name = "load_model_{}".format(safe_model_id)
         trigger_name = "trigger_load_{}".format(safe_model_id)
 
+        if loadable_options is None:
+            loadable_options = {}
+        elif isinstance(loadable_options, list):
+            prior_length = len([x for x in viewvalues(self.external_files) if x['id'] == model_id])
+            loadable_options = {str(prior_length + i): x for i, x in enumerate(loadable_options)}
+
         for name, values in viewitems(loadable_options):
             file_name = "{}_{}".format(safe_model_id, name)
+
+            file_path = os.path.join("data", file_name)
+            if self._output_path is not None:
+                file_path = os.path.join(self._output_path, file_path)
 
             file_obj = {
                 'name': file_name,
                 'columns': columns,
                 'id': model_id,
-                'data': values,
                 'func': func_name
             }
 
-            self.external_files[file_name] = file_obj
+            # Send the data to our file handler to actually save it
+            if self.target == LiveReport.UNHOSTED:
+                file_path += ".jsonp"
+                encoded_data = self.render_jsonp(func_name, values)
+                self._file_handler(file_path, encoded_data)
+            else:
+                raise UsageError("Only UNHOSTED LiveReport objects are currently supported")
+
+            self.external_files[file_path] = file_obj
 
         self.loadable_models[model_id] = {
             'trigger_function': trigger_name,
@@ -125,7 +159,7 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
         return trigger_name
 
     @classmethod
-    def render_jsonp(cls, path, info):
+    def render_jsonp(cls, func, data):
         """Render a dictionary as a jsonp file.
 
         These files are suitable for loading from a local filesystem so they
@@ -133,20 +167,21 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
         browser.
 
         Args:
-            path (str): The path at which to save the resulting jsonp file.
-            info (dict): An info dictionary as created by the mark_loadable_source
-                function.
+            func (str): The name of the function that should be called when
+                this jsonp file is loaded.
+            data (dict): The dict object that we should dump.
+
+        Returns:
+            bytes: Encoded jsonp data that can be written to a file
         """
 
-        json_data = json.dumps(info['data'])
+        json_data = json.dumps(data)
+        write_data = "{}({});".format(func, json_data)
 
-        with open(path, "w", encoding='utf-8') as outfile:
-            write_data = "{}({});".format(info['func'], json_data)
+        if not isinstance(write_data, str):
+            write_data = str(write_data, 'utf-8')
 
-            if not isinstance(write_data, str):
-                write_data = str(write_data, 'utf-8')
-
-            outfile.write(write_data)
+        return write_data.encode('utf-8')
 
     @classmethod
     def find_template(cls, package, folder, name):
@@ -186,7 +221,23 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
         template = env.from_string(template_str)
         return template.render(variables)
 
-    def run(self, output_path):
+    def _save_file(self, path, contents):
+        """Save a file to disk."""
+
+        basedir = os.path.dirname(os.path.abspath(path))
+
+        if os.path.exists(basedir) and not os.path.isdir(basedir):
+            raise UsageError("Cannot create directory %s, it already exists and is not a directory.  Trying to save %s", basedir, path)
+
+        if not os.path.exists(basedir):
+            self._logger.debug("Creating folder %s in _save_file", basedir)
+            os.makedirs(os.path.abspath(basedir))  # This cannot have .. in it, see https://docs.python.org/2/library/os.html#os.makedirs
+
+        with open(path, "wb") as outfile:
+            self._logger.debug("Saving file %s", path)
+            outfile.write(contents)
+
+    def run(self, output_path, file_handler=None):
         """Render this report to output_path.
 
         If this report is a standalone html file, the output path
@@ -195,14 +246,19 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
         If this report is not standalone, the output will be
         folder that is created at output_path.
 
-        If bundle is True and the report is not standalone, it will be zipped
-        into a file at output_path.zip.  Any html or directory that was
-        created as an intermediary before zipping will be deleted before this
-        function returns.
-
         Args:
             output_path (str): the path to the folder that we wish
                 to create.
+            file_handler (callable): A function that will be given a filelike
+                object for each file that this report generates as well as
+                the relative path to that file.  If you override this function,
+                it is your responsibility to save all of these files, otherwise
+                no output will be generated.  The purpose of this argument is
+                to allow for streaming these files to a remote server or some
+                other action that is not just saving the data to a local disk.
+
+                The default behavior is to just save to local disk, which happens
+                if file_handler is None (the default value).
 
         Returns:
             str: The path to the actual file or directory created.  This
@@ -210,66 +266,63 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
                 extension or the addition of a subdirectory.
         """
 
-        # Allow subclasses to finish any preparations before we render.
-        self.prepare_render()
+        if output_path is None and file_handler is None:
+            raise UsageError("You must pass an output_path and/or a file_handler to render this LiveReport")
 
-        all_files = []
+        if file_handler is None:
+            file_handler = self._save_file
 
-        if output_path is None:
-            raise UsageError("You must pass an output_path to render this LiveReport")
+        try:
+            all_files = []
 
-        # Make sure we have the path stem
-        if output_path.endswith(".html"):
-            output_path = output_path[:-5]
+            # Make sure we have the path stem
+            if output_path is not None and output_path.endswith(".html"):
+                output_path = output_path[:-5]
 
-        if self.standalone:
-            html_path = output_path + ".html"
-        else:
-            os.makedirs(output_path)
-            html_path = os.path.join(output_path, 'index.html')
+            # Allow subclasses to finish any preparations before we render.
+            self._output_path = output_path
+            self._file_handler = file_handler
+            self.prepare_render()
 
-        all_files.append(html_path)
+            # At this point, all additional files will have already been generated
+            # so we know if we are a standalone report or not.
+            if output_path is None:
+                html_path = "index.html"
+            elif self.standalone:
+                html_path = output_path + ".html"
+            else:
+                html_path = os.path.join(output_path, 'index.html')
 
-        env = Environment(loader=PackageLoader('iotile_analytics.interactive.reports', 'templates'))
-        env.globals['include_file'] = include_file
+            env = Environment(loader=PackageLoader('iotile_analytics.interactive.reports', 'templates'))
+            env.globals['include_file'] = include_file
 
-        if self.target == self.UNHOSTED:
-            template = env.get_template('unhosted_file.html')
-        else:
-            raise UsageError("HOSTED mode for LiveReports is not yet supported")
+            if self.target == self.UNHOSTED:
+                template = env.get_template('unhosted_file.html')
+            else:
+                raise UsageError("HOSTED mode for LiveReports is not yet supported")
 
-        template_vars = {
-            'loadable_models': self.loadable_models,
-            'timestamp': datetime.utcnow().isoformat(),
-            'header': self.header,
-            'before_content': self.before_content,
-            'after_content': self.after_content,
-            'footer': self.footer,
-            'extra_scripts': self.extra_scripts
-        }
+            template_vars = {
+                'loadable_models': self.loadable_models,
+                'timestamp': datetime.utcnow().isoformat(),
+                'header': self.header,
+                'before_content': self.before_content,
+                'after_content': self.after_content,
+                'footer': self.footer,
+                'extra_scripts': self.extra_scripts
+            }
 
-        # This does not return unicode on python 2 so we need to massage it
-        rendered_html = file_html(self.models, Resources('inline'), self.title, template, template_vars)
-        if not isinstance(rendered_html, str):
-            rendered_html = str(rendered_html, 'utf-8')
+            # This does not return unicode on python 2 so we need to massage it
+            rendered_html = file_html(self.models, Resources('inline'), self.title, template, template_vars)
+            if not isinstance(rendered_html, str):
+                rendered_html = str(rendered_html, 'utf-8')
 
-        with open(html_path, "w", encoding='utf-8') as outfile:
-            outfile.write(rendered_html)
+            file_handler(html_path, rendered_html.encode('utf-8'))
 
-        if not self.standalone:
-            datadir = os.path.join(output_path, "data")
-            os.makedirs(datadir)
-
-            for filename, fileinfo in viewitems(self.external_files):
-                file_path = os.path.join(datadir, filename)
-
-                if self.target == self.UNHOSTED:
-                    file_path += ".jsonp"
-                    self.render_jsonp(file_path, fileinfo)
-                else:
-                    raise UsageError("HOSTED mode for LiveReports is not yet supported")
-
-                all_files.append(file_path)
+            all_files.append(html_path)
+            all_files.extend(self.external_files)
+        finally:
+            self._output_path = None
+            self._file_handler = None
 
         return all_files
 
