@@ -160,18 +160,19 @@
 <span class="sd">    but it will also be pushed to the cloud in the finish() method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">domain</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">report_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">WebPushHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">label</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_slug</span> <span class="o">=</span> <span class="n">slug</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">domain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_report_id</span> <span class="o">=</span> <span class="n">report_id</span>
 
 <div class="viewcode-block" id="WebPushHandler.finish"><a class="viewcode-back" href="../../../../../api/iotile_analytics.interactive.reports.handlers.web_push_handler.html#iotile_analytics.interactive.reports.handlers.web_push_handler.WebPushHandler.finish">[docs]</a>    <span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Push this entire report up to the cloud.&quot;&quot;&quot;</span>
 
         <span class="n">uploader</span> <span class="o">=</span> <span class="n">ReportUploader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_domain</span><span class="p">)</span>
-        <span class="n">uploader</span><span class="o">.</span><span class="n">upload_report</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_slug</span><span class="p">)</span></div></div>
+        <span class="n">uploader</span><span class="o">.</span><span class="n">upload_report</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_slug</span><span class="p">,</span> <span class="n">report_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_report_id</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
