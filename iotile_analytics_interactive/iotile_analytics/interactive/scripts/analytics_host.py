@@ -116,8 +116,10 @@ def build_args():
     parser.add_argument('-b', '--bundle', action="store_true", help="Bundle the rendered output into a zip file")
     parser.add_argument('-w', '--web-push', action="store_true", help="Push the resulting report to iotile.cloud.")
     parser.add_argument('--unattended', action="store_true", help="Hint that we are running as an unattended script to not print dynamic progress bars")
+    parser.add_argument('--web-push-id', type=str, default=None, help="Use this report id when uploading rather than creating a new report record")
     parser.add_argument('--web-push-label', type=str, default=None, help="Set the label used when pushing a report to iotile.cloud (otherwise you are prompted for it)")
     parser.add_argument('--web-push-slug', type=str, default=None, help="Override the source slug given in the analysisgroup and force it to be this")
+    parser.add_argument('--token', type=str, default=None, help="Token for authentication to iotile cloud (instead of a password)")
     parser.add_argument('-d', '--domain', default=DOMAIN_NAME, help="Domain to use for remote queries, defaults to https://iotile.cloud")
     parser.add_argument('analysis_group', default=None, nargs='?', help="The slug or path of the object you want to perform analysis on")
 
@@ -247,7 +249,7 @@ def find_analysis_group(args):
             sys.exit(1)
 
     if is_cloud:
-        CloudSession(user=args.user, password=args.password, domain=args.domain, verify=not args.no_verify)
+        CloudSession(user=args.user, password=args.password, token=args.token, domain=args.domain, verify=not args.no_verify)
 
     group_obj = generator(group)
 
@@ -315,7 +317,7 @@ def check_output_settings(report_class, output_path, bundle, web_push):
         raise UsageError("The chosen AnalysisTemplate produces more than one file, you must specify an output path using -o if you are not pushing diretly to the cloud")
 
 
-def build_file_handler(output_path, standalone, bundle, web_push, label, group, slug, domain):
+def build_file_handler(output_path, standalone, bundle, web_push, label, group, slug, domain, report_id=None):
     """Build the appropriate file handler for the AnalysisTemplate's output."""
 
     if output_path is None and web_push is False:
@@ -342,9 +344,9 @@ def build_file_handler(output_path, standalone, bundle, web_push, label, group, 
         raise ArgumentError("The group provided did not have source slug information in its source_info", source_info=group.source_info)
 
     if output_path is None:
-        return None, StreamingWebPushHandler(label, slug, domain)
+        return None, StreamingWebPushHandler(label, slug, domain, report_id=report_id)
 
-    return output_path, WebPushHandler(label, slug, domain)
+    return output_path, WebPushHandler(label, slug, domain, report_id=report_id)
 
 
 def split_args(args):
@@ -429,9 +431,11 @@ def main(argv=None):
     # Make sure we create a cloud session now to capture the user's password
     # if they gave us a username and we haven't already logged in
     if not logged_in and args.user is not None and args.web_push:
-        CloudSession(user=args.user, password=args.password, domain=args.domain, verify=not args.no_verify)
+        CloudSession(user=args.user, password=args.password, token=args.token, domain=args.domain, verify=not args.no_verify)
 
-    output_path, handler = build_file_handler(args.output, report_obj.standalone, args.bundle, args.web_push, label=args.web_push_label, group=group, slug=args.web_push_slug, domain=args.domain)
+    output_path, handler = build_file_handler(args.output, report_obj.standalone, args.bundle, args.web_push,
+                                              label=args.web_push_label, group=group, slug=args.web_push_slug,
+                                              domain=args.domain, report_id=args.web_push_id)
 
     handler.start()
     rendered_paths = perform_analysis(report_obj, group, output_path, handler=handler.handle_file, args=report_args, domain=args.domain)

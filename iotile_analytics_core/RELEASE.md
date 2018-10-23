@@ -1,5 +1,10 @@
 # Release Notes
 
+## 0.5.1
+
+- Properly suppress warning if you choose verify=False during testing to disable
+  certificate verification.
+
 ## 0.5.0
 
 - Add incremental envelope calculation functions to handle accumulating a 

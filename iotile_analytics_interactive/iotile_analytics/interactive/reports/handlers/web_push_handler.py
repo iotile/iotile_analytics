@@ -11,15 +11,16 @@ class WebPushHandler(LocalDiskHandler):
     but it will also be pushed to the cloud in the finish() method.
     """
 
-    def __init__(self, label, slug, domain):
+    def __init__(self, label, slug, domain, report_id=None):
         super(WebPushHandler, self).__init__()
 
         self._label = label
         self._slug = slug
         self._domain = domain
+        self._report_id = report_id
 
     def finish(self, paths):
         """Push this entire report up to the cloud."""
 
         uploader = ReportUploader(self._domain)
-        uploader.upload_report(self._label, paths, slug=self._slug)
+        uploader.upload_report(self._label, paths, slug=self._slug, report_id=self._report_id)
