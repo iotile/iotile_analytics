@@ -24,12 +24,12 @@ try:
     #python2
     from urllib2 import urlopen, Request
     from urllib import urlencode
-    import requests.packages.urllib3 as urllib3
+    import urllib3
 except ImportError:
     #python3
     from urllib.request import urlopen, Request
     from urllib.parse import urlencode
-    import requests.packages.urllib3 as urllib3
+    import urllib3
 
 from typedargs.exceptions import ArgumentError
 from iotile_cloud.api.connection import Api, DOMAIN_NAME
@@ -107,6 +107,9 @@ class CloudSession(object):
         else:
             self.verify = cache.get('verify', True)
 
+        if self.verify is False:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
         if token is not None:
             self.token = token
             self.token_type = "jwt"
@@ -148,9 +151,6 @@ class CloudSession(object):
             if sys.version_info.major < 3:
                 prompt_str = prompt_str.encode('utf-8')
             password = getpass.getpass(prompt_str)
-
-        if self.verify is False:
-            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
         try:
             res = self._api.login(email=user, password=password)

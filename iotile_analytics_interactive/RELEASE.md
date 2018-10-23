@@ -1,5 +1,12 @@
 # Release Notes
 
+## 0.5.1
+
+- Add support for passing an iotile.cloud token on the command line using 
+  --token={token}
+- Add support for passing a pre-existing report id on the command line using
+  --web-push-id={id}
+
 ## 0.5.0
 
 - Add support for streaming report generation.  Now there are FileHandler

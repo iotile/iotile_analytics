@@ -12,7 +12,7 @@ class StreamingWebPushHandler(FileHandler):
     waits synchronously in the finish() routine until all uploads are done.
     """
 
-    def __init__(self, label, slug, domain):
+    def __init__(self, label, slug, domain, report_id=None):
         super(StreamingWebPushHandler, self).__init__()
 
         self._label = label
@@ -21,15 +21,19 @@ class StreamingWebPushHandler(FileHandler):
         self._logger = logging.getLogger(__name__)
         self._uploader = None
         self._last_path = None
-        self._report_id = None
+        self._report_id = report_id
 
     def start(self):
         """Perform any necessary actions before the AnalysisTemplate starts."""
 
         self._logger.info("Streaming files to cloud as they are generated")
         self._uploader = ReportUploader(self._domain)
-        self._report_id = self._uploader.create_report(self._label, slug=self._slug)
-        self._logger.debug("Created report id: %s", self._report_id)
+
+        if self._report_id is None:
+            self._report_id = self._uploader.create_report(self._label, slug=self._slug)
+            self._logger.debug("Created report id: %s", self._report_id)
+        else:
+            self._logger.debug("Using existing report id: %s", self._report_id)
 
     def finish(self, paths):
         """Perform any necessary actions after the AnalysisTemplate has finished.

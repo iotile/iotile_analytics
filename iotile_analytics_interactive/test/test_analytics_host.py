@@ -140,6 +140,20 @@ def test_user_pass_handling(water_meter, capsys):
     assert out == DEVICE_DATA
 
 
+def test_user_token_handling(water_meter, capsys):
+    """Make sure we can pass username and token on the cmdline."""
+
+    domain, _cloud = water_meter
+    slug = 'd--0000-0000-0000-00d2'
+
+    retval = main(['-t', 'basic_info', '-u', 'test@arch-iot.com', '--token', 'JWT_USER', slug, '-d', domain, '--no-verify', '-c'])
+    assert retval == 0
+
+    out, _err = capsys.readouterr()
+
+    assert out == DEVICE_DATA
+
+
 def test_local_files(water_meter, tmpdir):
     """Make sure we can run a report from a local file."""
 
