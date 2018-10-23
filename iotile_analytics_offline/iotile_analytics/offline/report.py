@@ -3,14 +3,15 @@
 class SaveOfflineReport(object):
     """Save all data locally as an HDF5 database file."""
 
+    # Standalone reports are those that can be serialized to a single file or the console
+    # since we don't support console serializaiton, we are not standalone
+    standalone = False
+
     def __init__(self, group):
         self._group = group
 
-        # Standalone reports are those that can be serialized to a single file or the console
-        # since we don't support console serializaiton, we are not standalone
-        self.standalone = False
 
-    def run(self, output_path):
+    def run(self, output_path, file_handler):
         """Render this report to output_path.
 
         Args:

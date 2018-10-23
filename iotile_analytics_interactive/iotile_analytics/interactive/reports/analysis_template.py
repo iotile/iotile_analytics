@@ -19,12 +19,19 @@ class AnalysisTemplate(object):
     then it can take a parameter in its __init__ function named domain which will
     be filled with the domain of the iotile.cloud server that it should ask for
     additional information.
+
+    All AnalysisTemplate subclasses must announce in advance of being run
+    whether they produce one or multiple files by setting the standalone property
+    as appropriate.  The property defaults to True, which means only a single
+    file is produced, so it only needs to be overriden by subclasses that produce
+    multiple files.  The standalone property must be a class property, not an
+    instance property so that it can be inspected before the class is instantiated.
     """
 
     standalone = True
     """Whether running this AnalysisTemplate produces a single or multiple files."""
 
-    def run(self, output_path):
+    def run(self, output_path, file_handler=None):
         """Run whatever analysis this class implements.
 
         The analysis should be saved in the location specified by output_path.
@@ -40,14 +47,30 @@ class AnalysisTemplate(object):
         important so that your caller can easily bundle your files into a zip
         and remove the originals if necessary.
 
-        If output_path is None then you are expected to write your output to
-        stdout.  If that is not possible for the analysis you are performing,
-        e.g. you are creating multiple files, then you should raise
-        UsageError().
+        If output_path is None and file_handler is None then you are expected
+        to write your output to stdout.  If that is not possible for the
+        analysis you are performing, e.g. you are creating multiple files,
+        then you should raise UsageError().
+
+        If output_path is None but file_handler is not None then you are
+        expected to hand each of your produced files to file_handler in order
+        for it to save them appropriately.
 
         Args:
             output_path (str): A location specifying where we should save the
                 output of the analysis.
+            file_handler (callable): A function that will be given a bytes
+                object for each file that this report generates as well as
+                the relative path to that file.  If you override this function,
+                it is your responsibility to save all of these files, otherwise
+                no output will be generated.  The purpose of this argument is
+                to allow for streaming these files to a remote server or some
+                other action that is not just saving the data to a local disk.
+
+                The default behavior is to just save to local disk, which happens
+                if file_handler is None (the default value).  The signature
+                of file_handler should be file_handler(path, contents) where
+                contents is a bytes object.
 
         Returns:
             list(str): A list of all of the files generated during the running of this analysis.

@@ -7,13 +7,13 @@ from builtins import input, str
 import argparse
 import logging
 import inspect
-import zipfile
-import shutil
 import pkg_resources
 from future.utils import viewitems
 from iotile_analytics.core.exceptions import UsageError, AuthenticationError
 from iotile_analytics.core import CloudSession, AnalysisGroup, Environment
+from iotile_analytics.core.channels import ChannelCaching
 from iotile_analytics.interactive.reports import ReportUploader
+from iotile_analytics.interactive.reports.handlers import StandardOutHandler, ZipHandler, LocalDiskHandler, WebPushHandler, StreamingWebPushHandler
 from typedargs.doc_parser import ParsedDocstring
 from typedargs.exceptions import ValidationError, ArgumentError
 from typedargs.metadata import AnnotatedMetadata
@@ -35,7 +35,7 @@ credentials, it can also run most analyses locally using predownloaded data
 that you have on your computer.
 
 The most up-to-date reference information is always available online at:
-http://iotile-analytics.readthedocs.io/en/latest/
+https://iotile.github.io/iotile_analytics/
 
 Most of the analysis templates included with analytics-host create interactive
 html web pages that embed graphs, controls and tables showing the results of
@@ -115,6 +115,7 @@ def build_args():
     parser.add_argument('-l', '--list', action="store_true", help="List all known analysis types without running one")
     parser.add_argument('-b', '--bundle', action="store_true", help="Bundle the rendered output into a zip file")
     parser.add_argument('-w', '--web-push', action="store_true", help="Push the resulting report to iotile.cloud.")
+    parser.add_argument('--unattended', action="store_true", help="Hint that we are running as an unattended script to not print dynamic progress bars")
     parser.add_argument('--web-push-label', type=str, default=None, help="Set the label used when pushing a report to iotile.cloud (otherwise you are prompted for it)")
     parser.add_argument('--web-push-slug', type=str, default=None, help="Override the source slug given in the analysisgroup and force it to be this")
     parser.add_argument('-d', '--domain', default=DOMAIN_NAME, help="Domain to use for remote queries, defaults to https://iotile.cloud")
@@ -166,20 +167,6 @@ def setup_logging(args):
         root.addHandler(logging.NullHandler())
 
 
-def upload_report(domain, files, label=None, group=None, slug=None):
-    """Upload a report to iotile.cloud."""
-
-    print("Uploading report to iotile.cloud server")
-    if label is None:
-        label = input("Enter a label for the report: ")
-
-    if slug is not None:
-        group = None
-
-    uploader = ReportUploader(domain=domain)
-    uploader.upload_report(label, files, group=group, slug=slug)
-
-
 def list_known_reports():
     """Print a table of all known analysis report types."""
 
@@ -229,8 +216,6 @@ def print_report_details(report):
 def find_analysis_group(args):
     """Find an analysis group by name."""
 
-    Environment.SetupScript()
-
     group = args.analysis_group
     is_cloud = False
 
@@ -263,6 +248,13 @@ def find_analysis_group(args):
 
     if is_cloud:
         CloudSession(user=args.user, password=args.password, domain=args.domain, verify=not args.no_verify)
+
+    group_obj = generator(group)
+
+    try:
+        group_obj.set_caching(ChannelCaching.NONE)
+    except NotImplementedError:
+        pass
 
     return is_cloud, generator(group)
 
@@ -310,6 +302,51 @@ def check_arguments(report, args, confirm=False):
         sys.exit(1)
 
 
+def check_output_settings(report_class, output_path, bundle, web_push):
+    """Verify that the combination of output settings is valid."""
+
+    if bundle and web_push:
+        raise UsageError("You cannot currently bundle and push a report.")
+
+    if bundle and output_path is None:
+        raise UsageError("You must specify an output path using -o for the bundle (-b)")
+
+    if not report_class.standalone and output_path is None and not web_push:
+        raise UsageError("The chosen AnalysisTemplate produces more than one file, you must specify an output path using -o if you are not pushing diretly to the cloud")
+
+
+def build_file_handler(output_path, standalone, bundle, web_push, label, group, slug, domain):
+    """Build the appropriate file handler for the AnalysisTemplate's output."""
+
+    if output_path is None and web_push is False:
+        return None, StandardOutHandler()
+
+    if bundle:
+        if standalone:
+            return os.path.basename(output_path), ZipHandler(output_path)
+
+        return None, ZipHandler(output_path, output_path)
+
+    if web_push is False:
+        return output_path, LocalDiskHandler()
+
+    # Otherwise we are pushing directly to the web
+    print("Uploading report to iotile.cloud server after completion")
+    if label is None:
+        label = input("Enter a label for the report: ")
+
+    if slug is None and group is not None:
+        slug = group.source_info.get('slug')
+
+    if slug is None:
+        raise ArgumentError("The group provided did not have source slug information in its source_info", source_info=group.source_info)
+
+    if output_path is None:
+        return None, StreamingWebPushHandler(label, slug, domain)
+
+    return output_path, WebPushHandler(label, slug, domain)
+
+
 def split_args(args):
     """Split name=value in a dictionary."""
 
@@ -322,7 +359,7 @@ def split_args(args):
     return split_args
 
 
-def perform_analysis(report_class, group, output_path=None, args=None, bundle=False, domain=None):
+def perform_analysis(report_class, group, output_path=None, handler=None, args=None, domain=None):
     """Save the results of an AnalysisTemplate to an output path or the console."""
 
     if args is None:
@@ -340,31 +377,9 @@ def perform_analysis(report_class, group, output_path=None, args=None, bundle=Fa
     conv_args = {name: metadata.convert_argument(name, val) for name, val in viewitems(args)}
 
     report_obj = report_class(group, **conv_args)
-
-    if not report_obj.standalone and output_path is None:
-        raise UsageError("You must specify an output path for this AnalysisTemplate type.")
-
-    paths = report_obj.run(output_path)
+    paths = report_obj.run(output_path, handler)
     if paths is None:
         paths = []
-
-    if bundle and len(paths) == 0:
-        raise UsageError("The report did not produce any output files so there is nothing to bundle.")
-
-    if bundle:
-        output_name = os.path.splitext(output_path)[0]
-        bundle_path = output_name + ".zip"
-        if report_obj.standalone:
-            main_path = paths[0]
-
-            zip_obj = zipfile.ZipFile(bundle_path, 'w', zipfile.ZIP_DEFLATED)
-            zip_obj.write(main_path, os.path.basename(main_path))
-            os.remove(main_path)
-        else:
-            shutil.make_archive(output_path, "zip", os.path.join(output_path, '..'), os.path.relpath(output_path, start=os.path.join(output_path, '..')))
-            shutil.rmtree(output_path)
-
-        return [bundle_path]
 
     return paths
 
@@ -382,6 +397,12 @@ def main(argv=None):
     args = parser.parse_args(args=argv)
 
     setup_logging(args)
+
+    if args.unattended:
+        print("Configuring unattended mode for status reporting")
+        Environment.SetupUnattended()
+    else:
+        Environment.SetupScript()
 
     if args.list and args.template is None:
         list_known_reports()
@@ -401,19 +422,20 @@ def main(argv=None):
     report_args = split_args(args.arg)
     logged_in, group = find_analysis_group(args)
 
-    check_arguments(report_obj, report_args, confirm=not args.no_confirm)
 
-    rendered_paths = perform_analysis(report_obj, group, args.output, args=report_args, bundle=args.bundle, domain=args.domain)
-    if len(rendered_paths) > 0:
-        print("Rendered report to: %s" % rendered_paths[0])
+    check_arguments(report_obj, report_args, confirm=not args.no_confirm)
+    check_output_settings(report_obj, args.output, args.bundle, args.web_push)
 
     # Make sure we create a cloud session now to capture the user's password
     # if they gave us a username and we haven't already logged in
-    if not logged_in and args.user is not None:
+    if not logged_in and args.user is not None and args.web_push:
         CloudSession(user=args.user, password=args.password, domain=args.domain, verify=not args.no_verify)
 
-    if args.web_push:
-        upload_report(args.domain, rendered_paths, label=args.web_push_label, group=group, slug=args.web_push_slug)
+    output_path, handler = build_file_handler(args.output, report_obj.standalone, args.bundle, args.web_push, label=args.web_push_label, group=group, slug=args.web_push_slug, domain=args.domain)
+
+    handler.start()
+    rendered_paths = perform_analysis(report_obj, group, output_path, handler=handler.handle_file, args=report_args, domain=args.domain)
+    handler.finish(rendered_paths)
 
     return 0
 

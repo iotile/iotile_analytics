@@ -7,7 +7,7 @@ iotile_analytics.core.channels.channel module
 .. currentmodule:: iotile_analytics.core.channels.channel
 
 .. automodule:: iotile_analytics.core.channels.channel
-    :members: AnalysisGroupChannel
+    :members: AnalysisGroupChannel, ChannelCaching
     :undoc-members:
     :show-inheritance:
     :member-order: bysource
@@ -21,6 +21,7 @@ iotile_analytics.core.channels.channel module
         :nosignatures:
 
         AnalysisGroupChannel
+        ChannelCaching
 
 
 

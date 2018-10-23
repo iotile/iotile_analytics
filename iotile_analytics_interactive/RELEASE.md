@@ -1,5 +1,15 @@
 # Release Notes
 
+## 0.5.0
+
+- Add support for streaming report generation.  Now there are FileHandler
+  classes that can be passed to a LiveReport and handle all of the files 
+  produced by that report.  This allows the possibility of streaming those 
+  files to a remote server without ever saving them to disk.  This particular
+  streaming support is added by the StreamingWebPushHandler class.
+- Updates analytics-host to use the new FileHandler functionality to implement
+  report bundling and web push.
+
 ## 0.4.5
 
 - Fix label of branded archive reports to properly find archive label.

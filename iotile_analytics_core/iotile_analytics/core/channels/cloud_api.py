@@ -8,7 +8,7 @@ from future.utils import viewitems
 import pandas as pd
 from iotile_cloud.api.exceptions import RestHttpBaseException
 from typedargs.exceptions import ArgumentError
-from .channel import AnalysisGroupChannel
+from .channel import AnalysisGroupChannel, ChannelCaching
 from ..session import CloudSession
 from ..interaction import ProgressBar
 from ..stream_series import StreamSeries
@@ -47,7 +47,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             source_type = self._classify_object(cloud_id)
             stream_finder = stream_finders.get(source_type, None)
 
-
+        self._cache_policy = ChannelCaching.UNLIMITED
         self._session = CloudSession(domain=domain)
         self._api = self._session.get_api()
         self._cloud_id = cloud_id
@@ -232,7 +232,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         except RestHttpBaseException as exc:
             raise CloudError("Error fetching events from stream", exception=exc, response=exc.response.status_code)
 
-    def fetch_raw_events(self, slug):
+    def fetch_raw_events(self, slug, postprocess=None):
         """Fetch all raw event data for this stream.
 
         These are the raw json dictionaries that may be stored for
@@ -241,6 +241,11 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         Args:
             slug (str): The slug of the stream that we should fetch
                 raw events for.
+            postprocess (callable): Function that should be applied to each
+                raw event before adding to the dataframe.  This should
+                take in a dict and return a dict.  The signature is
+                postprocess(i, data) where i is the index of the row in
+                the output dataframe.
 
         Returns:
             pd.DataFrame: All of the raw events.  This will be empty if
@@ -262,7 +267,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
                 resources.append(self._api.event(event_ids[index]).data)
                 new_index.append(indexes[index])
 
-        data = self._session.fetch_multiple(resources, message="Downloading Raw Event Data")
+        data = self._session.fetch_multiple(resources, postprocess=postprocess, message="Downloading Raw Event Data")
         # new_index includes all indexes with actual data
         new_index = pd.to_datetime(new_index)
         return pd.DataFrame(data, index=new_index)
@@ -347,3 +352,22 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             return results['results']
         except RestHttpBaseException as exc:
             raise CloudError("Error calling method on iotile.cloud", exception=exc, response=exc.response.status_code)
+
+    def set_caching(self, policy, param=None):
+        """Configure how this channel handling caching data that has been fetched.
+
+        Args:
+            policy (int): One of UNLIMITED_CACHE, LRU_CACHE or NO_CACHE.
+            param (object): Optional parameter that can configure the behavior of
+                the caching mode chosen.
+        """
+
+        if policy not in (ChannelCaching.UNLIMITED, ChannelCaching.NONE):
+            raise ArgumentError("Unsupported cache policy type", policy=policy)
+
+        self._cache_policy = policy
+
+        if policy == ChannelCaching.UNLIMITED:
+            self._session.enable_cache = True
+        else:
+            self._session.enable_cache = False

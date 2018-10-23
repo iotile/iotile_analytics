@@ -36,6 +36,7 @@ from iotile_cloud.api.connection import Api, DOMAIN_NAME
 from iotile_cloud.api.exceptions import HttpNotFoundError, HttpClientError, RestHttpBaseException, HttpCouldNotVerifyServerError
 from .exceptions import CloudError, AuthenticationError, CertificateVerificationError
 from .interaction import ProgressBar
+from .utilities.url_routines import get_url, pack_url, post_url
 
 
 class CloudSession(object):
@@ -99,6 +100,7 @@ class CloudSession(object):
                 CloudSession._login_cache[domain] = {'requests': {}, 'request_lock': Lock()}
 
         self.domain = domain
+        self.enable_cache = True
 
         if verify is not None:
             self.verify = verify
@@ -180,7 +182,7 @@ class CloudSession(object):
         except HttpClientError:
             return False
 
-    def fetch_multiple(self, resources, per_call_kw=None, message=None, **kwargs):
+    def fetch_multiple(self, resources, per_call_kw=None, postprocess=None, message=None, **kwargs):
         """Fetch multiple resources in parallel.
 
         Up to concurrency max calls are in flight at a given time.  The results
@@ -207,7 +209,7 @@ class CloudSession(object):
 
         try:
             with ProgressBar(total=len(resources), message=message, leave=False) as progbar:
-                args = [(x, _merge_dicts(per_call_kw[i], kwargs), progbar) for i, x in enumerate(resources)]
+                args = [(x, _merge_dicts(per_call_kw[i], kwargs), progbar, postprocess, i) for i, x in enumerate(resources)]
                 wrapped_results = self.pool.map(self._resource_fetcher, args)
 
                 failed = [err for result, err in wrapped_results if err is not None]
@@ -355,35 +357,23 @@ class CloudSession(object):
             raise self._translate_error(err, msg="Error fetching resource from IOTile.cloud", url=resource.url())
 
     def _resource_fetcher(self, args):
-        resource, kwargs, progress = args
+        resource, kwargs, progress, postprocess, i = args
 
         try:
-            url = resource.url()
-            query_string = urlencode(kwargs)
-
-            cache_key = "%s?%s" % (url, query_string)
-            result = self._check_cache(cache_key)
+            request = pack_url(resource.url(), kwargs, token=self.token, token_type=self.token_type, verify=self.verify)
+            result = self._check_cache(request.request_key)
 
             if result is None:
-                headers = {b'Authorization': '{} {}'.format(self.token_type, self.token).encode('utf-8')}
-                req = Request(cache_key, headers=headers)
+                result = get_url(request)
+                self._cache_result(request.request_key, result)
 
-                if self.verify is False:
-                    context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-                    context.options |= ssl.OP_NO_SSLv2
-                    context.options |= ssl.OP_NO_SSLv3
-
-                    resp = urlopen(req, context=context)
-                else:
-                    resp = urlopen(req)
-
-                data = resp.read()
-                result = json.loads(data.decode('utf-8'))
-                self._cache_result(cache_key, result)
+            if postprocess is not None:
+                result = postprocess(i, result)
 
             progress.update(1)
             return result, None
         except Exception as err:  # pylint:disable=W0703; we do the exception processing in the calling function
+            self.logger.exception("Error fetching resource")
             return None, err
 
     def _generic_url_poster(self, args):
@@ -392,29 +382,8 @@ class CloudSession(object):
         url, data, headers, progress = args
 
         try:
-            # We must encode the URL to bytes rather than unicode otherwise:
-            # https://stackoverflow.com/a/8715815 will cause a unicode decode
-            # error on our *data*
-            # However, we must pass a normal string on python 3
-            # See: https://github.com/iotile/iotile_analytics/issues/47
-            if sys.version_info.major < 3:
-                url = url.encode('utf-8')
-            else:
-                headers = {key.decode('utf-8'): val.decode('utf-8') for key, val in iteritems(headers)}
-
-            req = Request(url, data, headers=headers)
-
-            if self.verify is False:
-                context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-                context.options |= ssl.OP_NO_SSLv2
-                context.options |= ssl.OP_NO_SSLv3
-
-                resp = urlopen(req, context=context)
-            else:
-                resp = urlopen(req)
-
-            resp_data = resp.read().decode('utf-8')
-            progress.update(1)
+            request = pack_url(url, headers=headers, verify=self.verify)
+            resp_data = post_url(request, data, progress=progress)
             return resp_data, None
         except Exception as err:  # pylint:disable=W0703; we do the exception processing in the calling function
             self.logger.exception("Error posting to url %s, headers=%s", url, headers)
@@ -426,32 +395,16 @@ class CloudSession(object):
         resource, page, page_size, kwargs, progress = args
 
         try:
-            url = resource.url()
             query = kwargs.copy()
             query['page_size'] = page_size
             query['page'] = page
-            query_string = urlencode(query)
 
-            cache_key = "%s?%s" % (url, query_string)
-            result = self._check_cache(cache_key)
+            request = pack_url(resource.url(), query, token=self.token, token_type=self.token_type, verify=self.verify)
+            result = self._check_cache(request.request_key)
 
             if result is None:
-                headers = {b'Authorization': '{} {}'.format(self.token_type, self.token).encode('utf-8')}
-                req = Request(cache_key, headers=headers)
-
-                if self.verify is False:
-                    context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-                    context.options |= ssl.OP_NO_SSLv2
-                    context.options |= ssl.OP_NO_SSLv3
-
-                    resp = urlopen(req, context=context)
-                else:
-                    resp = urlopen(req)
-
-                data = resp.read()
-                result = json.loads(data.decode('utf-8'))
-
-                self._cache_result(cache_key, result)
+                result = get_url(request)
+                self._cache_result(request.request_key, result)
 
             progress.update(1)
             return result, None
@@ -459,12 +412,18 @@ class CloudSession(object):
             return None, err
 
     def _cache_result(self, query, response):
+        if not self.enable_cache:
+            return
+
         cache = self._login_cache[self.domain]
 
         with cache['request_lock']:
             cache['requests'][query] = response
 
     def _check_cache(self, key):
+        if not self.enable_cache:
+            return None
+
         cache = self._login_cache[self.domain]
 
         with cache['request_lock']:

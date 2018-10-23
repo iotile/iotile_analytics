@@ -1,5 +1,15 @@
 # Release Notes
 
+## 0.5.0
+
+- Add incremental envelope calculation functions to handle accumulating a 
+  large number of arrays with smaller memory footprint.
+- Refactor threaded http routines to be iotile.cloud agnostic for use with
+  ReportUploader in iotile-analytics-interactive
+- Add support for Unattended mode in Environment class.  This triggers 
+  ProgressBar to not show realtime progress updates but instead to print a
+  single summary line with how long each operation took from start to finish.
+
 ## 0.4.6
 
 - Add support for Device Data Masks. If user sets a device mask on IOTile Cloud,

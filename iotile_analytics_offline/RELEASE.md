@@ -1,5 +1,10 @@
 # Release Notes
 
+## 0.2.3
+
+- Update compatibility with latest iotile-analytics-{core, interactive} changes
+  to support streaming report generation.
+
 ## 0.2.2
 
 - Adjust offline save format to allow loading files between python major versions.

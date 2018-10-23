@@ -6,6 +6,9 @@ import os
 import json
 import string
 import random
+from queue import Queue
+from iotile_analytics.core.interaction import ProgressBar
+from iotile_analytics.core.utilities.url_routines import pack_url, post_url
 from iotile_analytics.core import CloudSession
 from iotile_analytics.core.exceptions import UsageError, CloudError
 from typedargs.exceptions import ArgumentError
@@ -14,6 +17,25 @@ from typedargs.exceptions import ArgumentError
 class ReportUploader(object):
     """Upload a series of files to S3 using signed URLs.
 
+    There are two ways to use this class.  You can use the synchronous
+    all-in-one upload_report function that takes in a list of files, and
+    uploads them in one shot, or you can use the a-la-cart interface.
+
+    The synchronous interface is to just call `upload_report` and pass
+    it a list of paths to the files to upload.  It will synchronously
+    create a report object on iotile.cloud, upload all files and then
+    notify the cloud about our success.
+
+    The a-la-carte interface lets you perform these three steps yourself:
+
+    - create_report(): starts the report upload process, returning a report id.
+    - upload_file(): queues a file for background uploading and starts uploading
+      it immediately.  This function does not wait for the file upload to finish
+      but returns as soon as it has been queued.
+    - finish_report(): Waits for all outstanding file uploads to finish and
+      then tells iotile.cloud that we have finished uploading the report.
+
+
     Args:
         domain (str): The iotile.cloud instance that we should use. If
             not passed, this defaults to https://iotile.cloud
@@ -21,8 +43,11 @@ class ReportUploader(object):
 
     def __init__(self, domain=None):
         self._session = CloudSession(domain=domain)
-        self._api = self._session._api
+        self._api = self._session.get_api()
+        self._in_progress = Queue()
         self._logger = logging.getLogger(__name__)
+        self._progress = None
+        self._managed_progress = False
 
     def upload_report(self, label, files, report_id=None, group=None, slug=None):
         """Upload a report to iotile.cloud to attach to a device or archive.
@@ -50,34 +75,134 @@ class ReportUploader(object):
                 specify the slug of the object used to generate the report and
                 the slug of the organization that it should be uploaded for.
 
+        Returns:
+            str: A URL where the uploaded report can be accessed.
+        """
+
+        self._progress = ProgressBar(total=len(files) + 2, message="Uploading report to iotile.cloud")
+
+        try:
+            if report_id is None:
+                report_id = self.create_report(label, group=group, slug=slug)
+            else:
+                self._logger.debug("Reusing report id: %s", report_id)
+                self._progress.update(1)
+
+            keys = self._clean_file_paths(files)
+
+            for i, (key, path) in enumerate(zip(keys, files)):
+                public = i != 0
+
+                with open(path, "rb") as infile:
+                    data = infile.read()
+
+                self.upload_file(report_id, key, data, public)
+
+            self.finish_report(report_id, keys[0])
+        finally:
+            self._progress.close()
+            self._progress = None
+
+    def create_report(self, label, group=None, slug=None):
+        """Create a report record on iotile.cloud.
+
+        This synchronously notifies that cloud that we are going to be
+        uploading a report.  After this function returns you can call
+        upload_file repeatedly to upload each file in the report and then
+        after you are finished you can call finish_report() to finish the
+        report.
+
+        Args:
+            label (str): The human readable label for the report that you
+                are uploading.
+            group (AnalysisGroup): The analysis group that was used to generate
+                this report.  If this is not specified then you must explicitly
+                specify the slug of the object used to generate the report and
+                the slug of the organization that it should be uploaded for.
+            slug (str): Optional string to override the slug that would be inferred
+                from group.
+
+        Returns:
+            str: The report id of the report that was created.
+        """
+
+        if self._progress is not None:
+            self._progress.set_description("Creating report object")
+
+        if group is not None:
+            slug = group.source_info.get('slug')
+
+            if slug is None:
+                raise ArgumentError("The group provided did not have source slug information in its source_info",
+                                    slug=slug)
+        elif slug is None:
+            raise UsageError("If you do not specify an AnalysisGroup you must pass an org and a slug to this function",
+                             slug=slug)
+
+        org = self._get_org_slug(slug)
+        report_id = self._create_report(label, slug, org)
+        self._logger.debug("Created report id: %s", report_id)
+
+        if self._progress is not None:
+            self._progress.update(1)
+
+        return report_id
+
+    def finish_report(self, report_id, index_path):
+        """Notify the cloud that we have successfully finished uploading all files for a report.
+
+        The report should have been created by a previous call to create_report().
+
+        Args:
+            report_id (str): The report id returned from the call to create_report()
+            index_path (str): The file path passed to a previous call to upload_file()
+                that should be treated as the main entry point to this report.
+                This path is not cleaned in any way except that \\ characters are
+                converted to /.
 
         Returns:
             str: A URL where the uploaded report can be accessed.
         """
 
-        if report_id == None:
-            if group is not None:
-                slug = group.source_info.get('slug')
+        # Wait for all in_progress files to finish being uploaded
+        # call get to rethrow any exceptions.
 
-                if slug is None:
-                    raise ArgumentError("The group provided did not have source slug information in its source_info",
-                                        slug=slug)
-            elif slug is None:
-                raise UsageError(
-                    "If you do not specify an AnalysisGroup you must pass an org and a slug to this function",
-                    slug=slug)
+        if self._progress:
+            self._progress.set_description("Waiting for file uploads to finish")
 
-            org = self._get_org_slug(slug)
-            report_id = self._create_report(label, slug, org)
-            self._logger.debug("Created report id: %s", report_id)
-        else:
-            self._logger.debug("Reusing report id: %s", report_id)
+        while not self._in_progress.empty():
+            result = self._in_progress.get()
+            result.get()
 
-        keys = self._clean_file_paths(files)
+        if self._progress:
+            self._progress.set_description("Finalizing report on iotile.cloud")
 
-        urls, fields = self._get_signed_urls(report_id, keys)
-        self._upload_files_to_s3(urls, fields, keys, files)
-        self._notify_upload_success(report_id, keys[0])
+        key = self._clean_file_path(index_path)
+        index_url = self._notify_upload_success(report_id, key)
+
+        if self._progress:
+            self._progress.update(1)
+
+        return index_url
+
+    def upload_file(self, report_id, file_path, file_data, public=True):
+        """Upload a file asynchronously as part of this report.
+
+        This function will return immediately and queue the file for
+        background uploading.  All files are guaranteed to be uploaded
+        by the time a call to finish_report() returns.
+
+        Args:
+            report_id (str): The report id returned from the call to create_report()
+            file_path (str): The key that should be used for this file on s3.
+                This path is not cleaned in any way except that \\ characters are
+                converted to /.
+            file_data (bytes): The data that should be uploaded for this file.
+            public (bool): Whether this file should be protected or public.
+        """
+
+        result = self._session.pool.apply_async(self._upload_file, (report_id, file_path, file_data, public))
+        self._in_progress.put(result)
 
     def _get_org_slug(self, dev_or_block_slug):
         """Look up the org for a device or block."""
@@ -99,15 +224,17 @@ class ReportUploader(object):
     def _clean_file_paths(cls, files):
         """Return a suitable s3 keys for all files."""
 
-        first = files[0]
-        basedir = os.path.dirname(first)
-        if basedir is not None:
-            keys = [os.path.relpath(x, basedir) for x in files]
-        else:
-            keys = [x for x in files]
+        basedir = os.path.dirname(files[0])
+        return [cls._clean_file_path(x, basedir=basedir) for x in files]
 
-        keys = [x.replace('\\', '/') for x in keys]
-        return keys
+    @classmethod
+    def _clean_file_path(cls, path, basedir=None):
+        """Turn a local file path into an s3 key."""
+
+        if basedir is not None:
+            path = os.path.relpath(path, basedir)
+
+        return path.replace('\\', '/')
 
     def _create_report(self, label, slug, org):
         payload = {
@@ -125,18 +252,6 @@ class ReportUploader(object):
 
         return report_id
 
-    def _get_signed_urls(self, report_id, files):
-        url_infos = [self._get_signature_url_payload(report_id, x, i > 0) for i, x in enumerate(files)]
-
-        urls = [x[0] for x in url_infos]
-        payloads = [x[1] for x in url_infos]
-
-        resp_list = self._session.post_multiple(urls, payloads, message="Getting file upload authorization", include_auth=True)
-        decoded_resps = [json.loads(resp) for resp in resp_list]
-        urls = [x['url'] for x in decoded_resps]
-        fields = [x['fields'] for x in decoded_resps]
-        return urls, fields
-
     def _get_signature_url_payload(self, report_id, file_name, public=True):
 
         payload = {
@@ -147,7 +262,10 @@ class ReportUploader(object):
 
         resource = self._api.report.generated(report_id).uploadurl
 
-        return resource.url(), payload
+        payload_str = json.dumps(payload)
+        payload_bytes = payload_str.encode('utf-8')
+
+        return resource.url(), payload_bytes
 
     @classmethod
     def _get_mime_type(cls, filename):
@@ -170,24 +288,43 @@ class ReportUploader(object):
 
         return "application/octet-stream"
 
-    def _upload_files_to_s3(self, urls, fields, keys, files):
-        bodies = []
-        headers = []
-        for key, field, file_path in zip(keys, fields, files):
-            with open(file_path, "rb") as infile:
-                file_data = infile.read()
+    def _upload_file(self, report_id, file_path, file_data, public):
+        """Upload a file to s3.
 
-            file_info = {
-                'filename': key,
-                'mimetype': self._get_mime_type(key),
-                'content': file_data
-            }
+        This function will ask for a signed s3 url from iotile.cloud and
+        then immediately use it to upload a file to s3.  It is designed
+        to be called from a background thread using the CloudSession.pool
+        thread pool so that many uploads can proceed in parallel.
+        """
 
-            body, header = encode_multipart(field, {'file': file_info})
-            bodies.append(body)
-            headers.append(header)
+        key = self._clean_file_path(file_path)
+        url, payload = self._get_signature_url_payload(report_id, key, public)
 
-        self._session.post_multiple(urls, bodies, headers, message="Uploading report files", include_auth=False)
+        request = pack_url(url, token=self._api.token, token_type=self._api.token_type, json=True)
+
+        try:
+            encoded_resp = post_url(request, payload)
+            decoded_resp = json.loads(encoded_resp)
+            upload_url = decoded_resp['url']
+            upload_fields = decoded_resp['fields']
+        except:
+            self._logger.exception("Error posting payload URL")
+            raise
+
+        file_info = {
+            'filename': key,
+            'mimetype': self._get_mime_type(key),
+            'content': file_data
+        }
+
+        self._logger.debug("Uploading file to %s with key %s", upload_url, key)
+        body, headers = encode_multipart(upload_fields, {'file': file_info})
+
+        request = pack_url(upload_url, headers=headers)
+        post_url(request, body)
+
+        if self._progress is not None:
+            self._progress.update(1)
 
     def _notify_upload_success(self, report_id, file_path):
         payload = {
