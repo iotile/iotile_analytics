@@ -11,14 +11,14 @@ iotile.cloud.
 
 <!-- MarkdownTOC autolink="true" bracket="round"-->
 
-- [Requirements](#requirements)
-- [Installation](#installation)
-    - [\(optional\) Jupyter Setup](#optional-jupyter-setup)
-    - [\(optional\) Interactive Widgets](#optional-interactive-widgets)
-    - [\(optional\) Windows Python Installation](#optional-windows-python-installation)
-    - [\(optional\) Using Docker](#optional-using-docker)
-- [Basic Usage](#basic-usage)
-- [Documentation](#documentation)
+- [Requirements][requirements]
+- [Installation][installation]
+    - [\(optional\) Jupyter Setup][optional-jupyter-setup]
+    - [\(optional\) Interactive Widgets][optional-interactive-widgets]
+    - [\(optional\) Windows Python Installation][optional-windows-python-installation]
+    - [\(optional\) Using Docker][optional-using-docker]
+- [Basic Usage][basic-usage]
+- [Documentation][documentation]
 
 <!-- /MarkdownTOC -->
 
@@ -35,7 +35,6 @@ This package requires the following standard python data analysis packages:
 - numpy
 - pandas
 - matplotlib
-- bqplot
 
 They are installed automatically when you install `iotile_anlytics` but if you
 are running on Windows, you may want to download a prebuilt python distribution
