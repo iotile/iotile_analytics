@@ -21,6 +21,20 @@ class ReportUploader(object):
     all-in-one upload_report function that takes in a list of files, and
     uploads them in one shot, or you can use the a-la-cart interface.
 
+    The synchronous interface is to just call `upload_report` and pass
+    it a list of paths to the files to upload.  It will synchronously
+    create a report object on iotile.cloud, upload all files and then
+    notify the cloud about our success.
+
+    The a-la-carte interface lets you perform these three steps yourself:
+
+    - create_report(): starts the report upload process, returning a report id.
+    - upload_file(): queues a file for background uploading and starts uploading
+      it immediately.  This function does not wait for the file upload to finish
+      but returns as soon as it has been queued.
+    - finish_report(): Waits for all outstanding file uploads to finish and
+      then tells iotile.cloud that we have finished uploading the report.
+
 
     Args:
         domain (str): The iotile.cloud instance that we should use. If
@@ -145,6 +159,9 @@ class ReportUploader(object):
                 that should be treated as the main entry point to this report.
                 This path is not cleaned in any way except that \\ characters are
                 converted to /.
+
+        Returns:
+            str: A URL where the uploaded report can be accessed.
         """
 
         # Wait for all in_progress files to finish being uploaded
@@ -161,10 +178,12 @@ class ReportUploader(object):
             self._progress.set_description("Finalizing report on iotile.cloud")
 
         key = self._clean_file_path(index_path)
-        self._notify_upload_success(report_id, key)
+        index_url = self._notify_upload_success(report_id, key)
 
         if self._progress:
             self._progress.update(1)
+
+        return index_url
 
     def upload_file(self, report_id, file_path, file_data, public=True):
         """Upload a file asynchronously as part of this report.
