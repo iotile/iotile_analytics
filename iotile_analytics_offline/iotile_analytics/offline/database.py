@@ -385,7 +385,7 @@ class OfflineDatabase(object):
 
         return {'points': data_count, 'events': event_count}
 
-    def fetch_raw_events(self, slug):
+    def fetch_raw_events(self, slug, postprocess=None):
         """Fetch all raw event data for this stream.
 
         These are the raw json dictionaries that are stored for
@@ -394,6 +394,10 @@ class OfflineDatabase(object):
         Args:
             slug (str): The slug of the stream that we should fetch
                 raw events for.
+            postprocess (callable): (Optional) function to call on each raw event before
+                adding it to the dataframe.  The signature should be:
+                postprocess(i, data) where i is the row in the output dataframe and data
+                is the raw data.
 
         Returns:
             pd.DataFrame: All of the raw events.
@@ -408,6 +412,9 @@ class OfflineDatabase(object):
 
         enc_event_data = getattr(self._file.root.streams, name).raw_events.read()
         event_data = [self._decode_json(x) for x in enc_event_data]
+
+        if postprocess is not None:
+            event_data = [postprocess(i, x) for i, x in enumerate(event_data)]
 
         index = pd.to_datetime([x['timestamp'] for x in events], unit='ns')
         return pd.DataFrame(event_data, index=index)
@@ -441,6 +448,18 @@ class OfflineDatabase(object):
 
         vartypes = [self._decode_json(x) for x in enc_vartypes]
         return {x['slug']: x for x in vartypes if x['slug'] in slugs}
+
+    def set_caching(self, policy, param=None):
+        """Configure how this channel handling caching data that has been fetched.
+
+        Args:
+            policy (int): One of UNLIMITED_CACHE, LRU_CACHE or NO_CACHE.
+            param (object): Optional parameter that can configure the behavior of
+                the caching mode chosen.
+        """
+
+        raise NotImplementedError()
+
 
 
 # Register hook to silently close files at process exit
