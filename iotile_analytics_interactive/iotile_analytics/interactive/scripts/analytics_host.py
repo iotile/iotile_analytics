@@ -35,7 +35,7 @@ credentials, it can also run most analyses locally using predownloaded data
 that you have on your computer.
 
 The most up-to-date reference information is always available online at:
-http://iotile-analytics.readthedocs.io/en/latest/
+https://iotile.github.io/iotile_analytics/
 
 Most of the analysis templates included with analytics-host create interactive
 html web pages that embed graphs, controls and tables showing the results of
