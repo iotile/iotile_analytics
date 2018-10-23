@@ -411,25 +411,23 @@
 <span class="sd">            subkey (str): Only include a single key of the event.  This is usefuly for complex</span>
 <span class="sd">                events where you want to just focus on a portion of them.</span>
 <span class="sd">            postprocess (callable): (Optional) function to call on each raw event before</span>
-<span class="sd">                adding it to the dataframe.</span>
+<span class="sd">                adding it to the dataframe.  The function will be called as:</span>
+<span class="sd">                postprocess(i, data), where i is the index of the row in the final dataframe</span>
+<span class="sd">                and data is the raw data (or data[subkey] if subkey is not None) fetched.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            pd.DataFrame: The raw event object data fetched from iotile.cloud.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_stream</span><span class="p">(</span><span class="n">slug_or_name</span><span class="p">)</span>
-
-        <span class="n">raw_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span><span class="o">.</span><span class="n">fetch_raw_events</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">postprocess</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">raw_events</span>
+            <span class="n">postprocess</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
 
+        <span class="n">combined_postprocess</span> <span class="o">=</span> <span class="n">postprocess</span>
         <span class="k">if</span> <span class="n">subkey</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">postprocess</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">subkey</span><span class="p">])</span> <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">raw_events</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">postprocess</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">raw_events</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()]</span>
+            <span class="n">combined_postprocess</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">postprocess</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">subkey</span><span class="p">])</span>
 
-        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">raw_events</span><span class="o">.</span><span class="n">index</span><span class="p">)</span></div>
+        <span class="n">slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_stream</span><span class="p">(</span><span class="n">slug_or_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span><span class="o">.</span><span class="n">fetch_raw_events</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="n">combined_postprocess</span><span class="p">)</span></div>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_parse_stream_list</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">stream_list</span><span class="p">):</span>
@@ -580,7 +578,18 @@
 <span class="sd">            list(str): A list of the names that can be passed to save or FromSaved.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">iter_entry_points</span><span class="p">(</span><span class="s1">&#39;iotile_analytics.save_format&#39;</span><span class="p">)]</span></div></div>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">iter_entry_points</span><span class="p">(</span><span class="s1">&#39;iotile_analytics.save_format&#39;</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="AnalysisGroup.set_caching"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.set_caching">[docs]</a>    <span class="k">def</span> <span class="nf">set_caching</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configure how this channel handling caching data that has been fetched.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            policy (int): One of UNLIMITED_CACHE, LRU_CACHE or NO_CACHE.</span>
+<span class="sd">            param (object): Optional parameter that can configure the behavior of</span>
+<span class="sd">                the caching mode chosen.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span><span class="o">.</span><span class="n">set_caching</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
@@ -593,7 +602,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -612,21 +621,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

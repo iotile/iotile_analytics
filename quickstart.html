@@ -178,7 +178,7 @@ that either embed data and plots or reference local data files that can be
 accessed without needing a web server.</p>
 <div class="admonition important">
 <p class="first admonition-title">Important</p>
-<p class="last">Download <a class="reference download internal" href="_downloads/thermo_device.hdf5" download=""><code class="xref download docutils literal notranslate"><span class="pre">thermo_device.hdf5</span></code></a> to use
+<p class="last">Download <a class="reference download internal" download="" href="_downloads/b72051fea6d177143af72401f2845434/thermo_device.hdf5"><code class="xref download docutils literal notranslate"><span class="pre">thermo_device.hdf5</span></code></a> to use
 as source data and place it in your current working directory.</p>
 </div>
 <p>The quickest way to generate a live report is to use the <code class="docutils literal notranslate"><span class="pre">analytics-host</span></code> command
@@ -315,7 +315,6 @@ temperature data.  Again, we’ll look more in depth later at how to configure t
 command, for now we just want to look at the report output (which will be saved
 as <code class="docutils literal notranslate"><span class="pre">temperature.html</span></code> because we pass <code class="docutils literal notranslate"><span class="pre">-o</span> <span class="pre">temperature</span></code>).</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ analytics-host -t stream_overview ./thermo_device.hdf5 -a stream=temp -c -o temperature -a units=Celsius
-Rendered report to: temperature.html
 </pre></div>
 </div>
 <p>You should have a file in your local directory named <code class="docutils literal notranslate"><span class="pre">temperature.html</span></code>, which
@@ -334,7 +333,7 @@ the data.  You just took your first steps interacting with sensor data using
 <code class="docutils literal notranslate"><span class="pre">iotile-analytics</span></code>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">If you weren’t able to run the command you download <a class="reference download internal" href="_downloads/temperature.html" download=""><code class="xref download docutils literal notranslate"><span class="pre">temperature.html</span></code></a>
+<p class="last">If you weren’t able to run the command you download <a class="reference download internal" download="" href="_downloads/2af07de533382be64c053b3ad6f9ee15/temperature.html"><code class="xref download docutils literal notranslate"><span class="pre">temperature.html</span></code></a>
 and open it locally to see what the command would have generated.</p>
 </div>
 </div>
@@ -366,16 +365,16 @@ Parameters:
    pass a value like &#39;days&#39;, &#39;hours&#39;, &#39;weeks&#39;, &#39;months&#39;.  This will be given to
    TimeSelectViewer so any valid value there is acceptable here.  Defaults to
    days.
- - stream (str):
-   A unique identifier for the stream that we wish to download and display.
-   This can be anything that could be passed to AnalysisGroup.fetch_stream
-   including a 4-character variable ID, a partial string that matches the label
-   of the stream, etc.
  - mdo (list(float)):
    An optional MDO to use to convert the data stored in this stream.  If passed
    this must be 3 float values that define a linear transformation of the data
    stored in the stream. The values are interpreted as m/d*value + o where the
    argument is specified as [m, d, o].
+ - stream (str):
+   A unique identifier for the stream that we wish to download and display.
+   This can be anything that could be passed to AnalysisGroup.fetch_stream
+   including a 4-character variable ID, a partial string that matches the label
+   of the stream, etc.
  - units (str):
    The desired units in which you want to see the data.  This must be defined as
    an available output unit on the stream.  If not passed, the default is to use
@@ -448,7 +447,7 @@ needing internet access.  In fact this how we generated the file
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -467,21 +466,14 @@ needing internet access.  In fact this how we generated the file
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

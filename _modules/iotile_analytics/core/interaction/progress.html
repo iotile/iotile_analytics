@@ -147,8 +147,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for iotile_analytics.core.interaction.progress</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">..environment</span> <span class="k">import</span> <span class="n">Environment</span>
-<span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">InternalError</span>
+<span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">..environment</span> <span class="k">import</span> <span class="n">Environment</span>
 
 
 <div class="viewcode-block" id="ProgressBar"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.interaction.progress.html#iotile_analytics.core.interaction.progress.ProgressBar">[docs]</a><span class="k">class</span> <span class="nc">ProgressBar</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -163,13 +163,20 @@
             <span class="k">if</span> <span class="n">message</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_bar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">disable</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">env</span><span class="o">.</span><span class="n">interactivity</span> <span class="o">==</span> <span class="n">Environment</span><span class="o">.</span><span class="n">Unattended</span><span class="p">:</span>
+                <span class="n">disable</span> <span class="o">=</span> <span class="kc">True</span>
+
             <span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">total</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="n">leave</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">total</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="n">leave</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="n">disable</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">message</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_bar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">=</span> <span class="n">total</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print_summary</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">interactivity</span> <span class="o">==</span> <span class="n">Environment</span><span class="o">.</span><span class="n">Unattended</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_message</span> <span class="o">=</span> <span class="n">message</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -182,13 +189,32 @@
 <div class="viewcode-block" id="ProgressBar.update"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.interaction.progress.html#iotile_analytics.core.interaction.progress.ProgressBar.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="ProgressBar.close"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.interaction.progress.html#iotile_analytics.core.interaction.progress.ProgressBar.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print_summary_line</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProgressBar.set_description"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.interaction.progress.html#iotile_analytics.core.interaction.progress.ProgressBar.set_description">[docs]</a>    <span class="k">def</span> <span class="nf">set_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bar</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_bar</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bar</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print_summary_line</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_print_summary_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print_summary</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message</span>
+            <span class="k">if</span> <span class="n">message</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Unnamed&quot;</span>
+
+            <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Operation &#39;</span><span class="si">%s</span><span class="s2">&#39; took </span><span class="si">%.1f</span><span class="s2"> seconds&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">total</span><span class="p">))</span></div>
 </pre></div>
 
            </div>
@@ -201,7 +227,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -220,21 +246,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

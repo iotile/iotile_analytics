@@ -193,7 +193,7 @@
 <dl class="class">
 <dt id="iotile_analytics.interactive.viewer_base.BaseViewer">
 <em class="property">class </em><code class="descclassname">iotile_analytics.interactive.viewer_base.</code><code class="descname">BaseViewer</code><span class="sig-paren">(</span><em>size=None</em>, <em>x_type='auto'</em>, <em>y_type='auto'</em>, <em>fixed_y=None</em>, <em>y_name=None</em>, <em>x_label=None</em>, <em>y_label=None</em>, <em>y_color=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/viewer_base.html#BaseViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.viewer_base.BaseViewer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A simple interface to plot data.</p>
 <p>Internally this object wraps a bqplot Figure object and provides
 reasonable defaults for all of the settings, while passing through access
@@ -203,18 +203,18 @@ to traits that you may want to update later.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a>) – Optional tuple of (width, height) as integers in pixels
+<li><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a>) – Optional tuple of (width, height) as integers in pixels
 if you wish this viewer to have a fixed size</li>
 <li><strong>x_type</strong> (<em>'auto'</em><em>, </em><em>'linear'</em><em>, </em><em>'log'</em><em>, </em><em>'datetime'</em>) – Whether we should create a
 log, linear, or time viewer.</li>
 <li><strong>y_type</strong> (<em>'auto'</em><em>, </em><em>'linear'</em><em>, </em><em>'log'</em><em>, </em><em>'datetime'</em>) – What scaling type to use for
 the y axis.</li>
-<li><strong>fixed_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a>) – Optional tuple to use a fixed y axis.</li>
-<li><strong>y_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Optional name for the default y axis so that we can refer to it
+<li><strong>fixed_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a>) – Optional tuple to use a fixed y axis.</li>
+<li><strong>y_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional name for the default y axis so that we can refer to it
 if there are multiple axes included in the plot.</li>
-<li><strong>x_label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The label for the x axis</li>
-<li><strong>y_label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The label for the default y axis</li>
-<li><strong>tools</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A list of tools to be added to the toolbar.  If these are passed then
+<li><strong>x_label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The label for the x axis</li>
+<li><strong>y_label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The label for the default y axis</li>
+<li><strong>tools</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – A list of tools to be added to the toolbar.  If these are passed then
 the toolbar is shown by default above the plot. If no tools are passed the default
 behavior is to associate no tools wtih the viewer.</li>
 </ul>
@@ -231,8 +231,8 @@ behavior is to associate no tools wtih the viewer.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>axis_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Either x or y for an x or y axis</li>
-<li><strong>axis_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the axis if there are multiple
+<li><strong>axis_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Either x or y for an x or y axis</li>
+<li><strong>axis_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the axis if there are multiple
 axis choices.  If you want the default axis, pass None.</li>
 <li><strong>ticker</strong> (<em>bokey.models.tickers.Ticker</em>) – The ticker to use
 to generate ticks.</li>
@@ -254,8 +254,8 @@ to use to generate names for major ticks.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the axis that we wish to adjust.</li>
-<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The axis label that we would like to set.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the axis that we wish to adjust.</li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The axis label that we would like to set.</li>
 </ul>
 </td>
 </tr>
@@ -283,11 +283,11 @@ color_yaxis.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A unique name for this axis.</li>
-<li><strong>y_range</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><em>min</em><em>, </em><em>max</em><em>)</em>) – A tuple with explicit min/max range for this axis.</li>
-<li><strong>location</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The location for the axis, one of left or right.</li>
-<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The optional label to use for the axis.</li>
-<li><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – An optional color that is used to color all aspects of the axis.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A unique name for this axis.</li>
+<li><strong>y_range</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a><em>(</em><em>min</em><em>, </em><em>max</em><em>)</em>) – A tuple with explicit min/max range for this axis.</li>
+<li><strong>location</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The location for the axis, one of left or right.</li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The optional label to use for the axis.</li>
+<li><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – An optional color that is used to color all aspects of the axis.</li>
 </ul>
 </td>
 </tr>
@@ -324,29 +324,29 @@ x_data argument.</li>
 <li><strong>x_data</strong> (<em>ndarray</em>) – An array of explicit x_values.  This can only be
 passed if data is a 1D ndarray that is then interpreted as y
 values.</li>
-<li><strong>x_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Optional explicit x column name if data is a
+<li><strong>x_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional explicit x column name if data is a
 ColumnDataSource, defaults to x.</li>
-<li><strong>y_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Optional explicit y column name is data is a
+<li><strong>y_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional explicit y column name is data is a
 ColumnDataSource, defaults to y.</li>
-<li><strong>y_axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Optional name for the y axis that should be used to
+<li><strong>y_axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional name for the y axis that should be used to
 plot this line.  If this is specified then the line is colored
 with the same color as the axis.</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Optional name for this data series.  This is used to
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional name for this data series.  This is used to
 name the columns in self.source and also used to stream
 updates by name.  If this is None, it defaults to series_N
 where N is incremented for each new add_series call.</li>
-<li><strong>mark</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The type of mark to add.  Valid types strings are:
+<li><strong>mark</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The type of mark to add.  Valid types strings are:
 line, scatter, bars</li>
-<li><strong>bar_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – For bar marks, the width of the bars.</li>
-<li><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Explicitly set the color of this line to the color
+<li><strong>bar_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – For bar marks, the width of the bars.</li>
+<li><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Explicitly set the color of this line to the color
 specified.  This overrides any default color that might be set
 based on the y_axis that is used.</li>
-<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Show this line in the legend and use the following legend
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Show this line in the legend and use the following legend
 string for it.</li>
-<li><strong>alpha_with_line</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Make the glyphs themselves transparent with this
+<li><strong>alpha_with_line</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Make the glyphs themselves transparent with this
 alpha value and include a fully opaque outline in the same color.  This
 only applies to scatter and bars type charts.</li>
-<li><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – For scatter plots, the screen space unit size of the markers.</li>
+<li><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – For scatter plots, the screen space unit size of the markers.</li>
 </ul>
 </td>
 </tr>
@@ -358,7 +358,7 @@ only applies to scatter and bars type charts.</li>
 </p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>, Renderer</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>, Renderer</p>
 </td>
 </tr>
 </tbody>
@@ -374,7 +374,7 @@ only applies to scatter and bars type charts.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the series added previously in add_series.
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the series added previously in add_series.
 If the name was autogenerated by add_series, it would have been
 returned from that function.</li>
 <li><strong>data</strong> (<em>ndarray</em><em> or </em><em>pd.Series</em>) – An array of values to plot.  If data
@@ -384,7 +384,7 @@ pass the x values explicitly using the x_data argument.</li>
 <li><strong>x_data</strong> (<em>ndarray</em>) – An array of explicit x_values.  This can only be
 passed if data is a 1D ndarray that is then interpreted as y
 values.</li>
-<li><strong>rollover</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – An optional maximum length for the columns to grow.
+<li><strong>rollover</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – An optional maximum length for the columns to grow.
 If you specify this, only the last rollover values will be kept.
 This allows you to create continously updating plots by just streaming
 new values as they become available.</li>
@@ -420,7 +420,7 @@ new values as they become available.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -439,21 +439,14 @@ new values as they become available.</li>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

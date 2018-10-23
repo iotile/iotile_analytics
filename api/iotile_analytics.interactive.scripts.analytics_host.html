@@ -184,8 +184,14 @@
 <tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.interactive.scripts.analytics_host.build_args" title="iotile_analytics.interactive.scripts.analytics_host.build_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_args</span></code></a></td>
 <td>Create a command line parser.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#iotile_analytics.interactive.scripts.analytics_host.check_arguments" title="iotile_analytics.interactive.scripts.analytics_host.check_arguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_arguments</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#iotile_analytics.interactive.scripts.analytics_host.build_file_handler" title="iotile_analytics.interactive.scripts.analytics_host.build_file_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_file_handler</span></code></a></td>
+<td>Build the appropriate file handler for the AnalysisTemplate’s output.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.interactive.scripts.analytics_host.check_arguments" title="iotile_analytics.interactive.scripts.analytics_host.check_arguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_arguments</span></code></a></td>
 <td>Check and optionally explicitly confirm the arguments that will be used.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#iotile_analytics.interactive.scripts.analytics_host.check_output_settings" title="iotile_analytics.interactive.scripts.analytics_host.check_output_settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_output_settings</span></code></a></td>
+<td>Verify that the combination of output settings is valid.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.interactive.scripts.analytics_host.cmdline_main" title="iotile_analytics.interactive.scripts.analytics_host.cmdline_main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cmdline_main</span></code></a></td>
 <td>Wrapper around main that catches exceptions and prints them nicely.</td>
@@ -214,9 +220,6 @@
 <tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.interactive.scripts.analytics_host.split_args" title="iotile_analytics.interactive.scripts.analytics_host.split_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_args</span></code></a></td>
 <td>Split name=value in a dictionary.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#iotile_analytics.interactive.scripts.analytics_host.upload_report" title="iotile_analytics.interactive.scripts.analytics_host.upload_report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upload_report</span></code></a></td>
-<td>Upload a report to iotile.cloud.</td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -238,12 +241,6 @@
 <dt id="iotile_analytics.interactive.scripts.analytics_host.setup_logging">
 <code class="descclassname">iotile_analytics.interactive.scripts.analytics_host.</code><code class="descname">setup_logging</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/scripts/analytics_host.html#setup_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.scripts.analytics_host.setup_logging" title="Permalink to this definition">¶</a></dt>
 <dd><p>Setup log level and output.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="iotile_analytics.interactive.scripts.analytics_host.upload_report">
-<code class="descclassname">iotile_analytics.interactive.scripts.analytics_host.</code><code class="descname">upload_report</code><span class="sig-paren">(</span><em>domain</em>, <em>files</em>, <em>label=None</em>, <em>group=None</em>, <em>slug=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/scripts/analytics_host.html#upload_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.scripts.analytics_host.upload_report" title="Permalink to this definition">¶</a></dt>
-<dd><p>Upload a report to iotile.cloud.</p>
 </dd></dl>
 
 <dl class="function">
@@ -271,6 +268,18 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="iotile_analytics.interactive.scripts.analytics_host.check_output_settings">
+<code class="descclassname">iotile_analytics.interactive.scripts.analytics_host.</code><code class="descname">check_output_settings</code><span class="sig-paren">(</span><em>report_class</em>, <em>output_path</em>, <em>bundle</em>, <em>web_push</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/scripts/analytics_host.html#check_output_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.scripts.analytics_host.check_output_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verify that the combination of output settings is valid.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="iotile_analytics.interactive.scripts.analytics_host.build_file_handler">
+<code class="descclassname">iotile_analytics.interactive.scripts.analytics_host.</code><code class="descname">build_file_handler</code><span class="sig-paren">(</span><em>output_path</em>, <em>standalone</em>, <em>bundle</em>, <em>web_push</em>, <em>label</em>, <em>group</em>, <em>slug</em>, <em>domain</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/scripts/analytics_host.html#build_file_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.scripts.analytics_host.build_file_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the appropriate file handler for the AnalysisTemplate’s output.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="iotile_analytics.interactive.scripts.analytics_host.split_args">
 <code class="descclassname">iotile_analytics.interactive.scripts.analytics_host.</code><code class="descname">split_args</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/scripts/analytics_host.html#split_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.scripts.analytics_host.split_args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Split name=value in a dictionary.</p>
@@ -278,7 +287,7 @@
 
 <dl class="function">
 <dt id="iotile_analytics.interactive.scripts.analytics_host.perform_analysis">
-<code class="descclassname">iotile_analytics.interactive.scripts.analytics_host.</code><code class="descname">perform_analysis</code><span class="sig-paren">(</span><em>report_class</em>, <em>group</em>, <em>output_path=None</em>, <em>args=None</em>, <em>bundle=False</em>, <em>domain=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/scripts/analytics_host.html#perform_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.scripts.analytics_host.perform_analysis" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">iotile_analytics.interactive.scripts.analytics_host.</code><code class="descname">perform_analysis</code><span class="sig-paren">(</span><em>report_class</em>, <em>group</em>, <em>output_path=None</em>, <em>handler=None</em>, <em>args=None</em>, <em>domain=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/scripts/analytics_host.html#perform_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.scripts.analytics_host.perform_analysis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save the results of an AnalysisTemplate to an output path or the console.</p>
 </dd></dl>
 
@@ -315,7 +324,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -334,21 +343,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

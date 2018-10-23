@@ -14,6 +14,7 @@ Key Functions and Classes
 .. autosummary::
     :nosignatures:
 
+    ~iotile_analytics.core.channels.channel.ChannelCaching
     ~iotile_analytics.core.channels.cloud_api.IOTileCloudChannel
     
 

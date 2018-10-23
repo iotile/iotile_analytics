@@ -152,14 +152,15 @@
 <div class="viewcode-block" id="SaveOfflineReport"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.report.html#iotile_analytics.offline.report.SaveOfflineReport">[docs]</a><span class="k">class</span> <span class="nc">SaveOfflineReport</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Save all data locally as an HDF5 database file.&quot;&quot;&quot;</span>
 
+    <span class="c1"># Standalone reports are those that can be serialized to a single file or the console</span>
+    <span class="c1"># since we don&#39;t support console serializaiton, we are not standalone</span>
+    <span class="n">standalone</span> <span class="o">=</span> <span class="kc">False</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="n">group</span>
 
-        <span class="c1"># Standalone reports are those that can be serialized to a single file or the console</span>
-        <span class="c1"># since we don&#39;t support console serializaiton, we are not standalone</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">standalone</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="SaveOfflineReport.run"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.report.html#iotile_analytics.offline.report.SaveOfflineReport.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+<div class="viewcode-block" id="SaveOfflineReport.run"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.report.html#iotile_analytics.offline.report.SaveOfflineReport.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">file_handler</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Render this report to output_path.</span>
 
 <span class="sd">        Args:</span>
@@ -187,7 +188,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -206,21 +207,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

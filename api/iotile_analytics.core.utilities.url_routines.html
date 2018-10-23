@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.core.utilities.url_routines module &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="iotile_analytics.offline package" href="iotile_analytics.offline.html" />
+    <link rel="prev" title="iotile_analytics.core.utilities.envelope module" href="iotile_analytics.core.utilities.envelope.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="iotile_analytics.core.html">iotile_analytics.core package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.html#key-functions-and-classes">Key Functions and Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.core.html#submodules">Submodules</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="iotile_analytics.core.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.core.channels.html">iotile_analytics.core.channels package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.core.interaction.html">iotile_analytics.core.interaction package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="iotile_analytics.core.utilities.html">iotile_analytics.core.utilities package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iotile_analytics.offline.html">iotile_analytics.offline package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iotile_analytics.interactive.html">iotile_analytics.interactive package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="iotile_analytics.core.html">iotile_analytics.core package</a> &raquo;</li>
+        
+          <li><a href="iotile_analytics.core.utilities.html">iotile_analytics.core.utilities package</a> &raquo;</li>
+        
+      <li>iotile_analytics.core.utilities.url_routines module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/iotile_analytics.core.utilities.url_routines.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-iotile_analytics.core.utilities.url_routines">
+<span id="iotile-analytics-core-utilities-url-routines-module"></span><h1>iotile_analytics.core.utilities.url_routines module<a class="headerlink" href="#module-iotile_analytics.core.utilities.url_routines" title="Permalink to this headline">¶</a></h1>
+<p>Thread-safe and parallelizable URL fetch and post routines based on urllib.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.core.utilities.url_routines.RequestInfo" title="iotile_analytics.core.utilities.url_routines.RequestInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RequestInfo</span></code></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Functions:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.core.utilities.url_routines.get_url" title="iotile_analytics.core.utilities.url_routines.get_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_url</span></code></a></td>
+<td>Method for fetching a url in a worker thread.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#iotile_analytics.core.utilities.url_routines.pack_url" title="iotile_analytics.core.utilities.url_routines.pack_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pack_url</span></code></a></td>
+<td>Create a RequestInfo object for passing to {get, post}_url.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.core.utilities.url_routines.post_url" title="iotile_analytics.core.utilities.url_routines.post_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">post_url</span></code></a></td>
+<td>Method for posting to an arbitrary URL with data.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="iotile_analytics.core.utilities.url_routines.RequestInfo">
+<em class="property">class </em><code class="descclassname">iotile_analytics.core.utilities.url_routines.</code><code class="descname">RequestInfo</code><span class="sig-paren">(</span><em>url</em>, <em>query_string</em>, <em>request_key</em>, <em>headers</em>, <em>verify</em><span class="sig-paren">)</span><a class="headerlink" href="#iotile_analytics.core.utilities.url_routines.RequestInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<dl class="attribute">
+<dt id="iotile_analytics.core.utilities.url_routines.RequestInfo.headers">
+<code class="descname">headers</code><a class="headerlink" href="#iotile_analytics.core.utilities.url_routines.RequestInfo.headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iotile_analytics.core.utilities.url_routines.RequestInfo.query_string">
+<code class="descname">query_string</code><a class="headerlink" href="#iotile_analytics.core.utilities.url_routines.RequestInfo.query_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iotile_analytics.core.utilities.url_routines.RequestInfo.request_key">
+<code class="descname">request_key</code><a class="headerlink" href="#iotile_analytics.core.utilities.url_routines.RequestInfo.request_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iotile_analytics.core.utilities.url_routines.RequestInfo.url">
+<code class="descname">url</code><a class="headerlink" href="#iotile_analytics.core.utilities.url_routines.RequestInfo.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iotile_analytics.core.utilities.url_routines.RequestInfo.verify">
+<code class="descname">verify</code><a class="headerlink" href="#iotile_analytics.core.utilities.url_routines.RequestInfo.verify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="iotile_analytics.core.utilities.url_routines.pack_url">
+<code class="descclassname">iotile_analytics.core.utilities.url_routines.</code><code class="descname">pack_url</code><span class="sig-paren">(</span><em>url</em>, <em>query_args=None</em>, <em>token=None</em>, <em>token_type='jwt'</em>, <em>headers=None</em>, <em>verify=True</em>, <em>json=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/utilities/url_routines.html#pack_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.utilities.url_routines.pack_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a RequestInfo object for passing to {get, post}_url.</p>
+<p>This function must be called before calling get_url or post_url.
+It encodes the query string and any required headers for the call.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The URL that we want to access.</li>
+<li><strong>query_args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A map of string: string for the query arguments that should
+be packed into the query string.</li>
+<li><strong>token</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional iotile.cloud token to include as an authentication header.
+This should be set if you are making an API call on iotile.cloud and not
+set if you are not interacting with iotile.cloud.</li>
+<li><strong>token_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The type of token you have.  This is normally ‘jwt’ (the default),
+but if you have a permanent machine token you should specify ‘a-jwt’ instead.</li>
+<li><strong>headers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – An optional dict of str-&gt;str for any additional headers that should
+be included in this request.</li>
+<li><strong>verify</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether to verify the SSL certificate of the https request being made.</li>
+<li><strong>json</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether there are posted contents that are JSON type.  This will add a
+Content-Type header.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An encoded object that can be used to make a call to get_url or post_url.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#iotile_analytics.core.utilities.url_routines.RequestInfo" title="iotile_analytics.core.utilities.url_routines.RequestInfo">RequestInfo</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iotile_analytics.core.utilities.url_routines.get_url">
+<code class="descclassname">iotile_analytics.core.utilities.url_routines.</code><code class="descname">get_url</code><span class="sig-paren">(</span><em>request_info</em>, <em>progress=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/utilities/url_routines.html#get_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.utilities.url_routines.get_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for fetching a url in a worker thread.</p>
+<p>This function will do an HTTP(s) GET.  This method assumes that the
+URL contents will be a JSON blob that it automatically decodes into
+a dict.</p>
+<p>It works correctly on python 2.7 and python 3 and has proper support for
+TLS with an option to disable verification of the TLS certificate for
+testing purposes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request_info</strong> (<a class="reference internal" href="#iotile_analytics.core.utilities.url_routines.RequestInfo" title="iotile_analytics.core.utilities.url_routines.RequestInfo"><em>RequestInfo</em></a>) – The result of a previous call to pack_url
+to produce a RequireInfo object.</li>
+<li><strong>progress</strong> (<em>tqdm</em>) – An optional progress bar that will be updated when this
+function completes.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The decoded dictionary from the JSON response of this GET.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iotile_analytics.core.utilities.url_routines.post_url">
+<code class="descclassname">iotile_analytics.core.utilities.url_routines.</code><code class="descname">post_url</code><span class="sig-paren">(</span><em>request_info</em>, <em>data</em>, <em>progress=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/utilities/url_routines.html#post_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.utilities.url_routines.post_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for posting to an arbitrary URL with data.</p>
+<p>This function will do an HTTP(s) post with data.</p>
+<p>It works correctly on python 2.7 and python 3 and has proper support for
+TLS with an option to disable verification of the TLS certificate for
+testing purposes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request_info</strong> (<a class="reference internal" href="#iotile_analytics.core.utilities.url_routines.RequestInfo" title="iotile_analytics.core.utilities.url_routines.RequestInfo"><em>RequestInfo</em></a>) – The result of a previous call to pack_url
+to produce a RequireInfo object.</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a>) – The raw data that we would like to post.</li>
+<li><strong>progress</strong> (<em>tqdm</em>) – An optional progress bar that will be updated when this
+function completes.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>The utf-8 decoded response of the POST.</p>
+<p>This will be a str on python 3 and a unicode object on python 2.</p>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a> or unicode</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="iotile_analytics.offline.html" class="btn btn-neutral float-right" title="iotile_analytics.offline package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="iotile_analytics.core.utilities.envelope.html" class="btn btn-neutral" title="iotile_analytics.core.utilities.envelope module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

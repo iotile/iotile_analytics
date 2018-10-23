@@ -534,7 +534,7 @@
 
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;points&#39;</span><span class="p">:</span> <span class="n">data_count</span><span class="p">,</span> <span class="s1">&#39;events&#39;</span><span class="p">:</span> <span class="n">event_count</span><span class="p">}</span>
 
-<div class="viewcode-block" id="OfflineDatabase.fetch_raw_events"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.fetch_raw_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_raw_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+<div class="viewcode-block" id="OfflineDatabase.fetch_raw_events"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.fetch_raw_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_raw_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fetch all raw event data for this stream.</span>
 
 <span class="sd">        These are the raw json dictionaries that are stored for</span>
@@ -543,6 +543,10 @@
 <span class="sd">        Args:</span>
 <span class="sd">            slug (str): The slug of the stream that we should fetch</span>
 <span class="sd">                raw events for.</span>
+<span class="sd">            postprocess (callable): (Optional) function to call on each raw event before</span>
+<span class="sd">                adding it to the dataframe.  The signature should be:</span>
+<span class="sd">                postprocess(i, data) where i is the row in the output dataframe and data</span>
+<span class="sd">                is the raw data.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            pd.DataFrame: All of the raw events.</span>
@@ -557,6 +561,9 @@
 
         <span class="n">enc_event_data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">raw_events</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">event_data</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_decode_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">enc_event_data</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">postprocess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">event_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">postprocess</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">event_data</span><span class="p">)]</span>
 
         <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">events</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">event_data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span></div>
@@ -589,7 +596,19 @@
         <span class="n">enc_vartypes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">vartype_definitions</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
         <span class="n">vartypes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_decode_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">enc_vartypes</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">vartypes</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">slugs</span><span class="p">}</span></div></div>
+        <span class="k">return</span> <span class="p">{</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">vartypes</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">slugs</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="OfflineDatabase.set_caching"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.set_caching">[docs]</a>    <span class="k">def</span> <span class="nf">set_caching</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configure how this channel handling caching data that has been fetched.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            policy (int): One of UNLIMITED_CACHE, LRU_CACHE or NO_CACHE.</span>
+<span class="sd">            param (object): Optional parameter that can configure the behavior of</span>
+<span class="sd">                the caching mode chosen.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
+
 
 
 <span class="c1"># Register hook to silently close files at process exit</span>
@@ -640,7 +659,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -659,21 +678,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

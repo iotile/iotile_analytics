@@ -149,6 +149,11 @@
   <h1>Source code for iotile_analytics.core.channels.channel</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Methods by which AnalysisGroup objects can find and download streams.&quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="ChannelCaching"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.channel.html#iotile_analytics.core.channels.channel.ChannelCaching">[docs]</a><span class="k">class</span> <span class="nc">ChannelCaching</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">UNLIMITED</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">LRU</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">NONE</span> <span class="o">=</span> <span class="mi">2</span></div>
+
 
 <div class="viewcode-block" id="AnalysisGroupChannel"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.channel.html#iotile_analytics.core.channels.channel.AnalysisGroupChannel">[docs]</a><span class="k">class</span> <span class="nc">AnalysisGroupChannel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A delegate object that can find and download streams.</span>
@@ -215,7 +220,7 @@
 
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="AnalysisGroupChannel.fetch_raw_events"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.channel.html#iotile_analytics.core.channels.channel.AnalysisGroupChannel.fetch_raw_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_raw_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+<div class="viewcode-block" id="AnalysisGroupChannel.fetch_raw_events"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.channel.html#iotile_analytics.core.channels.channel.AnalysisGroupChannel.fetch_raw_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_raw_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fetch all raw event data for this stream.</span>
 
 <span class="sd">        These are the raw json dictionaries that are stored for</span>
@@ -224,6 +229,9 @@
 <span class="sd">        Args:</span>
 <span class="sd">            slug (str): The slug of the stream that we should fetch</span>
 <span class="sd">                raw events for.</span>
+<span class="sd">            postprocess (callable): Function that should be applied to each</span>
+<span class="sd">                raw event before adding to the dataframe.  This should</span>
+<span class="sd">                take in a dict and return a dict.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            pd.DataFrame: All of the raw events.</span>
@@ -267,6 +275,17 @@
 <span class="sd">                point data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AnalysisGroupChannel.set_caching"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.channel.html#iotile_analytics.core.channels.channel.AnalysisGroupChannel.set_caching">[docs]</a>    <span class="k">def</span> <span class="nf">set_caching</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configure how this channel handling caching data that has been fetched.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            policy (int): One of UNLIMITED_CACHE, LRU_CACHE or NO_CACHE.</span>
+<span class="sd">            param (object): Optional parameter that can configure the behavior of</span>
+<span class="sd">                the caching mode chosen.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
 </pre></div>
 
@@ -280,7 +299,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -299,21 +318,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

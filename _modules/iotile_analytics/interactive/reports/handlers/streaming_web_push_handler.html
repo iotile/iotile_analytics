@@ -1,0 +1,265 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.interactive.reports.handlers.streaming_web_push_handler &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+
+  
+  <script src="../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>iotile_analytics.interactive.reports.handlers.streaming_web_push_handler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for iotile_analytics.interactive.reports.handlers.streaming_web_push_handler</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Report File Handler that streams each file to the cloud as generated.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">..cloud_uploader</span> <span class="k">import</span> <span class="n">ReportUploader</span>
+<span class="kn">from</span> <span class="nn">.base_handler</span> <span class="k">import</span> <span class="n">FileHandler</span>
+
+
+<div class="viewcode-block" id="StreamingWebPushHandler"><a class="viewcode-back" href="../../../../../api/iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.html#iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.StreamingWebPushHandler">[docs]</a><span class="k">class</span> <span class="nc">StreamingWebPushHandler</span><span class="p">(</span><span class="n">FileHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Asynchronous handler that pushes each file to the cloud as generated.</span>
+
+<span class="sd">    This class has a background thread that manages the upload process and</span>
+<span class="sd">    waits synchronously in the finish() routine until all uploads are done.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">domain</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StreamingWebPushHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_slug</span> <span class="o">=</span> <span class="n">slug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">domain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_uploader</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_report_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="StreamingWebPushHandler.start"><a class="viewcode-back" href="../../../../../api/iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.html#iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.StreamingWebPushHandler.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform any necessary actions before the AnalysisTemplate starts.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Streaming files to cloud as they are generated&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_uploader</span> <span class="o">=</span> <span class="n">ReportUploader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_domain</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_report_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_uploader</span><span class="o">.</span><span class="n">create_report</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_slug</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created report id: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_report_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamingWebPushHandler.finish"><a class="viewcode-back" href="../../../../../api/iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.html#iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.StreamingWebPushHandler.finish">[docs]</a>    <span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paths</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform any necessary actions after the AnalysisTemplate has finished.</span>
+
+<span class="sd">        This method will be called after run() returns on the AnalysisTemplate</span>
+<span class="sd">        and the paths argument will contain whatever run() returned.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            paths (list of str): The list of strings returned from the call to</span>
+<span class="sd">                run().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_path</span> <span class="o">!=</span> <span class="s2">&quot;index.html&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unexpected final path from report: </span><span class="si">%s</span><span class="s2">, expected index.html&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_uploader</span><span class="o">.</span><span class="n">finish_report</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_report_id</span><span class="p">,</span> <span class="s2">&quot;index.html&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StreamingWebPushHandler.handle_file"><a class="viewcode-back" href="../../../../../api/iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.html#iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.StreamingWebPushHandler.handle_file">[docs]</a>    <span class="k">def</span> <span class="nf">handle_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">file_contents</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save or otherwise handle a file produced by an AnalysisTemplate.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path (str): The path of the file.</span>
+<span class="sd">            file_contents (bytes): The raw binary contents of the file.  If these</span>
+<span class="sd">                contents are a string it will have already been encoded as utf-8.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># We are called with index.html for the main report and data/* for all of the data files</span>
+        <span class="c1"># The data files need to be public so that index.html can fetch them using ajax calls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Uploading file </span><span class="si">%s</span><span class="s2"> with length </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">file_contents</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_uploader</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_report_id</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">file_contents</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_path</span> <span class="o">=</span> <span class="n">path</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

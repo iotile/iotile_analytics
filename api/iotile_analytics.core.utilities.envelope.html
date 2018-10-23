@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="iotile_analytics.offline package" href="iotile_analytics.offline.html" />
+    <link rel="next" title="iotile_analytics.core.utilities.url_routines module" href="iotile_analytics.core.utilities.url_routines.html" />
     <link rel="prev" title="iotile_analytics.core.utilities.domain module" href="iotile_analytics.core.utilities.domain.html" /> 
 
   
@@ -176,6 +176,18 @@
 <p>Envelope calculation from a series of sampled functions.</p>
 <div class="section" id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.core.utilities.envelope.EnvelopeState" title="iotile_analytics.core.utilities.envelope.EnvelopeState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnvelopeState</span></code></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <p>Functions:</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -186,11 +198,38 @@
 <tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.core.utilities.envelope.envelope" title="iotile_analytics.core.utilities.envelope.envelope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">envelope</span></code></a></td>
 <td>Return the minimum and maximum envelopes from a series of arrays.</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="#iotile_analytics.core.utilities.envelope.envelope_create" title="iotile_analytics.core.utilities.envelope.envelope_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">envelope_create</span></code></a></td>
+<td>Create a uniform sampling envelope for a domain.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#iotile_analytics.core.utilities.envelope.envelope_finish" title="iotile_analytics.core.utilities.envelope.envelope_finish"><code class="xref py py-obj docutils literal notranslate"><span class="pre">envelope_finish</span></code></a></td>
+<td>Finish calculating an envelope and return the result.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#iotile_analytics.core.utilities.envelope.envelope_update" title="iotile_analytics.core.utilities.envelope.envelope_update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">envelope_update</span></code></a></td>
+<td>Update an envelope with a new array.</td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="iotile_analytics.core.utilities.envelope.EnvelopeState">
+<em class="property">class </em><code class="descclassname">iotile_analytics.core.utilities.envelope.</code><code class="descname">EnvelopeState</code><span class="sig-paren">(</span><em>data</em>, <em>mark</em><span class="sig-paren">)</span><a class="headerlink" href="#iotile_analytics.core.utilities.envelope.EnvelopeState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<dl class="attribute">
+<dt id="iotile_analytics.core.utilities.envelope.EnvelopeState.data">
+<code class="descname">data</code><a class="headerlink" href="#iotile_analytics.core.utilities.envelope.EnvelopeState.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="iotile_analytics.core.utilities.envelope.EnvelopeState.mark">
+<code class="descname">mark</code><a class="headerlink" href="#iotile_analytics.core.utilities.envelope.EnvelopeState.mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="iotile_analytics.core.utilities.envelope.envelope">
 <code class="descclassname">iotile_analytics.core.utilities.envelope.</code><code class="descname">envelope</code><span class="sig-paren">(</span><em>*arrays</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/utilities/envelope.html#envelope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.utilities.envelope.envelope" title="Permalink to this definition">¶</a></dt>
@@ -212,16 +251,103 @@ the bins using the keyword bin_mark = “left” | “right” | “center”.</
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>*arrays</strong> (<em>ndarray</em>) – A list of numpy arrays that must be 2D and are used
 to compute a min/max envelope.</li>
-<li><strong>bin_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – An optional keyword argument that indicates the number of
+<li><strong>bin_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – An optional keyword argument that indicates the number of
 bins to divde the domain into for envelope calculation.  Default: 100</li>
-<li><strong>bin_spacing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – An optional keyword argument of either ‘linear’ or ‘log’
+<li><strong>bin_spacing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – An optional keyword argument of either ‘linear’ or ‘log’
 to indicate whether the bins should be generated using.  Default: linear</li>
-<li><strong>bin_mark</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – How to return the bins that were used to calculate the
+<li><strong>bin_mark</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – How to return the bins that were used to calculate the
 envelope.  Possible options are “left”, “right” or “center” causing the
 first column of the output to contain the left edge, right edge or center
 of each bin respectively. Default: “center”</li>
 </ul>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iotile_analytics.core.utilities.envelope.envelope_create">
+<code class="descclassname">iotile_analytics.core.utilities.envelope.</code><code class="descname">envelope_create</code><span class="sig-paren">(</span><em>min_x</em>, <em>max_x</em>, <em>bin_count=100</em>, <em>bin_spacing='linear'</em>, <em>bin_mark='center'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/utilities/envelope.html#envelope_create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.utilities.envelope.envelope_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a uniform sampling envelope for a domain.</p>
+<p>This function is used to start an incremental envelope accumulation
+process.  For example, say you have 100 sampled functions and you want to
+calculate the minimum and maximum values in a series of bins along the
+domain.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>min_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The minimum x value you are interested in.</li>
+<li><strong>max_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The maximum x value you are interested in.</li>
+<li><strong>bin_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – An optional keyword argument that indicates the number of
+bins to divde the domain into for envelope calculation.  Default: 100</li>
+<li><strong>bin_spacing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – An optional keyword argument of either ‘linear’ or ‘log’
+to indicate whether the bins should be generated using.  Default: linear</li>
+<li><strong>bin_mark</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – How to return the bins that were used to calculate the
+envelope.  Possible options are “left”, “right” or “center” causing the
+first column of the output to contain the left edge, right edge or center
+of each bin respectively. Default: “center”</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>an opaque structure that you can pass to envelope_update or envelope_finish.</p>
+<p>This structure contains all information necessary for incrementally calculating
+the envelope of a set of sampled functions without needing to have all of those
+functions at once.</p>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#iotile_analytics.core.utilities.envelope.EnvelopeState" title="iotile_analytics.core.utilities.envelope.EnvelopeState">EnvelopeState</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iotile_analytics.core.utilities.envelope.envelope_update">
+<code class="descclassname">iotile_analytics.core.utilities.envelope.</code><code class="descname">envelope_update</code><span class="sig-paren">(</span><em>state</em>, <em>array</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/utilities/envelope.html#envelope_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.utilities.envelope.envelope_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update an envelope with a new array.</p>
+<p>This function will update every bin in the envelope currently pointed to
+by state with what was already there or the value in array.</p>
+<p>This function must be called with <cite>state</cite> being the return value from a
+previous call to envelope_create().</p>
+<p>The <cite>state</cite> parameter is modified in place.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>state</strong> (<a class="reference internal" href="#iotile_analytics.core.utilities.envelope.EnvelopeState" title="iotile_analytics.core.utilities.envelope.EnvelopeState"><em>EnvelopeState</em></a>) – Opaque envelope state created by a prior call
+to envelope_create().</li>
+<li><strong>array</strong> (<em>np.ndarray</em><em>(</em><em>[</em><em>N</em><em>, </em><em>2</em><em>]</em><em>)</em>) – An Nx2 array of x, y coordinates that will
+be digitized and used to update the appropriate envelope buckets.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="iotile_analytics.core.utilities.envelope.envelope_finish">
+<code class="descclassname">iotile_analytics.core.utilities.envelope.</code><code class="descname">envelope_finish</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/utilities/envelope.html#envelope_finish"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.utilities.envelope.envelope_finish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finish calculating an envelope and return the result.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state</strong> (<a class="reference internal" href="#iotile_analytics.core.utilities.envelope.EnvelopeState" title="iotile_analytics.core.utilities.envelope.EnvelopeState"><em>EnvelopeState</em></a>) – Opaque envelope state created by a prior call
+to envelope_create().</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An Nx3 array with bin markers, minimum values and maximum values.<p>The choice of bin marker depends on what bin_mark argument was passed
+when envelope_create was called and could be either the left edge of
+the bin, the center of the bin or the right edge.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray(N, 3)</td>
 </tr>
 </tbody>
 </table>
@@ -238,7 +364,7 @@ of each bin respectively. Default: “center”</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="iotile_analytics.offline.html" class="btn btn-neutral float-right" title="iotile_analytics.offline package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="iotile_analytics.core.utilities.url_routines.html" class="btn btn-neutral float-right" title="iotile_analytics.core.utilities.url_routines module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="iotile_analytics.core.utilities.domain.html" class="btn btn-neutral" title="iotile_analytics.core.utilities.domain module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -250,7 +376,7 @@ of each bin respectively. Default: “center”</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -269,21 +395,14 @@ of each bin respectively. Default: “center”</li>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

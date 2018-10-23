@@ -157,7 +157,7 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">iotile_cloud.api.exceptions</span> <span class="k">import</span> <span class="n">RestHttpBaseException</span>
 <span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">ArgumentError</span>
-<span class="kn">from</span> <span class="nn">.channel</span> <span class="k">import</span> <span class="n">AnalysisGroupChannel</span>
+<span class="kn">from</span> <span class="nn">.channel</span> <span class="k">import</span> <span class="n">AnalysisGroupChannel</span><span class="p">,</span> <span class="n">ChannelCaching</span>
 <span class="kn">from</span> <span class="nn">..session</span> <span class="k">import</span> <span class="n">CloudSession</span>
 <span class="kn">from</span> <span class="nn">..interaction</span> <span class="k">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">..stream_series</span> <span class="k">import</span> <span class="n">StreamSeries</span>
@@ -196,7 +196,7 @@
             <span class="n">source_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_classify_object</span><span class="p">(</span><span class="n">cloud_id</span><span class="p">)</span>
             <span class="n">stream_finder</span> <span class="o">=</span> <span class="n">stream_finders</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">source_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_policy</span> <span class="o">=</span> <span class="n">ChannelCaching</span><span class="o">.</span><span class="n">UNLIMITED</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_session</span> <span class="o">=</span> <span class="n">CloudSession</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_api</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">get_api</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cloud_id</span> <span class="o">=</span> <span class="n">cloud_id</span>
@@ -368,7 +368,7 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">event</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Downloading Events&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Downloading Events&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="n">slug</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
             <span class="n">dt_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
             <span class="n">extra_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;extra_data&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
@@ -381,7 +381,7 @@
         <span class="k">except</span> <span class="n">RestHttpBaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CloudError</span><span class="p">(</span><span class="s2">&quot;Error fetching events from stream&quot;</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">exc</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IOTileCloudChannel.fetch_raw_events"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_raw_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_raw_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+<div class="viewcode-block" id="IOTileCloudChannel.fetch_raw_events"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_raw_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_raw_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fetch all raw event data for this stream.</span>
 
 <span class="sd">        These are the raw json dictionaries that may be stored for</span>
@@ -390,6 +390,11 @@
 <span class="sd">        Args:</span>
 <span class="sd">            slug (str): The slug of the stream that we should fetch</span>
 <span class="sd">                raw events for.</span>
+<span class="sd">            postprocess (callable): Function that should be applied to each</span>
+<span class="sd">                raw event before adding to the dataframe.  This should</span>
+<span class="sd">                take in a dict and return a dict.  The signature is</span>
+<span class="sd">                postprocess(i, data) where i is the index of the row in</span>
+<span class="sd">                the output dataframe.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            pd.DataFrame: All of the raw events.  This will be empty if</span>
@@ -411,7 +416,7 @@
                 <span class="n">resources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">event_ids</span><span class="p">[</span><span class="n">index</span><span class="p">])</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
                 <span class="n">new_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indexes</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
 
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_multiple</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Downloading Raw Event Data&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_multiple</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="n">postprocess</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Downloading Raw Event Data&quot;</span><span class="p">)</span>
         <span class="c1"># new_index includes all indexes with actual data</span>
         <span class="n">new_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">new_index</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">new_index</span><span class="p">)</span></div>
@@ -455,7 +460,7 @@
             <span class="k">return</span> <span class="n">StreamSeries</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">dt_index</span><span class="p">)</span>
 
         <span class="n">resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">data</span>
-        <span class="n">raw_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Downloading Data&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
+        <span class="n">raw_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_all</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">page_size</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Downloading Data&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="n">slug</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="n">dt_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">raw_json</span><span class="p">])</span>
         <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;int_value&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">raw_json</span><span class="p">]</span>
@@ -495,7 +500,26 @@
             <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="n">project_id</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]</span>
         <span class="k">except</span> <span class="n">RestHttpBaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">CloudError</span><span class="p">(</span><span class="s2">&quot;Error calling method on iotile.cloud&quot;</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">exc</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="n">CloudError</span><span class="p">(</span><span class="s2">&quot;Error calling method on iotile.cloud&quot;</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="n">exc</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+
+<div class="viewcode-block" id="IOTileCloudChannel.set_caching"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.set_caching">[docs]</a>    <span class="k">def</span> <span class="nf">set_caching</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configure how this channel handling caching data that has been fetched.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            policy (int): One of UNLIMITED_CACHE, LRU_CACHE or NO_CACHE.</span>
+<span class="sd">            param (object): Optional parameter that can configure the behavior of</span>
+<span class="sd">                the caching mode chosen.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">policy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ChannelCaching</span><span class="o">.</span><span class="n">UNLIMITED</span><span class="p">,</span> <span class="n">ChannelCaching</span><span class="o">.</span><span class="n">NONE</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Unsupported cache policy type&quot;</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_policy</span> <span class="o">=</span> <span class="n">policy</span>
+
+        <span class="k">if</span> <span class="n">policy</span> <span class="o">==</span> <span class="n">ChannelCaching</span><span class="o">.</span><span class="n">UNLIMITED</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">enable_cache</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">enable_cache</span> <span class="o">=</span> <span class="kc">False</span></div></div>
 </pre></div>
 
            </div>
@@ -508,7 +532,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -527,21 +551,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

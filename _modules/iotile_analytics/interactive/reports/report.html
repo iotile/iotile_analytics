@@ -152,10 +152,12 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">str</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="nb">open</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">viewvalues</span>
 <span class="kn">from</span> <span class="nn">jinja2</span> <span class="k">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">PackageLoader</span><span class="p">,</span> <span class="n">contextfunction</span><span class="p">,</span> <span class="n">Markup</span>
 <span class="kn">from</span> <span class="nn">iotile_analytics.core.exceptions</span> <span class="k">import</span> <span class="n">UsageError</span>
 <span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">viewitems</span>
@@ -190,7 +192,7 @@
 <span class="sd">    of the LiveReport class.  The primary difference between a LiveReport and</span>
 <span class="sd">    a standard embedded Bokeh document is the method by which a LiveReport is</span>
 <span class="sd">    able to reference a tree of local files and load them into</span>
-<span class="sd">    ColumnDataSource objects without needing a web browser.</span>
+<span class="sd">    ColumnDataSource objects without needing a web server.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        target (int): Whether we are targetting a hosted or unhosted environment</span>
@@ -208,6 +210,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">loadable_models</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_relative_dir</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_handler</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Internal template variables that subclasses can override to insert details into the</span>
         <span class="c1"># template.</span>
@@ -231,11 +237,6 @@
 
         <span class="k">return</span> <span class="n">column</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">)</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">standalone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Whether this report creates a single file or multiple files.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
-
 <div class="viewcode-block" id="LiveReport.mark_loadable_source"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport.mark_loadable_source">[docs]</a>    <span class="k">def</span> <span class="nf">mark_loadable_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">loadable_options</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Mark a ColumnDataSource as externally loadable.</span>
 
@@ -243,7 +244,23 @@
 <span class="sd">        single argument and loads the passed data source with one of the</span>
 <span class="sd">        loadable options given its dictionary key which should be string or</span>
 <span class="sd">        an integer that will be formated in decimal and used as a file name.</span>
+
+<span class="sd">        It is safe to call this function multiple times with the same source</span>
+<span class="sd">        value.  You may want to call this function multiple times if you have</span>
+<span class="sd">        many different options for a given source and don&#39;t want to keep them</span>
+<span class="sd">        all in memory at the same time.</span>
+
+<span class="sd">        Note: this function should only be called during the render process</span>
+<span class="sd">        from either the run() function or from prepare_render().  It will</span>
+<span class="sd">        export the files immediately as you call mark_loadable_source in</span>
+<span class="sd">        order to keep the minimum amount of information in memory.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">standalone</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;You cannot call mark_loadable_source in a standalone report because that would not produce a single standalone file&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_handler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;mark_loadable_source called at invalid time, must be called from prepare_render with a valid file_handler&quot;</span><span class="p">)</span>
 
         <span class="n">ref</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">ref</span>
         <span class="n">model_id</span> <span class="o">=</span> <span class="n">ref</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
@@ -252,18 +269,35 @@
         <span class="n">func_name</span> <span class="o">=</span> <span class="s2">&quot;load_model_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">safe_model_id</span><span class="p">)</span>
         <span class="n">trigger_name</span> <span class="o">=</span> <span class="s2">&quot;trigger_load_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">safe_model_id</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">loadable_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">loadable_options</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loadable_options</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">prior_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">viewvalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_files</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">model_id</span><span class="p">])</span>
+            <span class="n">loadable_options</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">prior_length</span> <span class="o">+</span> <span class="n">i</span><span class="p">):</span> <span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loadable_options</span><span class="p">)}</span>
+
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="n">loadable_options</span><span class="p">):</span>
             <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">safe_model_id</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
 
             <span class="n">file_obj</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">file_name</span><span class="p">,</span>
                 <span class="s1">&#39;columns&#39;</span><span class="p">:</span> <span class="n">columns</span><span class="p">,</span>
                 <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">model_id</span><span class="p">,</span>
-                <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">values</span><span class="p">,</span>
                 <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="n">func_name</span>
             <span class="p">}</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">external_files</span><span class="p">[</span><span class="n">file_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_obj</span>
+            <span class="c1"># Send the data to our file handler to actually save it</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="n">LiveReport</span><span class="o">.</span><span class="n">UNHOSTED</span><span class="p">:</span>
+                <span class="n">file_path</span> <span class="o">+=</span> <span class="s2">&quot;.jsonp&quot;</span>
+                <span class="n">encoded_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_jsonp</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_file_handler</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">encoded_data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Only UNHOSTED LiveReport objects are currently supported&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">external_files</span><span class="p">[</span><span class="n">file_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_obj</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">loadable_models</span><span class="p">[</span><span class="n">model_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;trigger_function&#39;</span><span class="p">:</span> <span class="n">trigger_name</span><span class="p">,</span>
@@ -274,7 +308,7 @@
         <span class="k">return</span> <span class="n">trigger_name</span></div>
 
 <div class="viewcode-block" id="LiveReport.render_jsonp"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport.render_jsonp">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">render_jsonp</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">render_jsonp</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Render a dictionary as a jsonp file.</span>
 
 <span class="sd">        These files are suitable for loading from a local filesystem so they</span>
@@ -282,20 +316,21 @@
 <span class="sd">        browser.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            path (str): The path at which to save the resulting jsonp file.</span>
-<span class="sd">            info (dict): An info dictionary as created by the mark_loadable_source</span>
-<span class="sd">                function.</span>
+<span class="sd">            func (str): The name of the function that should be called when</span>
+<span class="sd">                this jsonp file is loaded.</span>
+<span class="sd">            data (dict): The dict object that we should dump.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: Encoded jsonp data that can be written to a file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">])</span>
+        <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">write_data</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">);&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">json_data</span><span class="p">)</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
-            <span class="n">write_data</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">);&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;func&#39;</span><span class="p">],</span> <span class="n">json_data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">write_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">write_data</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">write_data</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">write_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">write_data</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">write_data</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
-
-            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">write_data</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">write_data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LiveReport.find_template"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport.find_template">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">find_template</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">package</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
@@ -335,7 +370,23 @@
         <span class="n">template</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">template_str</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LiveReport.run"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">contents</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save a file to disk.&quot;&quot;&quot;</span>
+
+        <span class="n">basedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">basedir</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">basedir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Cannot create directory </span><span class="si">%s</span><span class="s2">, it already exists and is not a directory.  Trying to save </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">basedir</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">basedir</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating folder </span><span class="si">%s</span><span class="s2"> in _save_file&quot;</span><span class="p">,</span> <span class="n">basedir</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">basedir</span><span class="p">))</span>  <span class="c1"># This cannot have .. in it, see https://docs.python.org/2/library/os.html#os.makedirs</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Saving file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LiveReport.run"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.report.html#iotile_analytics.interactive.reports.report.LiveReport.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">file_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Render this report to output_path.</span>
 
 <span class="sd">        If this report is a standalone html file, the output path</span>
@@ -344,14 +395,19 @@
 <span class="sd">        If this report is not standalone, the output will be</span>
 <span class="sd">        folder that is created at output_path.</span>
 
-<span class="sd">        If bundle is True and the report is not standalone, it will be zipped</span>
-<span class="sd">        into a file at output_path.zip.  Any html or directory that was</span>
-<span class="sd">        created as an intermediary before zipping will be deleted before this</span>
-<span class="sd">        function returns.</span>
-
 <span class="sd">        Args:</span>
 <span class="sd">            output_path (str): the path to the folder that we wish</span>
 <span class="sd">                to create.</span>
+<span class="sd">            file_handler (callable): A function that will be given a filelike</span>
+<span class="sd">                object for each file that this report generates as well as</span>
+<span class="sd">                the relative path to that file.  If you override this function,</span>
+<span class="sd">                it is your responsibility to save all of these files, otherwise</span>
+<span class="sd">                no output will be generated.  The purpose of this argument is</span>
+<span class="sd">                to allow for streaming these files to a remote server or some</span>
+<span class="sd">                other action that is not just saving the data to a local disk.</span>
+
+<span class="sd">                The default behavior is to just save to local disk, which happens</span>
+<span class="sd">                if file_handler is None (the default value).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: The path to the actual file or directory created.  This</span>
@@ -359,66 +415,63 @@
 <span class="sd">                extension or the addition of a subdirectory.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># Allow subclasses to finish any preparations before we render.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_render</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">file_handler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;You must pass an output_path and/or a file_handler to render this LiveReport&quot;</span><span class="p">)</span>
 
-        <span class="n">all_files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">file_handler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">file_handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_file</span>
 
-        <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;You must pass an output_path to render this LiveReport&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">all_files</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="c1"># Make sure we have the path stem</span>
-        <span class="k">if</span> <span class="n">output_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">):</span>
-            <span class="n">output_path</span> <span class="o">=</span> <span class="n">output_path</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>
+            <span class="c1"># Make sure we have the path stem</span>
+            <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">output_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">):</span>
+                <span class="n">output_path</span> <span class="o">=</span> <span class="n">output_path</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">standalone</span><span class="p">:</span>
-            <span class="n">html_path</span> <span class="o">=</span> <span class="n">output_path</span> <span class="o">+</span> <span class="s2">&quot;.html&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
-            <span class="n">html_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;index.html&#39;</span><span class="p">)</span>
+            <span class="c1"># Allow subclasses to finish any preparations before we render.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">=</span> <span class="n">output_path</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_handler</span> <span class="o">=</span> <span class="n">file_handler</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prepare_render</span><span class="p">()</span>
 
-        <span class="n">all_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">html_path</span><span class="p">)</span>
+            <span class="c1"># At this point, all additional files will have already been generated</span>
+            <span class="c1"># so we know if we are a standalone report or not.</span>
+            <span class="k">if</span> <span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">html_path</span> <span class="o">=</span> <span class="s2">&quot;index.html&quot;</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">standalone</span><span class="p">:</span>
+                <span class="n">html_path</span> <span class="o">=</span> <span class="n">output_path</span> <span class="o">+</span> <span class="s2">&quot;.html&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">html_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;index.html&#39;</span><span class="p">)</span>
 
-        <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">loader</span><span class="o">=</span><span class="n">PackageLoader</span><span class="p">(</span><span class="s1">&#39;iotile_analytics.interactive.reports&#39;</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">))</span>
-        <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="p">[</span><span class="s1">&#39;include_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">include_file</span>
+            <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">loader</span><span class="o">=</span><span class="n">PackageLoader</span><span class="p">(</span><span class="s1">&#39;iotile_analytics.interactive.reports&#39;</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">))</span>
+            <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="p">[</span><span class="s1">&#39;include_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">include_file</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNHOSTED</span><span class="p">:</span>
-            <span class="n">template</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s1">&#39;unhosted_file.html&#39;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;HOSTED mode for LiveReports is not yet supported&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNHOSTED</span><span class="p">:</span>
+                <span class="n">template</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s1">&#39;unhosted_file.html&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;HOSTED mode for LiveReports is not yet supported&quot;</span><span class="p">)</span>
 
-        <span class="n">template_vars</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;loadable_models&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadable_models</span><span class="p">,</span>
-            <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
-            <span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">,</span>
-            <span class="s1">&#39;before_content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">before_content</span><span class="p">,</span>
-            <span class="s1">&#39;after_content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">after_content</span><span class="p">,</span>
-            <span class="s1">&#39;footer&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">footer</span><span class="p">,</span>
-            <span class="s1">&#39;extra_scripts&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_scripts</span>
-        <span class="p">}</span>
+            <span class="n">template_vars</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;loadable_models&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadable_models</span><span class="p">,</span>
+                <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                <span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">,</span>
+                <span class="s1">&#39;before_content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">before_content</span><span class="p">,</span>
+                <span class="s1">&#39;after_content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">after_content</span><span class="p">,</span>
+                <span class="s1">&#39;footer&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">footer</span><span class="p">,</span>
+                <span class="s1">&#39;extra_scripts&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_scripts</span>
+            <span class="p">}</span>
 
-        <span class="c1"># This does not return unicode on python 2 so we need to massage it</span>
-        <span class="n">rendered_html</span> <span class="o">=</span> <span class="n">file_html</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">,</span> <span class="n">Resources</span><span class="p">(</span><span class="s1">&#39;inline&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">template_vars</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rendered_html</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">rendered_html</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">rendered_html</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="c1"># This does not return unicode on python 2 so we need to massage it</span>
+            <span class="n">rendered_html</span> <span class="o">=</span> <span class="n">file_html</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">,</span> <span class="n">Resources</span><span class="p">(</span><span class="s1">&#39;inline&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">template_vars</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rendered_html</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">rendered_html</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">rendered_html</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">html_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
-            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">rendered_html</span><span class="p">)</span>
+            <span class="n">file_handler</span><span class="p">(</span><span class="n">html_path</span><span class="p">,</span> <span class="n">rendered_html</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">standalone</span><span class="p">:</span>
-            <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
-
-            <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">fileinfo</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_files</span><span class="p">):</span>
-                <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNHOSTED</span><span class="p">:</span>
-                    <span class="n">file_path</span> <span class="o">+=</span> <span class="s2">&quot;.jsonp&quot;</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">render_jsonp</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">fileinfo</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;HOSTED mode for LiveReports is not yet supported&quot;</span><span class="p">)</span>
-
-                <span class="n">all_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">all_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">html_path</span><span class="p">)</span>
+            <span class="n">all_files</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_files</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_handler</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">return</span> <span class="n">all_files</span></div>
 
@@ -437,7 +490,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -456,21 +509,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

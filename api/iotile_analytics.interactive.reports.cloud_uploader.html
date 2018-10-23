@@ -205,13 +205,29 @@
 <dl class="class">
 <dt id="iotile_analytics.interactive.reports.cloud_uploader.ReportUploader">
 <em class="property">class </em><code class="descclassname">iotile_analytics.interactive.reports.cloud_uploader.</code><code class="descname">ReportUploader</code><span class="sig-paren">(</span><em>domain=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/cloud_uploader.html#ReportUploader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.cloud_uploader.ReportUploader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Upload a series of files to S3 using signed URLs.</p>
+<p>There are two ways to use this class.  You can use the synchronous
+all-in-one upload_report function that takes in a list of files, and
+uploads them in one shot, or you can use the a-la-cart interface.</p>
+<p>The synchronous interface is to just call <cite>upload_report</cite> and pass
+it a list of paths to the files to upload.  It will synchronously
+create a report object on iotile.cloud, upload all files and then
+notify the cloud about our success.</p>
+<p>The a-la-carte interface lets you perform these three steps yourself:</p>
+<ul class="simple">
+<li>create_report(): starts the report upload process, returning a report id.</li>
+<li>upload_file(): queues a file for background uploading and starts uploading
+it immediately.  This function does not wait for the file upload to finish
+but returns as soon as it has been queued.</li>
+<li>finish_report(): Waits for all outstanding file uploads to finish and
+then tells iotile.cloud that we have finished uploading the report.</li>
+</ul>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The iotile.cloud instance that we should use. If
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The iotile.cloud instance that we should use. If
 not passed, this defaults to <a class="reference external" href="https://iotile.cloud">https://iotile.cloud</a></td>
 </tr>
 </tbody>
@@ -232,9 +248,9 @@ in lists where users may select to view the report.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The human readable label for the report that you
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The human readable label for the report that you
 are uploading.</li>
-<li><strong>report_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The ID of a GeneratedUserReport instance, if one
+<li><strong>report_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The ID of a GeneratedUserReport instance, if one
 was given. Report files will be attached to this existing report.
 If this is not specified, a new report record will be created.</li>
 <li><strong>files</strong> (<em>list of str</em>) – A list of all of the files that should
@@ -250,7 +266,95 @@ the slug of the organization that it should be uploaded for.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A URL where the uploaded report can be accessed.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.interactive.reports.cloud_uploader.ReportUploader.create_report">
+<code class="descname">create_report</code><span class="sig-paren">(</span><em>label</em>, <em>group=None</em>, <em>slug=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/cloud_uploader.html#ReportUploader.create_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.cloud_uploader.ReportUploader.create_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a report record on iotile.cloud.</p>
+<p>This synchronously notifies that cloud that we are going to be
+uploading a report.  After this function returns you can call
+upload_file repeatedly to upload each file in the report and then
+after you are finished you can call finish_report() to finish the
+report.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The human readable label for the report that you
+are uploading.</li>
+<li><strong>group</strong> (<a class="reference internal" href="iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup" title="iotile_analytics.core.group.AnalysisGroup"><em>AnalysisGroup</em></a>) – The analysis group that was used to generate
+this report.  If this is not specified then you must explicitly
+specify the slug of the object used to generate the report and
+the slug of the organization that it should be uploaded for.</li>
+<li><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional string to override the slug that would be inferred
+from group.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The report id of the report that was created.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.interactive.reports.cloud_uploader.ReportUploader.finish_report">
+<code class="descname">finish_report</code><span class="sig-paren">(</span><em>report_id</em>, <em>index_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/cloud_uploader.html#ReportUploader.finish_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.cloud_uploader.ReportUploader.finish_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notify the cloud that we have successfully finished uploading all files for a report.</p>
+<p>The report should have been created by a previous call to create_report().</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>report_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The report id returned from the call to create_report()</li>
+<li><strong>index_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The file path passed to a previous call to upload_file()
+that should be treated as the main entry point to this report.
+This path is not cleaned in any way except that characters are
+converted to /.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A URL where the uploaded report can be accessed.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.interactive.reports.cloud_uploader.ReportUploader.upload_file">
+<code class="descname">upload_file</code><span class="sig-paren">(</span><em>report_id</em>, <em>file_path</em>, <em>file_data</em>, <em>public=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/cloud_uploader.html#ReportUploader.upload_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.cloud_uploader.ReportUploader.upload_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload a file asynchronously as part of this report.</p>
+<p>This function will return immediately and queue the file for
+background uploading.  All files are guaranteed to be uploaded
+by the time a call to finish_report() returns.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>report_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The report id returned from the call to create_report()</li>
+<li><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The key that should be used for this file on s3.
+This path is not cleaned in any way except that characters are
+converted to /.</li>
+<li><strong>file_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a>) – The data that should be uploaded for this file.</li>
+<li><strong>public</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether this file should be protected or public.</li>
+</ul>
 </td>
 </tr>
 </tbody>
@@ -291,7 +395,7 @@ the slug of the organization that it should be uploaded for.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -310,21 +414,14 @@ the slug of the organization that it should be uploaded for.</li>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

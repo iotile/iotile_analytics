@@ -193,7 +193,7 @@
 <dl class="class">
 <dt id="iotile_analytics.interactive.reports.analysis_template.AnalysisTemplate">
 <em class="property">class </em><code class="descclassname">iotile_analytics.interactive.reports.analysis_template.</code><code class="descname">AnalysisTemplate</code><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/analysis_template.html#AnalysisTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.analysis_template.AnalysisTemplate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Base class for all objects that can be invoked by analytics-host.</p>
 <p>This class has a single method run(output_location, bundle=False) that
 takes a string identifying where the results of the analysis should be
@@ -207,6 +207,12 @@ instance, i.e. it cannot complete fully offline using just the AnalysisGroup,
 then it can take a parameter in its __init__ function named domain which will
 be filled with the domain of the iotile.cloud server that it should ask for
 additional information.</p>
+<p>All AnalysisTemplate subclasses must announce in advance of being run
+whether they produce one or multiple files by setting the standalone property
+as appropriate.  The property defaults to True, which means only a single
+file is produced, so it only needs to be overriden by subclasses that produce
+multiple files.  The standalone property must be a class property, not an
+instance property so that it can be inspected before the class is instantiated.</p>
 <dl class="attribute">
 <dt id="iotile_analytics.interactive.reports.analysis_template.AnalysisTemplate.standalone">
 <code class="descname">standalone</code><em class="property"> = True</em><a class="headerlink" href="#iotile_analytics.interactive.reports.analysis_template.AnalysisTemplate.standalone" title="Permalink to this definition">¶</a></dt>
@@ -215,7 +221,7 @@ additional information.</p>
 
 <dl class="method">
 <dt id="iotile_analytics.interactive.reports.analysis_template.AnalysisTemplate.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/analysis_template.html#AnalysisTemplate.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.analysis_template.AnalysisTemplate.run" title="Permalink to this definition">¶</a></dt>
+<code class="descname">run</code><span class="sig-paren">(</span><em>output_path</em>, <em>file_handler=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/analysis_template.html#AnalysisTemplate.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.analysis_template.AnalysisTemplate.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run whatever analysis this class implements.</p>
 <p>The analysis should be saved in the location specified by output_path.
 The output_path parameter should not be taken as the literal location
@@ -228,18 +234,37 @@ you generate multiple files then those files <strong>must</strong> be all contai
 inside a directory at <code class="docutils literal notranslate"><span class="pre">output_path</span></code> that you generate.  This is very
 important so that your caller can easily bundle your files into a zip
 and remove the originals if necessary.</p>
-<p>If output_path is None then you are expected to write your output to
-stdout.  If that is not possible for the analysis you are performing,
-e.g. you are creating multiple files, then you should raise
-UsageError().</p>
+<p>If output_path is None and file_handler is None then you are expected
+to write your output to stdout.  If that is not possible for the
+analysis you are performing, e.g. you are creating multiple files,
+then you should raise UsageError().</p>
+<p>If output_path is None but file_handler is not None then you are
+expected to hand each of your produced files to file_handler in order
+for it to save them appropriately.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A location specifying where we should save the
-output of the analysis.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>output_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A location specifying where we should save the
+output of the analysis.</li>
+<li><strong>file_handler</strong> (<em>callable</em>) – <p>A function that will be given a bytes
+object for each file that this report generates as well as
+the relative path to that file.  If you override this function,
+it is your responsibility to save all of these files, otherwise
+no output will be generated.  The purpose of this argument is
+to allow for streaming these files to a remote server or some
+other action that is not just saving the data to a local disk.</p>
+<p>The default behavior is to just save to local disk, which happens
+if file_handler is None (the default value).  The signature
+of file_handler should be file_handler(path, contents) where
+contents is a bytes object.</p>
+</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of all of the files generated during the running of this analysis.<p>The first file in the list should be considered the “main
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A list of all of the files generated during the running of this analysis.</p>
+<p>The first file in the list should be considered the “main
 entry point” of the analysis.  For example, if you are rendering an
 html file with supporting data in a directory, you should return the
 html file first and either a list of all the data files or the data
@@ -247,9 +272,11 @@ directory itself.  Returning a directory from this function will be
 interpreted as returning all files recursively contained in that directory.</p>
 <p>If running this report generates no files you should return an empty
 list.</p>
+</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -280,7 +307,7 @@ list.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -299,21 +326,14 @@ list.</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

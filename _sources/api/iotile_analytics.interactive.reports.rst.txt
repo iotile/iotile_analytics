@@ -37,6 +37,14 @@ Submodules
     ~iotile_analytics.interactive.reports.stream_report
 
 
+Subpackages
+-----------
+
+.. autosummary::
+    :nosignatures:
+    :toctree:
+
+    ~iotile_analytics.interactive.reports.handlers
 
 
 

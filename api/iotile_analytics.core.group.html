@@ -197,7 +197,7 @@ from a Project, a Device or a DataBlock.</p>
 <dl class="class">
 <dt id="iotile_analytics.core.group.AnalysisGroup">
 <em class="property">class </em><code class="descclassname">iotile_analytics.core.group.</code><code class="descname">AnalysisGroup</code><span class="sig-paren">(</span><em>channel</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A top level entry point for selecting and analyzing data.</p>
 <p>Currently AnalysisGroups must be created by passing the id
 or slug of a project in iotile.cloud and then are populated with
@@ -228,12 +228,12 @@ find and download streams.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The slug of the stream tha we want to check to
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The slug of the stream tha we want to check to
 see if it empty</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the stream is empty, otherwise false.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -264,7 +264,7 @@ but you can override that by passing include_empty=True.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>include_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Also show streams that have no data.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>include_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Also show streams that have no data.</td>
 </tr>
 </tbody>
 </table>
@@ -278,11 +278,11 @@ but you can override that by passing include_empty=True.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The slug that we wish to get the name of.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The slug that we wish to get the name of.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The name of the stream</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
 </tr>
 </tbody>
 </table>
@@ -306,9 +306,9 @@ on what you find in print streams will work as expected.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>partial</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A partial slug or identifier to use to uniquely
+<li><strong>partial</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A partial slug or identifier to use to uniquely
 find one stream.</li>
-<li><strong>include_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Also include streams that have no data in
+<li><strong>include_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Also include streams that have no data in
 the search.</li>
 </ul>
 </td>
@@ -321,7 +321,7 @@ the search.</li>
 </p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ArgumentError</span></code> – If the partial matches no streams or if it matches
@@ -352,7 +352,7 @@ s–0000-0011–0000-0000-0000-0222–5001 (Temperature)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug_or_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The stream that we want to fetch.  This
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug_or_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The stream that we want to fetch.  This
 can be a partial match to a full stream slug or name so long
 as it uniquely matches.  This is passed to find_stream so anything
 that find_stream accepts will be accepted here.</td>
@@ -385,7 +385,7 @@ partial stream names are accepted.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug_or_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The stream that we want to fetch.  This
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug_or_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The stream that we want to fetch.  This
 can be a partial match to a full stream slug or name so long
 as it uniquely matches.  This is passed to find_stream so anything
 that find_stream accepts will be accepted here.</td>
@@ -411,14 +411,16 @@ that find_stream accepts will be accepted here.</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>slug_or_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The stream that we want to fetch.  This
+<li><strong>slug_or_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The stream that we want to fetch.  This
 can be a partial match to a full stream slug or name so long
 as it uniquely matches.  This is passed to find_stream so anything
 that find_stream accepts will be accepted here.</li>
-<li><strong>subkey</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Only include a single key of the event.  This is usefuly for complex
+<li><strong>subkey</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Only include a single key of the event.  This is usefuly for complex
 events where you want to just focus on a portion of them.</li>
 <li><strong>postprocess</strong> (<em>callable</em>) – (Optional) function to call on each raw event before
-adding it to the dataframe.</li>
+adding it to the dataframe.  The function will be called as:
+postprocess(i, data), where i is the index of the row in the final dataframe
+and data is the raw data (or data[subkey] if subkey is not None) fetched.</li>
 </ul>
 </td>
 </tr>
@@ -447,15 +449,15 @@ then you don’t need to worry about external ids.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the slug of the device that we want.  This can either
+<li><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the slug of the device that we want.  This can either
 be a short slug with leading zeros omitted or long slug. It
 should start with ‘d–’ since it is a device slug.</li>
-<li><strong>external_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The external id of the device that we want to
+<li><strong>external_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The external id of the device that we want to
 search for. This external_id must be unique among all devices
 so that it matches a single device.</li>
-<li><strong>domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Optional iotile.cloud domain to connect to (defaults to
+<li><strong>domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional iotile.cloud domain to connect to (defaults to
 <a class="reference external" href="https://iotile.cloud">https://iotile.cloud</a>).</li>
-<li><strong>include_system</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Also include hidden system streams when fetching data
+<li><strong>include_system</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Also include hidden system streams when fetching data
 for this device.  System streams are not generally useful so this defaults
 to False.</li>
 </ul>
@@ -476,10 +478,10 @@ b–XXXX-XXXX-XXXX-XXXX</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the slug of the archive that we want.  This can either
+<li><strong>slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the slug of the archive that we want.  This can either
 be a short slug with leading zeros omitted or long slug. It
 should start with ‘b–’ since it is an archive slug.</li>
-<li><strong>domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Optional iotile.cloud domain to connect to (defaults to
+<li><strong>domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional iotile.cloud domain to connect to (defaults to
 <a class="reference external" href="https://iotile.cloud">https://iotile.cloud</a>).</li>
 </ul>
 </td>
@@ -501,11 +503,11 @@ AnalysisGroup without needing online access to IOTile.cloud.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The format specific identifier that we will
+<li><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The format specific identifier that we will
 use to name this saved AnalysisGroup.  The meaning of this
 parameter depends on the format but, for example, it could
 be the file name.</li>
-<li><strong>format_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – An identifier for the format we wish to use to
+<li><strong>format_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – An identifier for the format we wish to use to
 save our data.  You can find the list of available formats
 by calling list_formats().</li>
 </ul>
@@ -533,11 +535,11 @@ AnalysisGroup.FromSaved(identifier, format)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The format specific identifier that we will
+<li><strong>identifier</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The format specific identifier that we will
 use to name this saved AnalysisGroup.  The meaning of this
 parameter depends on the format but, for example, it could
 be the file name.</li>
-<li><strong>format_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – An identifier for the format we wish to use to
+<li><strong>format_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – An identifier for the format we wish to use to
 save our data.  You can find the list of available formats
 by calling list_formats().</li>
 </ul>
@@ -557,7 +559,26 @@ by calling list_formats().</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of the names that can be passed to save or FromSaved.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="iotile_analytics.core.group.AnalysisGroup.set_caching">
+<code class="descname">set_caching</code><span class="sig-paren">(</span><em>policy</em>, <em>param=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.set_caching"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.set_caching" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure how this channel handling caching data that has been fetched.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>policy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – One of UNLIMITED_CACHE, LRU_CACHE or NO_CACHE.</li>
+<li><strong>param</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – Optional parameter that can configure the behavior of
+the caching mode chosen.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -588,7 +609,7 @@ by calling list_formats().</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -607,21 +628,14 @@ by calling list_formats().</li>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

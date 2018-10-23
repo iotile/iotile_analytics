@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>iotile_analytics.interactive.reports.handlers package &mdash; IOTile Analytics 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="iotile_analytics.interactive.reports.handlers.base_handler module" href="iotile_analytics.interactive.reports.handlers.base_handler.html" />
+    <link rel="prev" title="iotile_analytics.interactive.reports.stream_report module" href="iotile_analytics.interactive.reports.stream_report.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> IOTile Analytics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">5-Minute Quickstart Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iotile_analytics.core.html">iotile_analytics.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iotile_analytics.offline.html">iotile_analytics.offline package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="iotile_analytics.interactive.html">iotile_analytics.interactive package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.html#key-functions-and-classes">Key Functions and Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iotile_analytics.interactive.html#submodules">Submodules</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="iotile_analytics.interactive.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="iotile_analytics.interactive.reports.html">iotile_analytics.interactive.reports package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iotile_analytics.interactive.scripts.html">iotile_analytics.interactive.scripts package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">IOTile Analytics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="iotile_analytics.interactive.html">iotile_analytics.interactive package</a> &raquo;</li>
+        
+          <li><a href="iotile_analytics.interactive.reports.html">iotile_analytics.interactive.reports package</a> &raquo;</li>
+        
+      <li>iotile_analytics.interactive.reports.handlers package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/iotile_analytics.interactive.reports.handlers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-iotile_analytics.interactive.reports.handlers">
+<span id="iotile-analytics-interactive-reports-handlers-package"></span><h1>iotile_analytics.interactive.reports.handlers package<a class="headerlink" href="#module-iotile_analytics.interactive.reports.handlers" title="Permalink to this headline">¶</a></h1>
+<p>Helper classes to manage saving report output.</p>
+<p>The classes in this package are used by analytics-host to properly save the
+files produced by an AnalysisTemplate either locally, as part of a zip file or
+by pushing them directly to a remote cloud server.</p>
+<div class="section" id="key-functions-and-classes">
+<h2>Key Functions and Classes<a class="headerlink" href="#key-functions-and-classes" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.handlers.base_handler.html#iotile_analytics.interactive.reports.handlers.base_handler.FileHandler" title="iotile_analytics.interactive.reports.handlers.base_handler.FileHandler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FileHandler</span></code></a></td>
+<td>Base class for all FileHandlers supported by analytics-host.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.reports.handlers.file_handler.html#iotile_analytics.interactive.reports.handlers.file_handler.LocalDiskHandler" title="iotile_analytics.interactive.reports.handlers.file_handler.LocalDiskHandler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LocalDiskHandler</span></code></a></td>
+<td>Base class for all FileHandlers supported by analytics-host.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.handlers.stdout_handler.html#iotile_analytics.interactive.reports.handlers.stdout_handler.StandardOutHandler" title="iotile_analytics.interactive.reports.handlers.stdout_handler.StandardOutHandler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StandardOutHandler</span></code></a></td>
+<td>A simple FileHandler that just writes all files to stdout.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.html#iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.StreamingWebPushHandler" title="iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.StreamingWebPushHandler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StreamingWebPushHandler</span></code></a></td>
+<td>Asynchronous handler that pushes each file to the cloud as generated.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.handlers.web_push_handler.html#iotile_analytics.interactive.reports.handlers.web_push_handler.WebPushHandler" title="iotile_analytics.interactive.reports.handlers.web_push_handler.WebPushHandler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WebPushHandler</span></code></a></td>
+<td>Push a report from local disk to the cloud.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.reports.handlers.zip_handler.html#iotile_analytics.interactive.reports.handlers.zip_handler.ZipHandler" title="iotile_analytics.interactive.reports.handlers.zip_handler.ZipHandler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZipHandler</span></code></a></td>
+<td>A file handler that zips up all of the files.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.handlers.base_handler.html#module-iotile_analytics.interactive.reports.handlers.base_handler" title="iotile_analytics.interactive.reports.handlers.base_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">base_handler</span></code></a></td>
+<td>Base class for all file handlers supported by analytics-host.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.reports.handlers.file_handler.html#module-iotile_analytics.interactive.reports.handlers.file_handler" title="iotile_analytics.interactive.reports.handlers.file_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">file_handler</span></code></a></td>
+<td>Basic file handler that just saves files to disk.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.handlers.stdout_handler.html#module-iotile_analytics.interactive.reports.handlers.stdout_handler" title="iotile_analytics.interactive.reports.handlers.stdout_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stdout_handler</span></code></a></td>
+<td>A simple handler that just writes its contents to stdout.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.reports.handlers.streaming_web_push_handler.html#module-iotile_analytics.interactive.reports.handlers.streaming_web_push_handler" title="iotile_analytics.interactive.reports.handlers.streaming_web_push_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">streaming_web_push_handler</span></code></a></td>
+<td>Report File Handler that streams each file to the cloud as generated.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="iotile_analytics.interactive.reports.handlers.web_push_handler.html#module-iotile_analytics.interactive.reports.handlers.web_push_handler" title="iotile_analytics.interactive.reports.handlers.web_push_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">web_push_handler</span></code></a></td>
+<td>A basic web push handler that pushes a report to the cloud after it has been written locally.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="iotile_analytics.interactive.reports.handlers.zip_handler.html#module-iotile_analytics.interactive.reports.handlers.zip_handler" title="iotile_analytics.interactive.reports.handlers.zip_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zip_handler</span></code></a></td>
+<td>A file handler that zips up all of the files.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="iotile_analytics.interactive.reports.handlers.base_handler.html" class="btn btn-neutral float-right" title="iotile_analytics.interactive.reports.handlers.base_handler module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="iotile_analytics.interactive.reports.stream_report.html" class="btn btn-neutral" title="iotile_analytics.interactive.reports.stream_report module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Arch Systems Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

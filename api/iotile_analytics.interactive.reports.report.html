@@ -222,12 +222,12 @@ outside of the context of a bokeh application or notebook.</p>
 of the LiveReport class.  The primary difference between a LiveReport and
 a standard embedded Bokeh document is the method by which a LiveReport is
 able to reference a tree of local files and load them into
-ColumnDataSource objects without needing a web browser.</p>
+ColumnDataSource objects without needing a web server.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Whether we are targetting a hosted or unhosted environment
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Whether we are targetting a hosted or unhosted environment
 so that we generate the appropriate content.</td>
 </tr>
 </tbody>
@@ -251,12 +251,6 @@ generates but does not include any explanatory text above the
 models in before_content or after_content.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="iotile_analytics.interactive.reports.report.LiveReport.standalone">
-<code class="descname">standalone</code><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.standalone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether this report creates a single file or multiple files.</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="iotile_analytics.interactive.reports.report.LiveReport.mark_loadable_source">
 <code class="descname">mark_loadable_source</code><span class="sig-paren">(</span><em>source</em>, <em>loadable_options</em>, <em>columns</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/report.html#LiveReport.mark_loadable_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.mark_loadable_source" title="Permalink to this definition">¶</a></dt>
@@ -265,11 +259,19 @@ models in before_content or after_content.</p>
 single argument and loads the passed data source with one of the
 loadable options given its dictionary key which should be string or
 an integer that will be formated in decimal and used as a file name.</p>
+<p>It is safe to call this function multiple times with the same source
+value.  You may want to call this function multiple times if you have
+many different options for a given source and don’t want to keep them
+all in memory at the same time.</p>
+<p>Note: this function should only be called during the render process
+from either the run() function or from prepare_render().  It will
+export the files immediately as you call mark_loadable_source in
+order to keep the minimum amount of information in memory.</p>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="iotile_analytics.interactive.reports.report.LiveReport.render_jsonp">
-<em class="property">classmethod </em><code class="descname">render_jsonp</code><span class="sig-paren">(</span><em>path</em>, <em>info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/report.html#LiveReport.render_jsonp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.render_jsonp" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">render_jsonp</code><span class="sig-paren">(</span><em>func</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/report.html#LiveReport.render_jsonp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.render_jsonp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render a dictionary as a jsonp file.</p>
 <p>These files are suitable for loading from a local filesystem so they
 can be used for unhosted LiveReports that are just opened in a web
@@ -278,11 +280,17 @@ browser.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path at which to save the resulting jsonp file.</li>
-<li><strong>info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – An info dictionary as created by the mark_loadable_source
-function.</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the function that should be called when
+this jsonp file is loaded.</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – The dict object that we should dump.</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Encoded jsonp data that can be written to a file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)">bytes</a></p>
 </td>
 </tr>
 </tbody>
@@ -300,11 +308,11 @@ inside a data inside an installed package.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>package</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A dotted package name for the subpackage that
+<li><strong>package</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A dotted package name for the subpackage that
 contains folder, which should not have an __init__.py file</li>
-<li><strong>folder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the folder that contains the templates
+<li><strong>folder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the folder that contains the templates
 and is located in the installed subpackage specified by package.</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the template that we wish to load.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the template that we wish to load.</li>
 </ul>
 </td>
 </tr>
@@ -327,8 +335,8 @@ and is located in the installed subpackage specified by package.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>template_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The template that we wish to render.</li>
-<li><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – The variables that we wish to substitute
+<li><strong>template_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The template that we wish to render.</li>
+<li><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – The variables that we wish to substitute
 into the template.</li>
 </ul>
 </td>
@@ -336,7 +344,7 @@ into the template.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The rendered string template.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
 </td>
 </tr>
 </tbody>
@@ -345,31 +353,43 @@ into the template.</li>
 
 <dl class="method">
 <dt id="iotile_analytics.interactive.reports.report.LiveReport.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/report.html#LiveReport.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.run" title="Permalink to this definition">¶</a></dt>
+<code class="descname">run</code><span class="sig-paren">(</span><em>output_path</em>, <em>file_handler=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/interactive/reports/report.html#LiveReport.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.interactive.reports.report.LiveReport.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render this report to output_path.</p>
 <p>If this report is a standalone html file, the output path
 will have .html appended to it and be a single file.</p>
 <p>If this report is not standalone, the output will be
 folder that is created at output_path.</p>
-<p>If bundle is True and the report is not standalone, it will be zipped
-into a file at output_path.zip.  Any html or directory that was
-created as an intermediary before zipping will be deleted before this
-function returns.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the path to the folder that we wish
-to create.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>The path to the actual file or directory created.  This</dt>
-<dd>may differ from the file you pass in output_path by an
-extension or the addition of a subdirectory.</dd>
-</dl>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>output_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the path to the folder that we wish
+to create.</li>
+<li><strong>file_handler</strong> (<em>callable</em>) – <p>A function that will be given a filelike
+object for each file that this report generates as well as
+the relative path to that file.  If you override this function,
+it is your responsibility to save all of these files, otherwise
+no output will be generated.  The purpose of this argument is
+to allow for streaming these files to a remote server or some
+other action that is not just saving the data to a local disk.</p>
+<p>The default behavior is to just save to local disk, which happens
+if file_handler is None (the default value).</p>
+</li>
+</ul>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>The path to the actual file or directory created.  This</dt>
+<dd><p class="first last">may differ from the file you pass in output_path by an
+extension or the addition of a subdirectory.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -406,7 +426,7 @@ extension or the addition of a subdirectory.</dd>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -425,21 +445,14 @@ extension or the addition of a subdirectory.</dd>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

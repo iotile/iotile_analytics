@@ -168,12 +168,19 @@
 <span class="sd">    then it can take a parameter in its __init__ function named domain which will</span>
 <span class="sd">    be filled with the domain of the iotile.cloud server that it should ask for</span>
 <span class="sd">    additional information.</span>
+
+<span class="sd">    All AnalysisTemplate subclasses must announce in advance of being run</span>
+<span class="sd">    whether they produce one or multiple files by setting the standalone property</span>
+<span class="sd">    as appropriate.  The property defaults to True, which means only a single</span>
+<span class="sd">    file is produced, so it only needs to be overriden by subclasses that produce</span>
+<span class="sd">    multiple files.  The standalone property must be a class property, not an</span>
+<span class="sd">    instance property so that it can be inspected before the class is instantiated.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">standalone</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="sd">&quot;&quot;&quot;Whether running this AnalysisTemplate produces a single or multiple files.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AnalysisTemplate.run"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.analysis_template.html#iotile_analytics.interactive.reports.analysis_template.AnalysisTemplate.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+<div class="viewcode-block" id="AnalysisTemplate.run"><a class="viewcode-back" href="../../../../api/iotile_analytics.interactive.reports.analysis_template.html#iotile_analytics.interactive.reports.analysis_template.AnalysisTemplate.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">file_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run whatever analysis this class implements.</span>
 
 <span class="sd">        The analysis should be saved in the location specified by output_path.</span>
@@ -189,14 +196,30 @@
 <span class="sd">        important so that your caller can easily bundle your files into a zip</span>
 <span class="sd">        and remove the originals if necessary.</span>
 
-<span class="sd">        If output_path is None then you are expected to write your output to</span>
-<span class="sd">        stdout.  If that is not possible for the analysis you are performing,</span>
-<span class="sd">        e.g. you are creating multiple files, then you should raise</span>
-<span class="sd">        UsageError().</span>
+<span class="sd">        If output_path is None and file_handler is None then you are expected</span>
+<span class="sd">        to write your output to stdout.  If that is not possible for the</span>
+<span class="sd">        analysis you are performing, e.g. you are creating multiple files,</span>
+<span class="sd">        then you should raise UsageError().</span>
+
+<span class="sd">        If output_path is None but file_handler is not None then you are</span>
+<span class="sd">        expected to hand each of your produced files to file_handler in order</span>
+<span class="sd">        for it to save them appropriately.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            output_path (str): A location specifying where we should save the</span>
 <span class="sd">                output of the analysis.</span>
+<span class="sd">            file_handler (callable): A function that will be given a bytes</span>
+<span class="sd">                object for each file that this report generates as well as</span>
+<span class="sd">                the relative path to that file.  If you override this function,</span>
+<span class="sd">                it is your responsibility to save all of these files, otherwise</span>
+<span class="sd">                no output will be generated.  The purpose of this argument is</span>
+<span class="sd">                to allow for streaming these files to a remote server or some</span>
+<span class="sd">                other action that is not just saving the data to a local disk.</span>
+
+<span class="sd">                The default behavior is to just save to local disk, which happens</span>
+<span class="sd">                if file_handler is None (the default value).  The signature</span>
+<span class="sd">                of file_handler should be file_handler(path, contents) where</span>
+<span class="sd">                contents is a bytes object.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list(str): A list of all of the files generated during the running of this analysis.</span>
@@ -225,7 +248,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -244,21 +267,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

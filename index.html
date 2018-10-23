@@ -216,7 +216,7 @@ application.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ analytics-host --help
 usage: analytics-host [-h] [-v] [-u USER] [-n] [-p PASSWORD] [-o OUTPUT]
                       [-t TEMPLATE] [-s] [-a ARG] [-c] [-l] [-b] [-w]
-                      [--web-push-label WEB_PUSH_LABEL]
+                      [--unattended] [--web-push-label WEB_PUSH_LABEL]
                       [--web-push-slug WEB_PUSH_SLUG] [-d DOMAIN]
                       [analysis_group]
 
@@ -233,7 +233,7 @@ credentials, it can also run most analyses locally using predownloaded data
 that you have on your computer.
 
 The most up-to-date reference information is always available online at:
-http://iotile-analytics.readthedocs.io/en/latest/
+https://iotile.github.io/iotile_analytics/
 
 Most of the analysis templates included with analytics-host create interactive
 html web pages that embed graphs, controls and tables showing the results of
@@ -321,6 +321,8 @@ optional arguments:
   -l, --list            List all known analysis types without running one
   -b, --bundle          Bundle the rendered output into a zip file
   -w, --web-push        Push the resulting report to iotile.cloud.
+  --unattended          Hint that we are running as an unattended script to
+                        not print dynamic progress bars
   --web-push-label WEB_PUSH_LABEL
                         Set the label used when pushing a report to
                         iotile.cloud (otherwise you are prompted for it)
@@ -359,7 +361,7 @@ working examples immediately.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -378,21 +380,14 @@ working examples immediately.</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 

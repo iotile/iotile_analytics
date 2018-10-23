@@ -152,10 +152,14 @@
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span>
                         <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="k">import</span> <span class="n">interp1d</span>
 <span class="kn">from</span> <span class="nn">typedargs.exceptions</span> <span class="k">import</span> <span class="n">ArgumentError</span>
 <span class="kn">from</span> <span class="nn">.domain</span> <span class="k">import</span> <span class="n">combine_domains</span>
+
+
+<span class="n">EnvelopeState</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;EnvelopeState&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;mark&#39;</span><span class="p">])</span>
 
 
 <div class="viewcode-block" id="envelope"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.utilities.envelope.html#iotile_analytics.core.utilities.envelope.envelope">[docs]</a><span class="k">def</span> <span class="nf">envelope</span><span class="p">(</span><span class="o">*</span><span class="n">arrays</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -233,14 +237,12 @@
     <span class="n">nan_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">env_min</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">nan_index</span><span class="p">):</span>
         <span class="n">nonnan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">nan_index</span><span class="p">)</span>
-        <span class="n">min_interp</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="n">nonnan</span><span class="p">],</span> <span class="n">env_min</span><span class="p">[</span><span class="n">nonnan</span><span class="p">],</span> <span class="n">assume_sorted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">env_min</span><span class="p">[</span><span class="n">nan_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_interp</span><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="n">nan_index</span><span class="p">])</span>
+        <span class="n">env_min</span><span class="p">[</span><span class="n">nan_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="n">nan_index</span><span class="p">],</span> <span class="n">centers</span><span class="p">[</span><span class="n">nonnan</span><span class="p">],</span> <span class="n">env_min</span><span class="p">[</span><span class="n">nonnan</span><span class="p">])</span>
 
     <span class="n">nan_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">env_max</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">nan_index</span><span class="p">):</span>
         <span class="n">nonnan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">nan_index</span><span class="p">)</span>
-        <span class="n">max_interp</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="n">nonnan</span><span class="p">],</span> <span class="n">env_max</span><span class="p">[</span><span class="n">nonnan</span><span class="p">],</span> <span class="n">assume_sorted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">env_max</span><span class="p">[</span><span class="n">nan_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_interp</span><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="n">nan_index</span><span class="p">])</span>
+        <span class="n">env_max</span><span class="p">[</span><span class="n">nan_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="n">nan_index</span><span class="p">],</span> <span class="n">centers</span><span class="p">[</span><span class="n">nonnan</span><span class="p">],</span> <span class="n">env_max</span><span class="p">[</span><span class="n">nonnan</span><span class="p">])</span>
 
 
     <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">([</span><span class="n">num_bins</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
@@ -257,6 +259,140 @@
 
 
     <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="envelope_create"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.utilities.envelope.html#iotile_analytics.core.utilities.envelope.envelope_create">[docs]</a><span class="k">def</span> <span class="nf">envelope_create</span><span class="p">(</span><span class="n">min_x</span><span class="p">,</span> <span class="n">max_x</span><span class="p">,</span> <span class="n">bin_count</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">bin_spacing</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">bin_mark</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a uniform sampling envelope for a domain.</span>
+
+<span class="sd">    This function is used to start an incremental envelope accumulation</span>
+<span class="sd">    process.  For example, say you have 100 sampled functions and you want to</span>
+<span class="sd">    calculate the minimum and maximum values in a series of bins along the</span>
+<span class="sd">    domain.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        min_x (float): The minimum x value you are interested in.</span>
+<span class="sd">        max_x (float): The maximum x value you are interested in.</span>
+<span class="sd">        bin_count (int): An optional keyword argument that indicates the number of</span>
+<span class="sd">            bins to divde the domain into for envelope calculation.  Default: 100</span>
+<span class="sd">        bin_spacing (str): An optional keyword argument of either &#39;linear&#39; or &#39;log&#39;</span>
+<span class="sd">            to indicate whether the bins should be generated using.  Default: linear</span>
+<span class="sd">        bin_mark (str): How to return the bins that were used to calculate the</span>
+<span class="sd">            envelope.  Possible options are &quot;left&quot;, &quot;right&quot; or &quot;center&quot; causing the</span>
+<span class="sd">            first column of the output to contain the left edge, right edge or center</span>
+<span class="sd">            of each bin respectively. Default: &quot;center&quot;</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        EnvelopeState: an opaque structure that you can pass to envelope_update or envelope_finish.</span>
+
+<span class="sd">        This structure contains all information necessary for incrementally calculating</span>
+<span class="sd">        the envelope of a set of sampled functions without needing to have all of those</span>
+<span class="sd">        functions at once.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">bin_mark</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="s1">&#39;center&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Invalid bin_mark, must be left, right or center&quot;</span><span class="p">,</span> <span class="n">bin_mark</span><span class="o">=</span><span class="n">bin_mark</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">bin_spacing</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Invalid bin spacing, must be linear or log&quot;</span><span class="p">,</span> <span class="n">bin_spacing</span><span class="o">=</span><span class="n">bin_spacing</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">bin_count</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Invalid bin count, must be a positive number&quot;</span><span class="p">,</span> <span class="n">bin_count</span><span class="o">=</span><span class="n">bin_count</span><span class="p">)</span>
+
+    <span class="n">state_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">bin_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">bin_spacing</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+        <span class="n">state_array</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_x</span><span class="p">,</span> <span class="n">max_x</span><span class="p">,</span> <span class="n">bin_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">state_array</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="n">min_x</span><span class="p">,</span> <span class="n">max_x</span><span class="p">,</span> <span class="n">bin_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Make sure there are no roundoff errors so that every element in the</span>
+    <span class="c1"># envelope domain is contained inside the bins.</span>
+    <span class="n">state_array</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_x</span>
+    <span class="n">state_array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_x</span>
+
+    <span class="n">state_array</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">state_array</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="k">return</span> <span class="n">EnvelopeState</span><span class="p">(</span><span class="n">state_array</span><span class="p">,</span> <span class="n">bin_mark</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="envelope_update"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.utilities.envelope.html#iotile_analytics.core.utilities.envelope.envelope_update">[docs]</a><span class="k">def</span> <span class="nf">envelope_update</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update an envelope with a new array.</span>
+
+<span class="sd">    This function will update every bin in the envelope currently pointed to</span>
+<span class="sd">    by state with what was already there or the value in array.</span>
+
+<span class="sd">    This function must be called with `state` being the return value from a</span>
+<span class="sd">    previous call to envelope_create().</span>
+
+<span class="sd">    The `state` parameter is modified in place.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (EnvelopeState): Opaque envelope state created by a prior call</span>
+<span class="sd">            to envelope_create().</span>
+<span class="sd">        array (np.ndarray([N, 2])): An Nx2 array of x, y coordinates that will</span>
+<span class="sd">            be digitized and used to update the appropriate envelope buckets.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">EnvelopeState</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;You must pass an EnvelopeState object created by a prior call to envelope_create&quot;</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">)</span>
+
+    <span class="n">envelope</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">data</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">array</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">right</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">arr_i</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="n">arr_i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">envelope</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">envelope</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="n">envelope</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="n">envelope</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">envelope</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="n">envelope</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="n">envelope</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
+
+
+<div class="viewcode-block" id="envelope_finish"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.utilities.envelope.html#iotile_analytics.core.utilities.envelope.envelope_finish">[docs]</a><span class="k">def</span> <span class="nf">envelope_finish</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Finish calculating an envelope and return the result.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (EnvelopeState): Opaque envelope state created by a prior call</span>
+<span class="sd">            to envelope_create().</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray(N, 3): An Nx3 array with bin markers, minimum values and maximum values.</span>
+
+<span class="sd">        The choice of bin marker depends on what bin_mark argument was passed</span>
+<span class="sd">        when envelope_create was called and could be either the left edge of</span>
+<span class="sd">        the bin, the center of the bin or the right edge.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">EnvelopeState</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;You must pass an EnvelopeState object created by a prior call to envelope_create&quot;</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">)</span>
+
+    <span class="n">envelope</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="n">centers</span> <span class="o">=</span> <span class="p">(</span><span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">envelope</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+    <span class="c1"># Fill in empty gaps with interpolation in case there weren&#39;t any values</span>
+    <span class="c1"># in a given bucket.  We default to a simple linear interpolation</span>
+    <span class="n">nan_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">nan_index</span><span class="p">):</span>
+        <span class="n">nonnan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">nan_index</span><span class="p">)</span>
+        <span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">][</span><span class="n">nan_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="n">nan_index</span><span class="p">],</span> <span class="n">centers</span><span class="p">[</span><span class="n">nonnan</span><span class="p">],</span> <span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">][</span><span class="n">nonnan</span><span class="p">])</span>
+
+    <span class="n">nan_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">nan_index</span><span class="p">):</span>
+        <span class="n">nonnan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">nan_index</span><span class="p">)</span>
+        <span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">2</span><span class="p">][</span><span class="n">nan_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="n">nan_index</span><span class="p">],</span> <span class="n">centers</span><span class="p">[</span><span class="n">nonnan</span><span class="p">],</span> <span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">2</span><span class="p">][</span><span class="n">nonnan</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">mark</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
+        <span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">envelope</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">state</span><span class="o">.</span><span class="n">mark</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
+        <span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">centers</span>
+
+    <span class="k">return</span> <span class="n">envelope</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span></div>
 </pre></div>
 
            </div>
@@ -269,7 +405,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Arch Systems Inc..
+        &copy; Copyright 2018, Arch Systems Inc.
 
     </p>
   </div>
@@ -288,21 +424,14 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.1.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
