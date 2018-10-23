@@ -10,7 +10,7 @@ from typedargs.exceptions import ArgumentError
 from .domain import combine_domains
 
 
-EnvelopeState = namedtuple("_EnvelopeState", ['data', 'mark'])
+EnvelopeState = namedtuple("EnvelopeState", ['data', 'mark'])
 
 
 def envelope(*arrays, **kwargs):

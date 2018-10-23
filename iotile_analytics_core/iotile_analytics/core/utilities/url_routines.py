@@ -17,13 +17,12 @@ except ImportError:
     from urllib.parse import urlencode
 
 from future.utils import iteritems
-
 from typedargs.exceptions import ArgumentError
 
 
 RequestInfo = namedtuple("RequestInfo", ['url', 'query_string', 'request_key', 'headers', 'verify'])
 
-#pytest:disable=too-many-arguments;These are all necessary, have sane defaults and will not all need to be specified together.
+#pylint:disable=too-many-arguments;These are all necessary, have sane defaults and will not all need to be specified together.
 def pack_url(url, query_args=None, token=None, token_type="jwt", headers=None, verify=True, json=False):
     """Create a RequestInfo object for passing to {get, post}_url.
 
