@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.5.2
+
+- Pin bokeh to 0.12.16 until we make necessary changes to migrate to 1.0.0
+
 ## 0.5.1
 
 - Add support for passing an iotile.cloud token on the command line using 
