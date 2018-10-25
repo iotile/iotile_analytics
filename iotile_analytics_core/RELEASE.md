@@ -1,5 +1,10 @@
 # Release Notes
 
+## 0.5.2
+
+- Fix envelope_update function to properly handle readings that are out of 
+  the domain of the envelope being computed.
+
 ## 0.5.1
 
 - Properly suppress warning if you choose verify=False during testing to disable

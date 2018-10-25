@@ -193,7 +193,7 @@ def envelope_update(state, array):
     for arr_i, i in enumerate(indices):
         val = array[arr_i, 1]
 
-        if i == len(envelope):
+        if i == len(envelope) - 1:
             continue
 
         if np.isnan(envelope[i + 1, 2]) or val > envelope[i + 1, 2]:
