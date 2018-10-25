@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.5.2
+
+- Pin bokeh version until we are compatible with bokeh 1.0.0
+
 ## 0.5.1
 
 - Add support for passing an iotile.cloud token on the command line using 
