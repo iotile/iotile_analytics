@@ -118,3 +118,10 @@ def test_bin_edges():
     assert out2_left[:, 0] == pytest.approx(bins[:-1])
     assert out2_right[:, 0] == pytest.approx(bins[1:])
     assert out2_center[:, 0] == pytest.approx((bins[1:] + bins[:-1]) / 2.0)
+
+    # Make sure that data outside of the bins is rejected without error
+    state = envelope_create(x_vals[0], x_vals[-1], bin_count=10, bin_mark='left')
+    envelope_update(state, in1)
+    envelope_update(state, in2)
+    envelope_update(state, np.array([[11, 5]]))
+    out2_left = envelope_finish(state)
