@@ -47,7 +47,8 @@ class BaseViewer(object):
         if kwargs.get('tools') is None:
             kwargs['toolbar_location'] = None
 
-        self.figure = figure(x_axis_type=x_type, y_axis_type=y_type, logo=None, **kwargs)
+        self.figure = figure(x_axis_type=x_type, y_axis_type=y_type, **kwargs)
+        self.figure.toolbar.logo = None
         self._notebook_handle = None
         self._in_notebook = False
         self._default_y_name = y_name
