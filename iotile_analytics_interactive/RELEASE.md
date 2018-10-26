@@ -1,8 +1,8 @@
 # Release Notes
 
-## 0.5.2
+## 0.6.0
 
-- Pin bokeh version until we are compatible with bokeh 1.0.0
+- Update to bokeh 1.0.0.
 
 ## 0.5.1
 

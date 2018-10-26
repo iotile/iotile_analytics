@@ -12,7 +12,7 @@ setup(
     license="LGPLv3",
     install_requires=[
         "iotile-analytics-core >= 0.1.0",
-        "bokeh == 0.12.16"
+        "bokeh >= 1.0.0"
     ],
     entry_points={
         'console_scripts': ['analytics-host = iotile_analytics.interactive.scripts.analytics_host:cmdline_main'],
