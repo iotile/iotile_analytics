@@ -360,11 +360,6 @@ do choose to override the units, you must specify a units name that has a known
 conversion from the internal stream units.
 
 Parameters:
- - mdo (list(float)):
-   An optional MDO to use to convert the data stored in this stream.  If passed
-   this must be 3 float values that define a linear transformation of the data
-   stored in the stream. The values are interpreted as m/d*value + o where the
-   argument is specified as [m, d, o].
  - units (str):
    The desired units in which you want to see the data.  This must be defined as
    an available output unit on the stream.  If not passed, the default is to use
@@ -375,6 +370,11 @@ Parameters:
    pass a value like &#39;days&#39;, &#39;hours&#39;, &#39;weeks&#39;, &#39;months&#39;.  This will be given to
    TimeSelectViewer so any valid value there is acceptable here.  Defaults to
    days.
+ - mdo (list(float)):
+   An optional MDO to use to convert the data stored in this stream.  If passed
+   this must be 3 float values that define a linear transformation of the data
+   stored in the stream. The values are interpreted as m/d*value + o where the
+   argument is specified as [m, d, o].
  - stream (str):
    A unique identifier for the stream that we wish to download and display.
    This can be anything that could be passed to AnalysisGroup.fetch_stream
