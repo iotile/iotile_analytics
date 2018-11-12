@@ -195,7 +195,7 @@ class CloudSession(object):
                 each call.
             message (str): Optional descriptive message that is printed with the progress bar
             postprocess (callable): Optional callable function that will be called as:
-                postprocess(index, data, *postprocess_args[index]).  If postprocess_args is not
+                `postprocess(index, data, *postprocess_args[index])`.  If postprocess_args is not
                 None, it must be a sequence of tuples with the same length as resources.
             postprocess_args (list of tuples): Optional list of additional arguments to pass
                 to postprocess function.  If it is not None, it must be a list of tuples with
