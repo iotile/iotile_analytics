@@ -203,8 +203,8 @@ class AnalysisGroup(object):
                 can be a partial match to a full stream slug or name so long
                 as it uniquely matches.  This is passed to find_stream so anything
                 that find_stream accepts will be accepted here.
-            allow_empty (bool): Allow fetching an empty stream.  Otherwise an ArgumentError
-                will be raised if the target stream is empty.
+            allow_empty (bool): Allow fetching an empty stream.  If allow_empty is False or
+                not passed, an ArgumentError will be raised if the target stream is empty.
 
         Returns:
             StreamSeries: A pandas DataFrame subclass containing the data points as columns.
