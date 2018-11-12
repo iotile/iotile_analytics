@@ -378,6 +378,7 @@
             "id": 1,
             "stream": "s--0000-0077--0000-0000-0000-00d2--5001",
             "timestamp": "2016-06-23T10:58:31Z",
+            "has_raw_data": true,
             "extra_data": 
             {
                 "meta": "hello"
@@ -386,7 +387,8 @@
         {
             "id": 2,
             "stream": "s--0000-0077--0000-0000-0000-00d2--5001",
-            "timestamp": "2016-06-23T10:59:31Z",
+            "timestamp": null,
+            "has_raw_data": true,
             "extra_data": 
             {
                 "meta": "goodbye"

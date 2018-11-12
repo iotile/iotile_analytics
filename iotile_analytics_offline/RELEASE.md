@@ -1,5 +1,11 @@
 # Release Notes
 
+## 0.3.0
+
+- Add support for filtering raw events and change postprocess event signature
+  to include raw event data in case you need to filter raw events based on their
+  summary data.
+
 ## 0.2.3
 
 - Update compatibility with latest iotile-analytics-{core, interactive} changes
