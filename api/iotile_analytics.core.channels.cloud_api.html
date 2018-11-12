@@ -347,8 +347,10 @@ events for.</td>
 <dt id="iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_raw_events">
 <code class="descname">fetch_raw_events</code><span class="sig-paren">(</span><em>slug</em>, <em>postprocess=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/channels/cloud_api.html#IOTileCloudChannel.fetch_raw_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_raw_events" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch all raw event data for this stream.</p>
-<p>These are the raw json dictionaries that may be stored for
-each event.</p>
+<p>These are the raw json dictionaries that may be stored for each event.
+If you specify a postprocess function, you can filter out event
+entries by returning None from your postprocess function.  This will
+cause the correspond event to be removed from the returned DataFrame.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -359,8 +361,9 @@ raw events for.</li>
 <li><strong>postprocess</strong> (<em>callable</em>) – Function that should be applied to each
 raw event before adding to the dataframe.  This should
 take in a dict and return a dict.  The signature is
-postprocess(i, data) where i is the index of the row in
-the output dataframe.</li>
+postprocess(i, data, event) where i is the index of the row in
+the output dataframe, data is the raw event data and event is
+the summary event data.</li>
 </ul>
 </td>
 </tr>
@@ -475,7 +478,6 @@ the caching mode chosen.</li>
         <script type="text/javascript" src="../_static/jquery.js"></script>
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   

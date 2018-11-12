@@ -244,7 +244,7 @@ If valid, bypasses the user+password login, then proceeds as usual</li>
 
 <dl class="method">
 <dt id="iotile_analytics.core.session.CloudSession.fetch_multiple">
-<code class="descname">fetch_multiple</code><span class="sig-paren">(</span><em>resources</em>, <em>per_call_kw=None</em>, <em>postprocess=None</em>, <em>message=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/session.html#CloudSession.fetch_multiple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.session.CloudSession.fetch_multiple" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fetch_multiple</code><span class="sig-paren">(</span><em>resources</em>, <em>per_call_kw=None</em>, <em>postprocess=None</em>, <em>message=None</em>, <em>postprocess_args=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/session.html#CloudSession.fetch_multiple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.session.CloudSession.fetch_multiple" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch multiple resources in parallel.</p>
 <p>Up to concurrency max calls are in flight at a given time.  The results
 are returned in the same order as resources is passed.</p>
@@ -258,6 +258,12 @@ are returned in the same order as resources is passed.</p>
 for each fetch call.  For example, you could pass a custom filter argument for
 each call.</li>
 <li><strong>message</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional descriptive message that is printed with the progress bar</li>
+<li><strong>postprocess</strong> (<em>callable</em>) – Optional callable function that will be called as:
+<cite>postprocess(index, data, *postprocess_args[index])</cite>.  If postprocess_args is not
+None, it must be a sequence of tuples with the same length as resources.</li>
+<li><strong>postprocess_args</strong> (<em>list of tuples</em>) – Optional list of additional arguments to pass
+to postprocess function.  If it is not None, it must be a list of tuples with
+the same length as resources.</li>
 <li><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Additional keyword arguments that are passed as part of
 the query string in the get request.</li>
 </ul>
@@ -485,7 +491,6 @@ of fetch_events with the event_id key set or an id for an event as an integer.</
         <script type="text/javascript" src="../_static/jquery.js"></script>
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   

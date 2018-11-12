@@ -408,8 +408,9 @@ each event.</p>
 raw events for.</li>
 <li><strong>postprocess</strong> (<em>callable</em>) – (Optional) function to call on each raw event before
 adding it to the dataframe.  The signature should be:
-postprocess(i, data) where i is the row in the output dataframe and data
-is the raw data.</li>
+postprocess(i, data, event_summary) where i is the row in the output dataframe, data
+is the raw data and event_summary if the pandas series corresponding to the event
+as returned by fetch_events()</li>
 </ul>
 </td>
 </tr>
@@ -533,7 +534,6 @@ the caching mode chosen.</li>
         <script type="text/javascript" src="../_static/jquery.js"></script>
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   

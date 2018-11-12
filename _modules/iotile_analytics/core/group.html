@@ -335,7 +335,7 @@
 
         <span class="k">return</span> <span class="n">found</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="AnalysisGroup.fetch_stream"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.fetch_stream">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug_or_name</span><span class="p">):</span>
+<div class="viewcode-block" id="AnalysisGroup.fetch_stream"><a class="viewcode-back" href="../../../api/iotile_analytics.core.group.html#iotile_analytics.core.group.AnalysisGroup.fetch_stream">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug_or_name</span><span class="p">,</span> <span class="n">allow_empty</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fetch data from a stream by its slug or name.</span>
 
 <span class="sd">        For example say you have the following stream in this analysis project:</span>
@@ -352,13 +352,15 @@
 <span class="sd">                can be a partial match to a full stream slug or name so long</span>
 <span class="sd">                as it uniquely matches.  This is passed to find_stream so anything</span>
 <span class="sd">                that find_stream accepts will be accepted here.</span>
+<span class="sd">            allow_empty (bool): Allow fetching an empty stream.  If allow_empty is False or</span>
+<span class="sd">                not passed, an ArgumentError will be raised if the target stream is empty.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            StreamSeries: A pandas DataFrame subclass containing the data points as columns.</span>
 <span class="sd">                The index of the dataframe is time in UTC.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_stream</span><span class="p">(</span><span class="n">slug_or_name</span><span class="p">)</span>
+        <span class="n">slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_stream</span><span class="p">(</span><span class="n">slug_or_name</span><span class="p">,</span> <span class="n">include_empty</span><span class="o">=</span><span class="n">allow_empty</span><span class="p">)</span>
         <span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span>
         <span class="n">raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span><span class="o">.</span><span class="n">fetch_datapoints</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
 
@@ -380,8 +382,7 @@
 <span class="sd">        events in the stream.  It will return only the extra summary</span>
 <span class="sd">        data stored with the event itself however.  If you need access to</span>
 <span class="sd">        any raw data uploaded with the event that was not part of the</span>
-<span class="sd">        summary, you need to use fetch_event for each event to get</span>
-<span class="sd">        the raw data.</span>
+<span class="sd">        summary, you need to use fetch_raw_events.</span>
 
 <span class="sd">        slug_or_name is passed to find_stream to convert it into a slug so</span>
 <span class="sd">        partial stream names are accepted.</span>
@@ -420,11 +421,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">postprocess</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">postprocess</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+            <span class="n">postprocess</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">x</span>
 
         <span class="n">combined_postprocess</span> <span class="o">=</span> <span class="n">postprocess</span>
         <span class="k">if</span> <span class="n">subkey</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">combined_postprocess</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">postprocess</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">subkey</span><span class="p">])</span>
+            <span class="n">combined_postprocess</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">postprocess</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="n">subkey</span><span class="p">],</span> <span class="n">event</span><span class="p">)</span>
 
         <span class="n">slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_stream</span><span class="p">(</span><span class="n">slug_or_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span><span class="o">.</span><span class="n">fetch_raw_events</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="n">combined_postprocess</span><span class="p">)</span></div>
@@ -627,7 +628,6 @@
         <script type="text/javascript" src="../../../_static/jquery.js"></script>
         <script type="text/javascript" src="../../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   

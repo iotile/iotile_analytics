@@ -384,8 +384,10 @@
 <div class="viewcode-block" id="IOTileCloudChannel.fetch_raw_events"><a class="viewcode-back" href="../../../../api/iotile_analytics.core.channels.cloud_api.html#iotile_analytics.core.channels.cloud_api.IOTileCloudChannel.fetch_raw_events">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_raw_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fetch all raw event data for this stream.</span>
 
-<span class="sd">        These are the raw json dictionaries that may be stored for</span>
-<span class="sd">        each event.</span>
+<span class="sd">        These are the raw json dictionaries that may be stored for each event.</span>
+<span class="sd">        If you specify a postprocess function, you can filter out event</span>
+<span class="sd">        entries by returning None from your postprocess function.  This will</span>
+<span class="sd">        cause the correspond event to be removed from the returned DataFrame.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            slug (str): The slug of the stream that we should fetch</span>
@@ -393,8 +395,9 @@
 <span class="sd">            postprocess (callable): Function that should be applied to each</span>
 <span class="sd">                raw event before adding to the dataframe.  This should</span>
 <span class="sd">                take in a dict and return a dict.  The signature is</span>
-<span class="sd">                postprocess(i, data) where i is the index of the row in</span>
-<span class="sd">                the output dataframe.</span>
+<span class="sd">                postprocess(i, data, event) where i is the index of the row in</span>
+<span class="sd">                the output dataframe, data is the raw event data and event is</span>
+<span class="sd">                the summary event data.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            pd.DataFrame: All of the raw events.  This will be empty if</span>
@@ -411,12 +414,32 @@
         <span class="n">indexes</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">index</span>
         <span class="n">resources</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">new_index</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">postprocess_args</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">postprocess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">postprocess_args</span> <span class="o">=</span> <span class="p">[]</span>
+
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">event_ids</span><span class="p">)):</span>
             <span class="k">if</span> <span class="n">event_has_data</span><span class="p">[</span><span class="n">index</span><span class="p">]:</span>
                 <span class="n">resources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">event_ids</span><span class="p">[</span><span class="n">index</span><span class="p">])</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
                 <span class="n">new_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indexes</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
 
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_multiple</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="n">postprocess</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Downloading Raw Event Data&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">postprocess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">postprocess_args</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">events</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index</span><span class="p">],))</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session</span><span class="o">.</span><span class="n">fetch_multiple</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">postprocess</span><span class="o">=</span><span class="n">postprocess</span><span class="p">,</span> <span class="n">postprocess_args</span><span class="o">=</span><span class="n">postprocess_args</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Downloading Raw Event Data&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">postprocess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">to_remove</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">to_remove</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_remove</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">new_index</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_index</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_remove</span><span class="p">]</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_remove</span><span class="p">]</span>
+
         <span class="c1"># new_index includes all indexes with actual data</span>
         <span class="n">new_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">new_index</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">new_index</span><span class="p">)</span></div>
@@ -557,7 +580,6 @@
         <script type="text/javascript" src="../../../../_static/jquery.js"></script>
         <script type="text/javascript" src="../../../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   

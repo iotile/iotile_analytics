@@ -545,8 +545,9 @@
 <span class="sd">                raw events for.</span>
 <span class="sd">            postprocess (callable): (Optional) function to call on each raw event before</span>
 <span class="sd">                adding it to the dataframe.  The signature should be:</span>
-<span class="sd">                postprocess(i, data) where i is the row in the output dataframe and data</span>
-<span class="sd">                is the raw data.</span>
+<span class="sd">                postprocess(i, data, event_summary) where i is the row in the output dataframe, data</span>
+<span class="sd">                is the raw data and event_summary if the pandas series corresponding to the event</span>
+<span class="sd">                as returned by fetch_events()</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            pd.DataFrame: All of the raw events.</span>
@@ -557,15 +558,26 @@
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="s2">&quot;Stream slug not found in OfflineDatabase&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">)</span>
 
-        <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event_index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_events</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+        <span class="n">event_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_event_index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
         <span class="n">enc_event_data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">raw_events</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">event_data</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_decode_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">enc_event_data</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">postprocess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">event_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">postprocess</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">event_data</span><span class="p">)]</span>
+            <span class="n">event_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">postprocess</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">events</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">event_data</span><span class="p">)]</span>
 
-        <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">events</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">)</span>
+            <span class="n">to_remove</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">event_data</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">to_remove</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_remove</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">event_index</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">event_index</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_remove</span><span class="p">]</span>
+                <span class="n">event_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">event_data</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_remove</span><span class="p">]</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">event_index</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;ns&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">event_data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="OfflineDatabase.count_streams"><a class="viewcode-back" href="../../../api/iotile_analytics.offline.database.html#iotile_analytics.offline.database.OfflineDatabase.count_streams">[docs]</a>    <span class="k">def</span> <span class="nf">count_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slugs</span><span class="p">):</span>
@@ -684,7 +696,6 @@
         <script type="text/javascript" src="../../../_static/jquery.js"></script>
         <script type="text/javascript" src="../../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   

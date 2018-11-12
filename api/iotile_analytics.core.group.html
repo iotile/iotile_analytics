@@ -334,7 +334,7 @@ multiple streams.</p>
 
 <dl class="method">
 <dt id="iotile_analytics.core.group.AnalysisGroup.fetch_stream">
-<code class="descname">fetch_stream</code><span class="sig-paren">(</span><em>slug_or_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.fetch_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.fetch_stream" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fetch_stream</code><span class="sig-paren">(</span><em>slug_or_name</em>, <em>allow_empty=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iotile_analytics/core/group.html#AnalysisGroup.fetch_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#iotile_analytics.core.group.AnalysisGroup.fetch_stream" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch data from a stream by its slug or name.</p>
 <p>For example say you have the following stream in this analysis project:
 s–0000-0011–0000-0000-0000-0222–5001 (Temperature)</p>
@@ -352,18 +352,26 @@ s–0000-0011–0000-0000-0000-0222–5001 (Temperature)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slug_or_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The stream that we want to fetch.  This
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>slug_or_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The stream that we want to fetch.  This
 can be a partial match to a full stream slug or name so long
 as it uniquely matches.  This is passed to find_stream so anything
-that find_stream accepts will be accepted here.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>A pandas DataFrame subclass containing the data points as columns.</dt>
-<dd>The index of the dataframe is time in UTC.</dd>
-</dl>
+that find_stream accepts will be accepted here.</li>
+<li><strong>allow_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Allow fetching an empty stream.  If allow_empty is False or
+not passed, an ArgumentError will be raised if the target stream is empty.</li>
+</ul>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="iotile_analytics.core.stream_series.html#iotile_analytics.core.stream_series.StreamSeries" title="iotile_analytics.core.stream_series.StreamSeries">StreamSeries</a></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>A pandas DataFrame subclass containing the data points as columns.</dt>
+<dd><p class="first last">The index of the dataframe is time in UTC.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="iotile_analytics.core.stream_series.html#iotile_analytics.core.stream_series.StreamSeries" title="iotile_analytics.core.stream_series.StreamSeries">StreamSeries</a></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -377,8 +385,7 @@ that find_stream accepts will be accepted here.</td>
 events in the stream.  It will return only the extra summary
 data stored with the event itself however.  If you need access to
 any raw data uploaded with the event that was not part of the
-summary, you need to use fetch_event for each event to get
-the raw data.</p>
+summary, you need to use fetch_raw_events.</p>
 <p>slug_or_name is passed to find_stream to convert it into a slug so
 partial stream names are accepted.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -634,7 +641,6 @@ the caching mode chosen.</li>
         <script type="text/javascript" src="../_static/jquery.js"></script>
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 
   
