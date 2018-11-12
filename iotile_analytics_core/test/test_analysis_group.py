@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division,
 from builtins import *
 
 import pytest
+import pandas as pd
 from typedargs.exceptions import ArgumentError
 from iotile_analytics.core import CloudSession, AnalysisGroup
 from iotile_analytics.core.stream_series import StreamSeries
@@ -89,6 +90,17 @@ def test_stream_download(filter_group):
         data.convert('Test Unit')
 
 
+def test_empty_stream(filter_group):
+    """Make sure we can download an empty data stream."""
+
+    with pytest.raises(ArgumentError):
+        filter_group.fetch_stream('5003')
+
+    data = filter_group.fetch_stream('5003', allow_empty=True)
+    assert isinstance(data, StreamSeries)
+    assert len(data) == 0
+
+
 def test_invalid_stream(filter_group):
     """Make sure we raise the right error if we can't find a stream."""
 
@@ -112,6 +124,28 @@ def test_raw_events(filter_group):
     assert len(raw) == 2
     assert raw.iloc[0]['test'] == 1
     assert raw.iloc[1]['goodbye'] == 15.0
+
+
+def test_raw_events_postprocess(filter_group):
+    """Make sure we can postprocess with no arguments."""
+
+    def postprocess(i, raw, event):
+        assert event is not None
+        return raw
+
+    raw = filter_group.fetch_raw_events('5001', postprocess=postprocess)
+    assert len(raw) == 2
+
+
+def test_raw_events_filter(filter_group):
+    def postprocess(i, raw, event):
+        if pd.isna(event.name):
+            return None
+
+        return raw
+
+    raw = filter_group.fetch_raw_events('5001', postprocess=postprocess)
+    assert len(raw) == 1
 
 
 def test_channel_info(filter_group):

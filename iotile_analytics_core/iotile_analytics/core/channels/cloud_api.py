@@ -235,8 +235,10 @@ class IOTileCloudChannel(AnalysisGroupChannel):
     def fetch_raw_events(self, slug, postprocess=None):
         """Fetch all raw event data for this stream.
 
-        These are the raw json dictionaries that may be stored for
-        each event.
+        These are the raw json dictionaries that may be stored for each event.
+        If you specify a postprocess function, you can filter out event
+        entries by returning None from your postprocess function.  This will
+        cause the correspond event to be removed from the returned DataFrame.
 
         Args:
             slug (str): The slug of the stream that we should fetch
@@ -244,8 +246,9 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             postprocess (callable): Function that should be applied to each
                 raw event before adding to the dataframe.  This should
                 take in a dict and return a dict.  The signature is
-                postprocess(i, data) where i is the index of the row in
-                the output dataframe.
+                postprocess(i, data, event) where i is the index of the row in
+                the output dataframe, data is the raw event data and event is
+                the summary event data.
 
         Returns:
             pd.DataFrame: All of the raw events.  This will be empty if
@@ -262,12 +265,32 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         indexes = events.index
         resources = []
         new_index = []
+
+        postprocess_args = None
+        if postprocess is not None:
+            postprocess_args = []
+
         for index in range(len(event_ids)):
             if event_has_data[index]:
                 resources.append(self._api.event(event_ids[index]).data)
                 new_index.append(indexes[index])
 
-        data = self._session.fetch_multiple(resources, postprocess=postprocess, message="Downloading Raw Event Data")
+                if postprocess is not None:
+                    postprocess_args.append((events.iloc[index],))
+
+        data = self._session.fetch_multiple(resources, postprocess=postprocess, postprocess_args=postprocess_args, message="Downloading Raw Event Data")
+
+        if postprocess is not None:
+            to_remove = set()
+
+            for i, value in enumerate(data):
+                if value is None:
+                    to_remove.add(i)
+
+            if len(to_remove) > 0:
+                new_index = [x for i, x in enumerate(new_index) if i not in to_remove]
+                data = [x for i, x in enumerate(data) if i not in to_remove]
+
         # new_index includes all indexes with actual data
         new_index = pd.to_datetime(new_index)
         return pd.DataFrame(data, index=new_index)

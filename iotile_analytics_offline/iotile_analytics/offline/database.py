@@ -396,8 +396,9 @@ class OfflineDatabase(object):
                 raw events for.
             postprocess (callable): (Optional) function to call on each raw event before
                 adding it to the dataframe.  The signature should be:
-                postprocess(i, data) where i is the row in the output dataframe and data
-                is the raw data.
+                postprocess(i, data, event_summary) where i is the row in the output dataframe, data
+                is the raw data and event_summary if the pandas series corresponding to the event
+                as returned by fetch_events()
 
         Returns:
             pd.DataFrame: All of the raw events.
@@ -408,15 +409,26 @@ class OfflineDatabase(object):
         if name not in self._file.root.streams:
             raise ArgumentError("Stream slug not found in OfflineDatabase", slug=slug)
 
-        events = self._get_event_index(name)
+        events = self.fetch_events(slug)
+        event_index = self._get_event_index(name)
 
         enc_event_data = getattr(self._file.root.streams, name).raw_events.read()
         event_data = [self._decode_json(x) for x in enc_event_data]
 
         if postprocess is not None:
-            event_data = [postprocess(i, x) for i, x in enumerate(event_data)]
+            event_data = [postprocess(i, x, events.iloc[i]) for i, x in enumerate(event_data)]
 
-        index = pd.to_datetime([x['timestamp'] for x in events], unit='ns')
+            to_remove = set()
+
+            for i, value in enumerate(event_data):
+                if value is None:
+                    to_remove.add(i)
+
+            if len(to_remove) > 0:
+                event_index = [x for i, x in enumerate(event_index) if i not in to_remove]
+                event_data = [x for i, x in enumerate(event_data) if i not in to_remove]
+
+        index = pd.to_datetime([x['timestamp'] for x in event_index], unit='ns')
         return pd.DataFrame(event_data, index=index)
 
     def count_streams(self, slugs):

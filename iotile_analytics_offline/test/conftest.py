@@ -68,6 +68,7 @@ def database(group):
     definition = group.streams[slug]
     events = group.fetch_events(slug)
     raw_events = group.fetch_raw_events(slug)
+
     db.save_stream(slug, definition, data, events, raw_events)
 
     slug = group.find_stream('5002')

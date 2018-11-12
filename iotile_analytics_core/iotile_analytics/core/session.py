@@ -182,7 +182,7 @@ class CloudSession(object):
         except HttpClientError:
             return False
 
-    def fetch_multiple(self, resources, per_call_kw=None, postprocess=None, message=None, **kwargs):
+    def fetch_multiple(self, resources, per_call_kw=None, postprocess=None, message=None, postprocess_args=None, **kwargs):
         """Fetch multiple resources in parallel.
 
         Up to concurrency max calls are in flight at a given time.  The results
@@ -194,6 +194,12 @@ class CloudSession(object):
                 for each fetch call.  For example, you could pass a custom filter argument for
                 each call.
             message (str): Optional descriptive message that is printed with the progress bar
+            postprocess (callable): Optional callable function that will be called as:
+                postprocess(index, data, *postprocess_args[index]).  If postprocess_args is not
+                None, it must be a sequence of tuples with the same length as resources.
+            postprocess_args (list of tuples): Optional list of additional arguments to pass
+                to postprocess function.  If it is not None, it must be a list of tuples with
+                the same length as resources.
             **kwargs (str): Additional keyword arguments that are passed as part of
                 the query string in the get request.
 
@@ -207,9 +213,19 @@ class CloudSession(object):
         if len(per_call_kw) != len(resources):
             raise ArgumentError("You must pass the same number of per_call keyword arguments as resources (or none at all)", fetch_length=len(resources), kw_length=len(per_call_kw))
 
+        if postprocess is None and postprocess_args is not None:
+            raise ArgumentError("You can only pass postprocess_args if you pass a postprocess function", postprocess_args=postprocess_args)
+
+        if postprocess_args is not None and len(postprocess_args) != len(resources):
+            raise ArgumentError("If you pass postprocess_args, it must be a sequence with the same length as resources",
+                                fetch_length=len(resources), postprocess_args_length=len(postprocess_args))
+
+        if postprocess_args is None:
+            postprocess_args = [tuple() for x in range(0, len(resources))]
+
         try:
             with ProgressBar(total=len(resources), message=message, leave=False) as progbar:
-                args = [(x, _merge_dicts(per_call_kw[i], kwargs), progbar, postprocess, i) for i, x in enumerate(resources)]
+                args = [(x, _merge_dicts(per_call_kw[i], kwargs), progbar, postprocess, i, postprocess_args[i]) for i, x in enumerate(resources)]
                 wrapped_results = self.pool.map(self._resource_fetcher, args)
 
                 failed = [err for result, err in wrapped_results if err is not None]
@@ -357,7 +373,7 @@ class CloudSession(object):
             raise self._translate_error(err, msg="Error fetching resource from IOTile.cloud", url=resource.url())
 
     def _resource_fetcher(self, args):
-        resource, kwargs, progress, postprocess, i = args
+        resource, kwargs, progress, postprocess, i, postprocess_args = args
 
         try:
             request = pack_url(resource.url(), kwargs, token=self.token, token_type=self.token_type, verify=self.verify)
@@ -368,7 +384,7 @@ class CloudSession(object):
                 self._cache_result(request.request_key, result)
 
             if postprocess is not None:
-                result = postprocess(i, result)
+                result = postprocess(i, result, *postprocess_args)
 
             progress.update(1)
             return result, None

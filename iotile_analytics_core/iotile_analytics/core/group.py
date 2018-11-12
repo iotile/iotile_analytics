@@ -186,7 +186,7 @@ class AnalysisGroup(object):
 
         return found[0]
 
-    def fetch_stream(self, slug_or_name):
+    def fetch_stream(self, slug_or_name, allow_empty=False):
         """Fetch data from a stream by its slug or name.
 
         For example say you have the following stream in this analysis project:
@@ -203,13 +203,15 @@ class AnalysisGroup(object):
                 can be a partial match to a full stream slug or name so long
                 as it uniquely matches.  This is passed to find_stream so anything
                 that find_stream accepts will be accepted here.
+            allow_empty (bool): Allow fetching an empty stream.  Otherwise an ArgumentError
+                will be raised if the target stream is empty.
 
         Returns:
             StreamSeries: A pandas DataFrame subclass containing the data points as columns.
                 The index of the dataframe is time in UTC.
         """
 
-        slug = self.find_stream(slug_or_name)
+        slug = self.find_stream(slug_or_name, include_empty=allow_empty)
         stream = self.streams[slug]
         raw = self._channel.fetch_datapoints(slug)
 
@@ -231,8 +233,7 @@ class AnalysisGroup(object):
         events in the stream.  It will return only the extra summary
         data stored with the event itself however.  If you need access to
         any raw data uploaded with the event that was not part of the
-        summary, you need to use fetch_event for each event to get
-        the raw data.
+        summary, you need to use fetch_raw_events.
 
         slug_or_name is passed to find_stream to convert it into a slug so
         partial stream names are accepted.
@@ -271,11 +272,11 @@ class AnalysisGroup(object):
         """
 
         if postprocess is None:
-            postprocess = lambda i, x: x
+            postprocess = lambda i, x, event: x
 
         combined_postprocess = postprocess
         if subkey is not None:
-            combined_postprocess = lambda i, x: postprocess(i, x[subkey])
+            combined_postprocess = lambda i, x, event: postprocess(i, x[subkey], event)
 
         slug = self.find_stream(slug_or_name)
         return self._channel.fetch_raw_events(slug, postprocess=combined_postprocess)

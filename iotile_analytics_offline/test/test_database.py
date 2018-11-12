@@ -2,6 +2,7 @@
 
 import pytest
 import numpy as np
+import pandas as pd
 from iotile_analytics.offline import OfflineDatabase
 from typedargs.exceptions import ArgumentError
 
@@ -76,3 +77,32 @@ def test_get_data(group, database):
 
     assert len(events5002) == 0
     assert len(grp5002) == 0
+
+
+def test_postprocess_events(group, database):
+    """Make sure we can filter and postprocess events."""
+
+    slug5001 = 's--0000-0077--0000-0000-0000-00d2--5001'
+
+    def _postprocess(i, raw, event):
+        print(event)
+
+        if pd.isna(event.name):
+            return None
+
+        return raw
+
+    events5001 = database.fetch_raw_events(slug5001, postprocess=_postprocess)
+    grp5001 = group.fetch_raw_events(slug5001, postprocess=_postprocess)
+
+    print("Start result")
+    print(events5001)
+
+    print("Start group")
+    print(grp5001)
+
+    del events5001['goodbye']
+
+    assert len(events5001) == 1
+    assert np.all(events5001.values == grp5001.values)
+    assert np.allclose(grp5001.index.astype('int64'), events5001.index.astype('int64'))

@@ -1,5 +1,11 @@
 # Release Notes
 
+## 0.6.0
+
+- Add support for passing event summary Series to postprocess function in
+  AnalysisGroup.fetch_raw_events and allow the function to return None, 
+  indicating that the event should be filtered out.
+
 ## 0.5.2
 
 - Fix envelope_update function to properly handle readings that are out of 
