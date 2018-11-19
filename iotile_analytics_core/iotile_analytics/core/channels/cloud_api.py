@@ -315,7 +315,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         use_data_api = False
 
         with ProgressBar(1, "Fetching %s" % slug, leave=False) as prog:
-            raw_data = self._api.df.get(filter=slug, format='csv')
+            raw_data = self._api.df.get(filter=slug, format='csv', mask=1)
 
             str_data = raw_data.decode('utf-8')
             rows = str_data.splitlines()
