@@ -1,5 +1,10 @@
 # Release Notes
 
+## 0.6.1
+
+- Properly support data masks when querying for data points.  Previously, only
+  events respected data masks.
+
 ## 0.6.0
 
 - Add support for passing event summary Series to postprocess function in
