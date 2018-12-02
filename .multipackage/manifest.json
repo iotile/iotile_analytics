@@ -47,6 +47,10 @@
         "hash": "MD5:4F35A577E80AC25F8004E252BBCF047B",
         "hash_type": "line"
     },
+    ".multipackage/scripts/test_by_name.py": {
+        "hash": "MD5:86DA473596C33B73DEF7322297A3C737",
+        "hash_type": "line"
+    },
     ".multipackage/settings.json": {
         "hash": "MD5:BF84893D6BE02F767F5E148802B44010",
         "hash_type": "json"
@@ -56,7 +60,7 @@
         "hash_type": "line"
     },
     ".travis.yml": {
-        "hash": "MD5:6C8293FDD3453905A62FAE6A26F5B6C6",
+        "hash": "MD5:BBB28E37A7DBBA7F5E093335AEFD6F30",
         "hash_type": "line"
     },
     "doc/_template/module.rst": {
