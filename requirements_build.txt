@@ -9,3 +9,4 @@ pylint ~= 1.9
 tox
 pytest-localserver
 pytest-logging
+pyopenssl
