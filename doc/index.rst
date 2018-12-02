@@ -41,6 +41,7 @@ any other details, try the :ref:`quickstart-label`.
   overview
   quickstart
   api
+  release
 
 
 Prerequisites

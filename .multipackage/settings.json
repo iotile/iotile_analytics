@@ -1,0 +1,19 @@
+{
+    "options": {
+        "test_matrix": {
+            "platforms": [
+                "macos",
+                "windows",
+                "linux"
+            ],
+            "python_versions": [
+                "2.7",
+                "3.6"
+            ]
+        }
+    },
+    "template": "pypi_package",
+    "version": "0.1",
+    "name": "IOTile Analytics",
+    "author": "Arch Systems Inc."
+}

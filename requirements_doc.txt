@@ -1,8 +1,7 @@
-bokeh >= 1.0.0
-sphinx >= 1.7.2
-twine==1.11.0
-better-apidoc
-pandas
-scipy
-numpy
-sphinxcontrib-programoutput
+#BEGIN MULTIPACKAGE MANAGED SECTION, HASH=MD5:0227389671ECF6F51A0469FE69926ABD
+sphinx ~= 1.8
+jinja2 ~= 2.10
+recommonmark ~= 0.4
+sphinx_rtd_theme ~= 0.4
+sphinxcontrib-programoutput ~= 0.11
+#END MULTIPACKAGE MANAGED SECTION

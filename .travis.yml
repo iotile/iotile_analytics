@@ -1,42 +1,105 @@
-language: python
-cache: 
-  pip: true
-sudo: false
-python:
-- '2.7'
-- '3.6'
-- '3.5'
-matrix:
+jobs:
   include:
-  - python: 3.6
-    env: TRAVIS_BUILD_DOCS=1
-install:
-- pip install --upgrade tox-travis -r requirements_build.txt
-script:
-- if [[ "$TRAVIS_BUILD_DOCS" != "1" ]]; then tox; fi
-- if [[ "$TRAVIS_BUILD_DOCS" == "1" ]]; then tox -e docs; fi
+    - stage: Test
+      os: osx
+      language: sh
+      python: "3.6"
+      name: "Mac OS - Python 3.6"
+      addons:
+        homebrew:
+          packages:
+            - python3
+      before_install:
+        - python3 -m pip install --upgrade pip wheel virtualenv
+        - virtualenv venv -p python3
+        - source venv/bin/activate
+        - python --version
+    - os: osx
+      language: sh
+      python: "2.7"
+      name: "Mac OS - Python 2.7"
+      before_install:
+        - python -m pip install virtualenv
+        - virtualenv venv -p python2
+        - source venv/bin/activate
+        - python --version
+    - os: windows
+      language: sh
+      python: "3.6"
+      name: "Windows - Python 3.6"
+      before_install:
+        - choco install python3 --version 3.6.5
+        - export PATH="/c/Python36:/c/Python36/Scripts:$PATH"
+        - python -m pip install --upgrade pip wheel virtualenv
+        - python --version
+    - os: windows
+      language: sh
+      python: "2.7"
+      name: "Windows - Python 2.7"
+      before_install:
+        - choco install python2
+        - export PATH="/c/Python27:/c/Python27/Scripts:$PATH"
+        - python -m pip install --upgrade pip wheel
+        - python --version
+    - os: linux
+      dist: xenial
+      python: "3.6"
+      language: python
+      name: "Linux - Python 3.6"
+    - os: linux
+      dist: xenial
+      python: "2.7"
+      name: "Linux - Python 2.7"
+      language: python
 
-deploy:
-  - provider: script
-    skip_cleanup: true
-    script: python scripts/release.py $TRAVIS_TAG
-    on:
-      branch: master
-      tags: true
-      condition: $TRAVIS_PYTHON_VERSION = "2.7"
-  - provider: pages
-    skip-cleanup: true
-    github-token: $GITHUB_TOKEN
-    committer-from-gh: true
-    keep-history: true
-    local-dir: built_docs
-    on:
-      branch: master
-      condition: $TRAVIS_BUILD_DOCS = "1"
+    - stage: "Deploy"
+      if: branch = master AND type != pull_request
+      script: python .multipackage/scripts/build_documentation.py
+      os: linux
+      dist: xenial
+      python: "3.6"
+      language: python
+      name: "Documentation to Github Pages"
+      deploy:
+        - provider: pages
+          skip-cleanup: true
+          github-token: $GITHUB_TOKEN
+          committer-from-gh: true
+          keep-history: true
+          local-dir: built_docs
+      env:
+        - secure: gfoAtLu+tZekSrg2HPe8Ycp6Ul8I7GIwmgUcUA9yk1H7xArRA+yAWGcAfVzXAFr1C/Oe00WAUxkzCdPGacsEwPQ9PAQXe2f9dzOVVgvOQMCnkQ9WgswtyvMQnSyaiKGXtTPP8e9V6TIpEclSpOm/7oaVWuYiW5eHpl0tNuNob9Flv8OZgPu68pfJ/E5cJhskyYDeJA0oyWjobfAVZqxC2iktmlVxBULwhexi2ul88+ZxcaCalUwPFbiB41zPq1NPdvr99Yd031uOAf7imZswlUvzXsFdeNJYaIxIpqBASA5em0+k7dNa62VO3szFickr0tsu4+w2KR42Ma9jobGgAQ5eb9uJLnMsjX5fV1oLDTdL3ggOkrQu0Q62f9Zgf/wxk0N+UbnuiTgxP1Lwn+ckfzXeYlv+xkYyxm3CLg0LaNFfGXb9FOZpv6R2AsaHkGrwNBtIKVTAehJQunTGz1Pvgb/PsqHi/ZlRUnGe12H6lsQgqSQQYRuB8NRCVj3F5ZLlc9OUm/jYL1aCZxxrHY8TEZZ7IyvuG41JGdee6sK9KJ8BTpqj8lkvY9cc2fKxkEl0SJpm47Q0yEt9HPCtguT/R8XJ3IS/2GW42whhnJduSl6Km1chDk2pll5a4/VPIxsrCo/aY3E7Zp8cq5WJG+ftDj3mvRYkS16n9E9pakcFm0c=
+    - stage: "Deploy"
+      if: tag IS present
+      script: python .multipackage/scripts/release_by_name.py $TRAVIS_TAG
+      os: linux
+      dist: xenial
+      python: "3.6"
+      language: python
+      name: "Release to PyPI Index"
+      env:
+        - secure: VtDTbxqJmVp6+A6nDnyzArlkWC0NEwCJo5JLZZbk1mHqt1W5t24TnRaCGgKTmSlasmAe6wU8R4WpnbDTFvq3L5c+atX06n5NkVwEhWvd62JbaDsbsjfRVY6Q7MeSADtDaby6WlOdsIWCcoeN1zL7Ve9sh9xFEeC4m3043sNDVbdFf/3tFeyf9AO8pfeidKXnDkIyXWEhMiUdA2unknNWjS6GvI+Z/lvYu00A232KQHq/RApNCnBBb34ozIHp8/I4DqgWZ8J9v2FKDOXtu0akHOpn4SrZHU19hzxcPXV8izA9TVwI48Ue4Z1We5yzq3vJ6K7eU+k9KvVUsiCRYeAH01jBowIsZ+TjNdHWBWUZONW1mJNEdgKeDUi6WFwndLAzREdSxxZnV0IN9r2+2Z4zCW3+4kBzY9oCPL9HF4yyz4NA1ku281Re5++/R3mplMFr/f4frKSuuTnnWrcfgMtynnB7d+tpdsFgdCE4MYyPe6VWQsoSXhCNhP5fOJvHzCWFTafxZvPK1Z/4kkUB1GvRpsz/L1CE59uPo5TG3EXKrxug+KHEZbHtIBTGfEAQkvJ8LLDNt8LjMIcnBqWKbVGtj57mQlrhJoQbWylDHmUgw0jTNwOIrmS6KBGiJ136k7F3bQjdIY9pqcquG1XlPKPiF1FFtbZ+7GwG1SuyTbBUG5Y=
+        - secure: IMXlWc5v4LLtTBuQTRqmBN+z3awCt+d36wfMgjs1WO+lqc9NKB9EydjTEBBlxD1S5Q2AspqO6OV/azmOkrAIZCjFeV8jJm6E/rYyIDxhuSAolbNmrqrHOqnnjdLqVV8XYROPELp5b4jpijWMerR2QSdJ4B9crbBNmajV83RmjyiFuCECSjTo7JLw1uEEvLvXRsS1l0mRiw2oigo9hIE0QZLMMS0DfKTTme+ZQ8vRyXiyTTuGU1uLRa0FsSCavFXVJwuQUzzVlVUHrw8nDnUZmlxRq/ws51lZytO4J1/BSeP0O36ca2vPKWUPkmlbij5jJJNRaMIHrInUyFX8PC5uTyThgZ4aTgBMlmF6wbEXDbD6rRZgIUccAv1teoh+0wa2LYEjquEKLDtmUrTQL+kctMTVPq3WnSF8N4NftnMO+3gy/WS9DJXETF1ZBOuTZp1CHUGahQcuwj6Dp5TF1JcWQK/ix8Z3hf02MHaFduysOp7ev2MDeYjBvVl1MtLPOghV31vDcbzJZh0y1tkGpNPiniycLVmPuoVVmUdYU5jfFO0Ednrx1A6J4XWcuxGlBfErSlUHZORGTydrJiwUWgjGite6Yb8vfCSV2ipOf29aXZWUsfMCAod0zxz5FpoQLwViQjwD2U6jMP1UjUVUqoGOp95P3gfs7cwLw2yVDTDxM6g=
+        - secure: tXCyzQBWvNBzuoriiejPVIz23sqzs+Kk5NfNaFNFZe0dQ0ORIvZLN63T60kvpmHBrNgB/tjD7U+vulel5655ZWdOzWotkdaZWzS6Ww9ceuBsdtp/hKX69Ex0PN1iHZTFK5b7ckDSAWVnK/2G3+5B0rxoZ1ndp5Nzo1C2yK7Cvf90aPhxXP/gWxbuC1LNhWx49GGhy+qIopOlCcTHU0Fa2F0dT1aqLCl733XiG+FnRaArJslLCkhZbb2Dpizke1J/5cI+HZQBK3pAz4Reuiz0F72pKozQVzjvCFB/t5R0n9zQOgEOJPrdEmtZh+59D73NIB7rt0KAvIdnYbRmD2eavtlK4E8vPJluN2/XhlvfS2jYl93svaNeGupQaB8bbgxYoMW7DN4nzGln/CMqv4BNqUDD6EABXSHXi+5ega6Xfs2F7twh0SxUW2ftT0DObHeJ7n66roQ3ymkedDqf9zYTTcGj4p+irkV5ACXJPda4dD9NQ8od07huAnMRy3m2Fl4CtEQ5zArnVrTXSePJFDrEGryRYvHhE5jC82n2BYfluV6xsxX9lBlCZ/MTh7B1aOz3uk0O99yzV5eHO/IKgIgI4rp8FyQlDz2czRKYdbTvmdy0WiziaKCl2TZW51Rtg+vRpQIKmldzww7/n2vc0nzKRL3rmQuGqcDD7vVZymeHi68=
+
+install:
+- pip install -r requirements_build.txt -r requirements_doc.txt
+- pip install ./iotile_analytics_core
+- pip install ./iotile_analytics_interactive
+- pip install ./iotile_analytics_offline
+
+script:
+- cd ./iotile_analytics_core && pwd && pytest test
+- cd ./iotile_analytics_interactive && pwd && pytest test
+- cd ./iotile_analytics_offline && pwd && pytest test
+- python .multipackage/scripts/build_documentation.py
 
 notifications:
-  on_success: always
-  on_failure: always
   email: false
   slack:
-    secure: Dvy6Gg/6XHNsfG5T6o4uvTVsxxzdpfMczpP71bZ5Q5JA4s7OjI4+OIAXc7UOb03TQL8HyLG4SF96osbvUVakg9fe3NbwcC1bxI6aNufCN5JDbKAjh0pAndugAoDX+m1sMZDcov3XqiMms+QHDQT2ecS4PgTGSNTLoIxnIXeya2dSJOxKYk1DzAugR124we5PGb3cZo/PatxRTGStbFtfhXHKy984wdMXXUGEu0M+ZLDrafcPL9emywd+8aUmc1gg5e6WrnCEuXhwEHe+P5Rre3//0BaqtGjT2yuwLz8IaFksYX9cLIEyMlrhteL6d1sillUiNLTRAhRdv7PLDxlaLDXI0Yn0y3TR2Y2erXf5tsOIoC8cKnjpO8TJ47LkceTde+z+Byz48dII8KNmu2LicaLv2NUGI+EMKkZdVk3Z5PdEGtKALs0wsBbdEZZcrUioP0dXSgIC/bDMVZtEGHaZyeNj9+MxyYKSJfAYuDg/KQN39hVsR7DZu6T+WB4wIwSEth4GSI5GcVvXi8FB6IGUolxTOzI6cRxlc4LG0AKN20OJyNrRlaqYNH2WNqtAdtHUWaLDMPzGz/a0A35cqr9I1PkiXKAAm+G/IheSq4bszNYtMFzEJcsVetWvuNCcOCJ+xlsVDi3VHWjo9QFOoAPAWHvOdq1vHQiV0codiwH55Bg=
+    rooms:
+    - secure: wAIW5+s3L13jCooYTpfKEoffvdbZfjABb4eoLrf73ML3hJuhj/eO7FygzPiTyj4ju4W0FVwiA7mN4zbz7EwDcMm+FIjUDQ0VnI0d6QxzgRxpLQ/zxgPs5SlnsfJLIiRwXFrOYo5WyJgoy2TNHfWQ+Yu0+gyspVI88dhcbYTQgV+02wtXZG3vDVdbEOLtBkSZ5dodNLuLfpT+fmS4dth9LTA26CO+yLU5ijlgjkPNHLIA1m/7CXmQQDDWgysLzYtzia2OajMXdSi5cfgVytw4anV5Sk3nq5sFotL86hNJdsYjKUcxyUVQ70Ody0yAbMEUmD8nT3ceBYEZ7UaJ36RCq+OGnfOHJU7RnaxPFfRc2NEJ/Dwy/NMgu1i7Y+R6ebbRdwYJYPSRWab0BNW+C/KikW/Sl3nDx+iWCeZHBKVPjivsvObRaAXQdRx0CqfFCQwc/3OLyWR+eu2MglXUesulymGuD5G0463nitXQk4OlVcELZKjK9Zl1Yj/vtLrYXb0nz85WTm+vSzaV3OwbcFLyNlJH83fhLtdRMjw/aXujvqun2p/XaBXnqB9o2r/QzQA+6zP5tnTKySi1J+ukieMgI8yUfoyXd+8eESOwwcmoHRiFOL1hE9H6HUdgcnDWAvo+D6e75gnamHkXcDA/1I2BOJjCfBJh2C/hh/lQUXV78eo=
+    template:
+    - "Build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) of %{repository_slug}@%{branch} in PR <%{pull_request_url}|#%{pull_request_number}> by %{author} %{result} in %{elapsed_time}"
+    on_success: always
+    on_failure: always
