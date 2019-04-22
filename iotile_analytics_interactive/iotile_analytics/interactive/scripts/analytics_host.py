@@ -121,7 +121,7 @@ def build_args():
     parser.add_argument('--web-push-slug', type=str, default=None, help="Override the source slug given in the analysisgroup and force it to be this")
     parser.add_argument('--token', type=str, default=None, help="Token for authentication to iotile cloud (instead of a password)")
     parser.add_argument('-d', '--domain', default=DOMAIN_NAME, help="Domain to use for remote queries, defaults to https://iotile.cloud")
-    parser.add_argument('analysis_group', default=None, nargs='+', help="The slug or path of the object you want to perform analysis on")
+    parser.add_argument('analysis_group', default=None, nargs='*', help="The slug or path of the object you want to perform analysis on")
 
     return parser
 
