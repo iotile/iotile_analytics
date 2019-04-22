@@ -121,7 +121,7 @@ def build_args():
     parser.add_argument('--web-push-slug', type=str, default=None, help="Override the source slug given in the analysisgroup and force it to be this")
     parser.add_argument('--token', type=str, default=None, help="Token for authentication to iotile cloud (instead of a password)")
     parser.add_argument('-d', '--domain', default=DOMAIN_NAME, help="Domain to use for remote queries, defaults to https://iotile.cloud")
-    parser.add_argument('analysis_group', default=None, nargs='?', help="The slug or path of the object you want to perform analysis on")
+    parser.add_argument('analysis_group', default=None, nargs='+', help="The slug or path of the object you want to perform analysis on")
 
     return parser
 
@@ -214,6 +214,21 @@ def print_report_details(report):
     except ValidationError:
         print("Error parsing docstring for report.")
 
+def find_analysis_groups(args):
+    """Parse through the list of options for analysis_group and build a list"""
+    all_groups = []
+    all_logins = True
+
+    groups = args.analysis_group
+    for _group in groups:
+        logged_in, group = find_analysis_group(_group)
+        all_groups.append(group)
+        all_logins = all_logins and logged_in
+
+    if len(all_groups) == 1:
+        return all_logins, all_groups[0]
+
+    return all_logins, all_groups
 
 def find_analysis_group(args):
     """Find an analysis group by name."""
@@ -337,6 +352,11 @@ def build_file_handler(output_path, standalone, bundle, web_push, label, group, 
     if label is None:
         label = input("Enter a label for the report: ")
 
+
+    # if there are multiple AnalysisGroup, push to the first one by default
+    if isinstance(group, list):
+        group = group[0]
+
     if slug is None and group is not None:
         slug = group.source_info.get('slug')
 
@@ -422,7 +442,7 @@ def main(argv=None):
         return 0
 
     report_args = split_args(args.arg)
-    logged_in, group = find_analysis_group(args)
+    logged_in, group = find_analysis_groups(args)
 
 
     check_arguments(report_obj, report_args, confirm=not args.no_confirm)
