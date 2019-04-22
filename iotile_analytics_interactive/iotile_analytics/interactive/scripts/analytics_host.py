@@ -216,12 +216,12 @@ def print_report_details(report):
 
 def find_analysis_groups(args):
     """Parse through the list of options for analysis_group and build a list"""
+    groups = args.analysis_group
+
     all_groups = []
     all_logins = True
-
-    groups = args.analysis_group
     for _group in groups:
-        logged_in, group = find_analysis_group(_group)
+        logged_in, group = find_analysis_group(args, _group)
         all_groups.append(group)
         all_logins = all_logins and logged_in
 
@@ -230,10 +230,10 @@ def find_analysis_groups(args):
 
     return all_logins, all_groups
 
-def find_analysis_group(args):
+def find_analysis_group(args, group_in):
     """Find an analysis group by name."""
 
-    group = args.analysis_group
+    group = group_in
     is_cloud = False
 
     if group.startswith('d--'):
