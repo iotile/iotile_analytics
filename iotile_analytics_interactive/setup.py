@@ -17,6 +17,7 @@ setup(
     entry_points={
         'console_scripts': ['analytics-host = iotile_analytics.interactive.scripts.analytics_host:cmdline_main'],
         'iotile_analytics.live_report': ['basic_info = iotile_analytics.interactive.reports.info_report:SourceInfoReport',
+                                         'multiple_source_info = iotile_analytics.interactive.reports.multiple_source_info:MultipleSourceInfoReport',
                                          'stream_overview = iotile_analytics.interactive.reports.stream_report:StreamOverviewReport']
     },
     include_package_data=True,
