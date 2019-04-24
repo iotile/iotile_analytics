@@ -49,7 +49,7 @@ MULTIPLE_SOURCES_ARCHIVE = (
 "-----------\n"
 "block                          1\n"
 "created_by                     tim\n"
-"created_on                     2017-10-27T21:23:36.710544Z\n"
+"created_on                     2017-10-27T21:23:36Z\n"
 "description                    Test archive for analysis purposes\n"
 "id                             25\n"
 "org                            arch-internal\n"
@@ -90,7 +90,7 @@ MULTIPLE_SOURCES_ARCHIVE = (
 "-----------\n"
 "block                          1\n"
 "created_by                     tim\n"
-"created_on                     2017-10-27T21:23:36.710544Z\n"
+"created_on                     2017-10-27T21:23:36Z\n"
 "description                    Test archive for analysis purposes\n"
 "id                             25\n"
 "org                            arch-internal\n"
@@ -126,7 +126,7 @@ MULTIPLE_SOURCES_ARCHIVE = (
 "System No                      1\n"
 "Transport Type                 Air\n"
 "TransportType                  AIR/AIR TRUCK\n"
-"TripID                         31\n"
+"TripID                         31"
 )
 
 
