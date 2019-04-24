@@ -290,7 +290,3 @@ def test_multiple_analysis_group_inputs(shipping, capsys):
     retval = main(['-t', 'multiple_source_info', slug1, slug2, '-d', domain, '--no-verify', '-c'])
     assert retval == 0
 
-    out, err = capsys.readouterr()
-
-    assert out == MULTIPLE_SOURCES_ARCHIVE
-
