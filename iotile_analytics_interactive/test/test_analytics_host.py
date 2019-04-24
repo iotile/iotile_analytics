@@ -44,6 +44,92 @@ DEVICE_DATA = (
 "----------\n")
 
 
+MULTIPLE_SOURCES_ARCHIVE = (
+"Source Info\n"
+"-----------\n"
+"block                          1\n"
+"created_by                     tim\n"
+"created_on                     2017-10-27T21:23:36Z\n"
+"description                    Test archive for analysis purposes\n"
+"id                             25\n"
+"org                            arch-internal\n"
+"pid\n"
+"sg                             saver-v1-0-0\n"
+"slug                           b--0001-0000-0000-04e7\n"
+"title                          Archive: Test Saver Device (04e7)\n\n"
+"Properties\n"
+"----------\n"
+"CargoDescription               S.O 80287\n"
+"Country                        USA\n"
+"Customer                       Test Customer\n"
+"LoadingType                    7310037\n"
+"Message                        Ship Date:06/23/2016\n"
+"                               PAL:1206-40\n"
+"                               Test Calibration:03/29/2018\n"
+"                               C3684\n"
+"Notes                          Ship Date:06/23/2016\n"
+"                               PAL:1206-40\n"
+"                               Test Calibration:03/29/2018\n"
+"                               C3684\n"
+"Product/Tool Type              Big Box\n"
+"ProjectID                      TP\n"
+"Region                         A\n"
+"S/N                            0540-949\n"
+"Sales Order No                 15\n"
+"Ship From                      America\n"
+"Ship To                        The World\n"
+"Ship Via                       Fedex\n"
+"ShipFrom                       KLA ISRAEL\n"
+"ShipTo                         SMNC\n"
+"ShipVia                        AIR/AIR TRUCK\n"
+"System No                      1\n"
+"Transport Type                 Air\n"
+"TransportType                  AIR/AIR TRUCK\n"
+"TripID                         31\n"
+"Source Info\n"
+"-----------\n"
+"block                          1\n"
+"created_by                     tim\n"
+"created_on                     2017-10-27T21:23:36Z\n"
+"description                    Test archive for analysis purposes\n"
+"id                             25\n"
+"org                            arch-internal\n"
+"pid\n"
+"sg                             saver-v1-0-0\n"
+"slug                           b--0001-0000-0000-04e7\n"
+"title                          Archive: Test Saver Device (04e7)\n\n"
+"Properties\n"
+"----------\n"
+"CargoDescription               S.O 80287\n"
+"Country                        USA\n"
+"Customer                       Test Customer\n"
+"LoadingType                    7310037\n"
+"Message                        Ship Date:06/23/2016\n"
+"                               PAL:1206-40\n"
+"                               Test Calibration:03/29/2018\n"
+"                               C3684\n"
+"Notes                          Ship Date:06/23/2016\n"
+"                               PAL:1206-40\n"
+"                               Test Calibration:03/29/2018\n"
+"                               C3684\n"
+"Product/Tool Type              Big Box\n"
+"ProjectID                      TP\n"
+"Region                         A\n"
+"S/N                            0540-949\n"
+"Sales Order No                 15\n"
+"Ship From                      America\n"
+"Ship To                        The World\n"
+"Ship Via                       Fedex\n"
+"ShipFrom                       KLA ISRAEL\n"
+"ShipTo                         SMNC\n"
+"ShipVia                        AIR/AIR TRUCK\n"
+"System No                      1\n"
+"Transport Type                 Air\n"
+"TransportType                  AIR/AIR TRUCK\n"
+"TripID                         31"
+)
+
+
 def test_info_report_archive_stdout(shipping, capsys):
     """Make sure we can render info to stdout from an archive."""
 
@@ -192,3 +278,15 @@ def test_rendering_report(water_meter, tmpdir):
 
     retval = main(['-t', 'stream_overview', slug, '-d', domain, '--no-verify', '-o', str(tmpdir.join('report')), '-c', '-a', 'stream=%s' % stream])
     assert retval == 0
+
+def test_multiple_analysis_group_inputs(shipping, capsys):
+    """Test whether we pass multiple slugs as arguments to AnalysisTemplate"""
+
+    domain, _cloud = shipping
+    slug1 = 'b--0001-0000-0000-04e7'
+    slug2 = 'b--0001-0000-0000-04e7'
+
+    CloudSession(user='test@arch-iot.com', password='test', domain=domain, verify=False)
+    retval = main(['-t', 'multiple_source_info', slug1, slug2, '-d', domain, '--no-verify', '-c'])
+    assert retval == 0
+
