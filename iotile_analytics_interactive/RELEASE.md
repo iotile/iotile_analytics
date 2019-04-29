@@ -1,5 +1,10 @@
 # Release Notes
 
+## 0.6.1
+
+- Update to `analytics-host` command line program to support multiple 
+  AnalysisGroup options to analytics report templates
+
 ## 0.6.0
 
 - Update to bokeh 1.0.0.
