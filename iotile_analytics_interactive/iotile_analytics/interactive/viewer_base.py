@@ -220,7 +220,7 @@ class BaseViewer(object):
 
         return np.linspace(0, len(input_data) - 1, len(input_data)), np.array(input_data)
 
-    def add_series(self, data, x_data=None, size=None, name=None, alpha_with_line=None, label=None, mark='line', x_name='x', y_name='y', y_axis=None, color=None, bar_width=0.1):
+    def add_series(self, data, x_data=None, size=None, name=None, alpha_with_line=None, label=None, mark='line', x_name='x', y_name='y', y_axis=None, color=None, bar_width=0.1, line_width=None):
         """Add a new line to the plot.
 
         This function does not clear the data that is already there so it
@@ -255,6 +255,7 @@ class BaseViewer(object):
             mark (str): The type of mark to add.  Valid types strings are:
                 line, scatter, bars
             bar_width (int): For bar marks, the width of the bars.
+            line_width (int): For line plot, the width of the line to be used.
             color (str): Explicitly set the color of this line to the color
                 specified.  This overrides any default color that might be set
                 based on the y_axis that is used.
@@ -301,6 +302,9 @@ class BaseViewer(object):
             kwargs['legend'] = label
 
         if mark == 'line':
+            if line_width is not None:
+                kwargs['line_width'] = line_width
+
             render = self.figure.line(x=x_name, y=y_name, name=name, source=source, **kwargs)
         else:
             if alpha_with_line is not None:
