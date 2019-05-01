@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.6.2
+
+- Minor enhancement to BaseViewer for line plots
+
 ## 0.6.1
 
 - Update to `analytics-host` command line program to support multiple 
