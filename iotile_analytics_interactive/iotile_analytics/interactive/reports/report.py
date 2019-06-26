@@ -308,7 +308,8 @@ class LiveReport(AnalysisTemplate, AnalyticsObject):
                 'before_content': self.before_content,
                 'after_content': self.after_content,
                 'footer': self.footer,
-                'extra_scripts': self.extra_scripts
+                'extra_scripts': self.extra_scripts,
+                'extra_css': self.extra_css
             }
 
             # This does not return unicode on python 2 so we need to massage it
