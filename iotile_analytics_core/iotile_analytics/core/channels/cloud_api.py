@@ -295,7 +295,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         new_index = pd.to_datetime(new_index)
         return pd.DataFrame(data, index=new_index)
 
-    def fetch_datapoints(self, slug):
+    def fetch_datapoints(self, slug, start=None, end=None):
         """Fetch all data points for this stream.
 
         These are time, value data pairs stored in the stream. Internal
@@ -307,6 +307,12 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             slug (str): The slug of the stream that we should fetch
                 raw data points for.
 
+            start (str): A datetime compatible string representing start time
+                for datapoint fetch
+
+            end (str): A datetime compatible string representing end time for
+                datapoint fetch
+
         Returns:
             StreamSeries: A data fame with internal value as floating
                 point data.
@@ -314,8 +320,25 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
         use_data_api = False
 
+        if (start and not isinstance(start, str)) or (end and not isinstance(end, str)):
+            raise ArgumentError("Unsupported type for start or end time specification", start=start,
+                                end=end, type_start=type(start), type_end=type(end))
+
+        if start:
+            start_utc = self._convert_to_datetime(start)
+
+        if end:
+            end_utc = self._convert_to_datetime(end)
+
         with ProgressBar(1, "Fetching %s" % slug, leave=False) as prog:
-            raw_data = self._api.df.get(filter=slug, format='csv', mask=1)
+            if start and end:
+                raw_data = self._api.df.get(filter=slug, format='csv', mask=1, start=start_utc, end=end_utc)
+            elif start and (end is None):
+                raw_data = self._api.df.get(filter=slug, format='csv', mask=1, start=start_utc)
+            elif end and (start is None):
+                raw_data = self._api.df.get(filter=slug, format='csv', mask=1, end=end_utc)
+            else:
+                raw_data = self._api.df.get(filter=slug, format='csv', mask=1)
 
             str_data = raw_data.decode('utf-8')
             rows = str_data.splitlines()
@@ -394,3 +417,8 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             self._session.enable_cache = True
         else:
             self._session.enable_cache = False
+
+    @staticmethod
+    def _convert_to_datetime(ts):
+        """Convert timestamp to iso format UTC timestamp"""
+        return ts
