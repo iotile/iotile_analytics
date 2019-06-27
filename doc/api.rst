@@ -6,6 +6,6 @@ API Reference
 .. toctree::
   :hidden:
 
-  api/iotile_analytics.core
-  api/iotile_analytics.offline
-  api/iotile_analytics.interactive
+  api/iotile_analytics.core 
+  api/iotile_analytics.interactive 
+  api/iotile_analytics.offline 

@@ -1,3 +1,14 @@
+#BEGIN MULTIPACKAGE MANAGED SECTION, HASH=MD5:DD4A3F46668F31EC3670C332E2F5EAC5
+workspace/
+*.egg-info/
+dist/*
+__pycache__
+*.pyc
+.pytest_cache/
+build/*
+.tmp_docs
+built_docs
+#END MULTIPACKAGE MANAGED SECTION
 # Linting and workspace related code
 workspace/*
 

@@ -1,8 +1,12 @@
+#BEGIN MULTIPACKAGE MANAGED SECTION, HASH=MD5:03D7A168016D82B507BB05422B9B9323
+requests ~= 2.20
+twine ~= 1.12
+pycryptodome ~= 3.7
+pytest ~= 4.0
+wheel >= 0.32
+pylint ~= 1.9
+#END MULTIPACKAGE MANAGED SECTION
 tox
-setuptools>=30.2.0
-wheel
-pip
-twine==1.11.0
-requests >= 2.4.2
-cmdln >= 2.0.0
-pytest
+pytest-localserver
+pytest-logging
+pyopenssl
