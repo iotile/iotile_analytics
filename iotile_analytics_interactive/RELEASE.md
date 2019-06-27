@@ -1,5 +1,10 @@
 # Release Notes
 
+## 0.6.3
+
+- Minor bug fixes to address `extra_css` support in LiveReport
+- Arch website URL updated in LiveReport
+
 ## 0.6.2
 
 - Minor enhancement to BaseViewer for line plots
