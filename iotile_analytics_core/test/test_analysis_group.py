@@ -4,6 +4,8 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from builtins import *
 
+from datetime import datetime
+
 import pytest
 import pandas as pd
 from typedargs.exceptions import ArgumentError
@@ -173,3 +175,18 @@ def test_hidden_streams(filter_group, with_system):
 
     data = withsys_group.fetch_stream('5c00')
     assert len(data) == 4
+
+
+def test_stream_download_with_timerange(filter_group):
+    """Make sure we can download streams from an analysis group with a given time range."""
+
+    now = datetime.now()
+
+    data = filter_group.fetch_stream('5001', start=now, end=now)
+    assert len(data) == 0
+
+    assert isinstance(data, StreamSeries)
+    assert set(data.available_units) == set(['Liters', 'Gallons', 'Cubic Meters', 'Acre Feet'])
+
+    outL = data.convert('Liters')
+    outG = data.convert('Gallons')

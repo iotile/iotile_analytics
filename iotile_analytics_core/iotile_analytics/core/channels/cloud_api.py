@@ -330,16 +330,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
         with ProgressBar(1, "Fetching %s" % slug, leave=False) as prog:
             if range_payload:
-                if range_payload.get('start') and range_payload.get('end'):
-                    raw_data = self._api.df.get(filter=slug, format='csv', mask=1,
-                                                start=range_payload.get('start'),
-                                                end=range_payload.get('end'))
-                elif range_payload.get('start'):
-                    raw_data = self._api.df.get(filter=slug, format='csv', mask=1,
-                                                start=range_payload.get('start'))
-                elif range_payload.get('end'):
-                    raw_data = self._api.df.get(filter=slug, format='csv', mask=1,
-                                                end=range_payload.get('end'))
+                raw_data = self._api.df.get(filter=slug, format='csv', mask=1, **range_payload)
             else:
                 raw_data = self._api.df.get(filter=slug, format='csv', mask=1)
 
