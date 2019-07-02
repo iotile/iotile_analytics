@@ -6,6 +6,8 @@ from builtins import *
 from future.utils import viewitems
 
 import pandas as pd
+from datetime import datetime
+
 from iotile_cloud.api.exceptions import RestHttpBaseException
 from typedargs.exceptions import ArgumentError
 from .channel import AnalysisGroupChannel, ChannelCaching
@@ -13,7 +15,6 @@ from ..session import CloudSession
 from ..interaction import ProgressBar
 from ..stream_series import StreamSeries
 from ..exceptions import CloudError
-
 
 class IOTileCloudChannel(AnalysisGroupChannel):
     """An AnalysisGroupChannel that fetches data from IOTile.cloud
@@ -321,20 +322,24 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
         use_data_api = False
 
-        if (start and not isinstance(start, str)) or (end and not isinstance(end, str)):
-            raise ArgumentError("Unsupported type for start or end time specification", start=start,
-                                end=end, type_start=type(start), type_end=type(end))
-
         range_payload = {}
-        if start or end:
-            if start:
-                range_payload['start'] = start
-            if end:
-                range_payload['end'] = end
+        if start is not None:
+            range_payload['start'] = start
+        if end is not None:
+            range_payload['end'] = end
 
         with ProgressBar(1, "Fetching %s" % slug, leave=False) as prog:
             if range_payload:
-                raw_data = self._api.df.get(filter=slug, format='csv', mask=1, **range_payload)
+                if range_payload.get('start') and range_payload.get('end'):
+                    raw_data = self._api.df.get(filter=slug, format='csv', mask=1,
+                                                start=range_payload.get('start'),
+                                                end=range_payload.get('end'))
+                elif range_payload.get('start'):
+                    raw_data = self._api.df.get(filter=slug, format='csv', mask=1,
+                                                start=range_payload.get('start'))
+                elif range_payload.get('end'):
+                    raw_data = self._api.df.get(filter=slug, format='csv', mask=1,
+                                                end=range_payload.get('end'))
             else:
                 raw_data = self._api.df.get(filter=slug, format='csv', mask=1)
 
