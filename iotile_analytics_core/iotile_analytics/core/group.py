@@ -19,7 +19,7 @@ from typedargs.exceptions import ArgumentError
 from .exceptions import CloudError
 from .session import CloudSession
 from .channels import IOTileCloudChannel
-from utilities import get_utc_ts
+from .utilities import get_utc_ts
 
 
 class AnalysisGroup(object):
