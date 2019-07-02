@@ -228,7 +228,7 @@ class AnalysisGroup(object):
                 The index of the dataframe is time in UTC.
         """
 
-        slug = self.find_stream(include_empty=allow_empty)
+        slug = self.find_stream(slug_or_name, include_empty=allow_empty)
         stream = self.streams[slug]
         raw = self._channel.fetch_datapoints(slug, start=get_utc_ts(start), end=get_utc_ts(end))
 
