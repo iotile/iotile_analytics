@@ -303,15 +303,16 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         pandas Series subclass with additional functionality to support unit
         conversion.
 
+        Optional start and end times can be provided as argument to this method,
+        which are then passed to the appropriate data resource.
+
         Args:
             slug (str): The slug of the stream that we should fetch
                 raw data points for.
 
-            start (str): A datetime compatible string representing start time
-                for datapoint fetch
+            start (str): Start time for datapoint fetch in UTC
 
-            end (str): A datetime compatible string representing end time for
-                datapoint fetch
+            end (str): End time for datapoint fetch in UTC
 
         Returns:
             StreamSeries: A data fame with internal value as floating
@@ -324,19 +325,16 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             raise ArgumentError("Unsupported type for start or end time specification", start=start,
                                 end=end, type_start=type(start), type_end=type(end))
 
-        if start:
-            start_utc = self._convert_to_datetime(start)
-
-        if end:
-            end_utc = self._convert_to_datetime(end)
+        range_payload = {}
+        if start or end:
+            if start:
+                range_payload['start'] = start
+            if end:
+                range_payload['end'] = end
 
         with ProgressBar(1, "Fetching %s" % slug, leave=False) as prog:
-            if start and end:
-                raw_data = self._api.df.get(filter=slug, format='csv', mask=1, start=start_utc, end=end_utc)
-            elif start and (end is None):
-                raw_data = self._api.df.get(filter=slug, format='csv', mask=1, start=start_utc)
-            elif end and (start is None):
-                raw_data = self._api.df.get(filter=slug, format='csv', mask=1, end=end_utc)
+            if range_payload:
+                raw_data = self._api.df.get(filter=slug, format='csv', mask=1, **range_payload)
             else:
                 raw_data = self._api.df.get(filter=slug, format='csv', mask=1)
 
@@ -357,7 +355,8 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             return StreamSeries([float(x[1]) for x in data], index=dt_index)
 
         resource = self._api.data
-        raw_json = self._session.fetch_all(resource, page_size=10000, message="Downloading Data", filter=slug, mask=1)
+        raw_json = self._session.fetch_all(resource, page_size=10000, message="Downloading Data",
+                                           filter=slug, mask=1, **range_payload)
 
         dt_index = pd.to_datetime([x['timestamp'] for x in raw_json])
         data = [x['int_value'] for x in raw_json]
