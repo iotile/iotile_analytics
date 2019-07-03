@@ -19,6 +19,7 @@ from typedargs.exceptions import ArgumentError
 from .exceptions import CloudError
 from .session import CloudSession
 from .channels import IOTileCloudChannel
+from .utilities import get_utc_ts
 
 
 class AnalysisGroup(object):
@@ -186,7 +187,7 @@ class AnalysisGroup(object):
 
         return found[0]
 
-    def fetch_stream(self, slug_or_name, allow_empty=False):
+    def fetch_stream(self, slug_or_name, allow_empty=False, start=None, end=None):
         """Fetch data from a stream by its slug or name.
 
         For example say you have the following stream in this analysis project:
@@ -198,6 +199,16 @@ class AnalysisGroup(object):
          - Temperature
          - s--0000-0011--0000-0000-0000-0222--5001
 
+        This method also supports fetching entries between specific start and end timestamps.
+        By default the start and end values set by this method are None. If either of the
+        options is ommitted, then the fetched stream entries are bound only by the other option.
+
+        If both the options are specified, then they are first converted to valid
+        ISO formatted datetime strings in UTC, and then passed to the data APIs for querying.
+
+        If the string represented timestamps are not datetime compatible, then an appropriate
+        error is thrown.
+
         Args:
             slug_or_name (str): The stream that we want to fetch.  This
                 can be a partial match to a full stream slug or name so long
@@ -206,6 +217,12 @@ class AnalysisGroup(object):
             allow_empty (bool): Allow fetching an empty stream.  If allow_empty is False or
                 not passed, an ArgumentError will be raised if the target stream is empty.
 
+            start (str or datetime): A string or a datetime representing the start time for
+            datapoint fetch. If not specified, this defaults to None
+
+            end (str or datetime): A string or a datetime representing the end time for datapoint
+            fetch. If not specified, this defaults to None
+
         Returns:
             StreamSeries: A pandas DataFrame subclass containing the data points as columns.
                 The index of the dataframe is time in UTC.
@@ -213,7 +230,7 @@ class AnalysisGroup(object):
 
         slug = self.find_stream(slug_or_name, include_empty=allow_empty)
         stream = self.streams[slug]
-        raw = self._channel.fetch_datapoints(slug)
+        raw = self._channel.fetch_datapoints(slug, start=get_utc_ts(start), end=get_utc_ts(end))
 
         if stream is not None:
             raw.set_stream(stream)

@@ -6,6 +6,8 @@ from builtins import *
 from future.utils import viewitems
 
 import pandas as pd
+from datetime import datetime
+
 from iotile_cloud.api.exceptions import RestHttpBaseException
 from typedargs.exceptions import ArgumentError
 from .channel import AnalysisGroupChannel, ChannelCaching
@@ -13,7 +15,6 @@ from ..session import CloudSession
 from ..interaction import ProgressBar
 from ..stream_series import StreamSeries
 from ..exceptions import CloudError
-
 
 class IOTileCloudChannel(AnalysisGroupChannel):
     """An AnalysisGroupChannel that fetches data from IOTile.cloud
@@ -295,7 +296,7 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         new_index = pd.to_datetime(new_index)
         return pd.DataFrame(data, index=new_index)
 
-    def fetch_datapoints(self, slug):
+    def fetch_datapoints(self, slug, start=None, end=None):
         """Fetch all data points for this stream.
 
         These are time, value data pairs stored in the stream. Internal
@@ -303,9 +304,16 @@ class IOTileCloudChannel(AnalysisGroupChannel):
         pandas Series subclass with additional functionality to support unit
         conversion.
 
+        Optional start and end times can be provided as argument to this method,
+        which are then passed to the appropriate data resource.
+
         Args:
             slug (str): The slug of the stream that we should fetch
                 raw data points for.
+
+            start (str): Start time for datapoint fetch in UTC
+
+            end (str): End time for datapoint fetch in UTC
 
         Returns:
             StreamSeries: A data fame with internal value as floating
@@ -314,8 +322,17 @@ class IOTileCloudChannel(AnalysisGroupChannel):
 
         use_data_api = False
 
+        range_payload = {}
+        if start is not None:
+            range_payload['start'] = start
+        if end is not None:
+            range_payload['end'] = end
+
         with ProgressBar(1, "Fetching %s" % slug, leave=False) as prog:
-            raw_data = self._api.df.get(filter=slug, format='csv', mask=1)
+            if range_payload:
+                raw_data = self._api.df.get(filter=slug, format='csv', mask=1, **range_payload)
+            else:
+                raw_data = self._api.df.get(filter=slug, format='csv', mask=1)
 
             str_data = raw_data.decode('utf-8')
             rows = str_data.splitlines()
@@ -334,7 +351,8 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             return StreamSeries([float(x[1]) for x in data], index=dt_index)
 
         resource = self._api.data
-        raw_json = self._session.fetch_all(resource, page_size=10000, message="Downloading Data", filter=slug, mask=1)
+        raw_json = self._session.fetch_all(resource, page_size=10000, message="Downloading Data",
+                                           filter=slug, mask=1, **range_payload)
 
         dt_index = pd.to_datetime([x['timestamp'] for x in raw_json])
         data = [x['int_value'] for x in raw_json]
@@ -394,3 +412,8 @@ class IOTileCloudChannel(AnalysisGroupChannel):
             self._session.enable_cache = True
         else:
             self._session.enable_cache = False
+
+    @staticmethod
+    def _convert_to_datetime(ts):
+        """Convert timestamp to iso format UTC timestamp"""
+        return ts
